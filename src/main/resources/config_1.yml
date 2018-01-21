@@ -98,6 +98,7 @@ preferences:
     render_entities: false
     spawn_random_monsters: true
     spawn_limit: 10
+    no_coords: false
     no_creative_condense: false
     vortex_fall: kill
 # desktop theme
