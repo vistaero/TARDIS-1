@@ -4,7 +4,10 @@
 1. Fix bugs!
 
 ## Next version `4.0-beta-1`
-1. Update to Minecraft/Spigot 1.13 _started_
+1. Update to Minecraft/Spigot 1.13 - _started_
+   * Update ARS records at first run - _started_
+   * Update configs - _started_
+   * Tidy up database creation (remove unused fields where necessary)
 2. Add glazed terracotta chameleon presets?
 3. Fix Biome adaptive presets dropping flowers & seeds (properly)
 
@@ -42,7 +45,7 @@
 * Use WorldGuard region data
 
 ## Waiting on Bukkit / SpigotAPI
-0. IDs/data are soon to be history... so convert all ID/data use to block data _started_ 
+0. IDs/data are soon to be history... so convert all ID/data use to block data - _started_ 
 1. Get/set horse speed (Attribute API)
 
 ## Minecraft API if ever available

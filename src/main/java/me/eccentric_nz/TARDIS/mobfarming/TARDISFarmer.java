@@ -262,7 +262,6 @@ public class TARDISFarmer {
                             horsetotal++;
                             break;
                         case LLAMA:
-                            // TODO make a Llama room
                             Tameable ll_brokenin = (Tameable) e;
                             Llama llama = (Llama) e;
                             // if horse has a passenger, eject them!
