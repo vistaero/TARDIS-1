@@ -161,15 +161,6 @@ public class TARDISChameleonConstructorListener extends TARDISMenuListener imple
                                     break;
                                 case 5:
                                     // abort
-                                    // drop any user placed items in the inventory
-                                    for (int s = 18; s < 54; s++) {
-                                        if (s != 26 && s != 43 && s != 52) {
-                                            ItemStack userStack = inv.getItem(s);
-                                            if (userStack != null) {
-                                                player.getWorld().dropItemNaturally(player.getLocation(), userStack);
-                                            }
-                                        }
-                                    }
                                     close(player);
                                     break;
                                 case 7:
@@ -201,6 +192,9 @@ public class TARDISChameleonConstructorListener extends TARDISMenuListener imple
                                                 Material type = d.getType();
                                                 if ((!plugin.getConfig().getBoolean("allow.all_blocks") && precious.contains(type)) || type.equals(Material.CARPET)) {
                                                     TARDISMessage.send(player, "CHAM_NOT_CUSTOM");
+                                                    // return items
+                                                    player.getWorld().dropItemNaturally(player.getLocation(), d);
+                                                    inv.clear(s + c);
                                                     return;
                                                 }
                                                 int tid = d.getTypeId();
@@ -364,7 +358,10 @@ public class TARDISChameleonConstructorListener extends TARDISMenuListener imple
         TARDISMessage.send(player, "CHAM_SET", ChatColor.AQUA + "Construct");
         // rebuild
         player.performCommand("tardis rebuild");
-        close(player);
+        plugin.getTrackerKeeper().getConstructors().remove(player.getUniqueId());
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            close(player);
+        }, 2L);
         // damage the circuit if configured
         if (plugin.getConfig().getBoolean("circuits.damage") && !plugin.getDifficulty().equals(DIFFICULTY.EASY) && plugin.getConfig().getInt("circuits.uses.chameleon") > 0) {
             TARDISCircuitChecker tcc = new TARDISCircuitChecker(plugin, id);
