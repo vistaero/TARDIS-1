@@ -872,6 +872,11 @@ public class TARDIS extends JavaPlugin {
 
     private void checkTCG() {
         if (getConfig().getBoolean("creation.create_worlds")) {
+            if (getConfig().getBoolean("abandon.enabled")) {
+                getConfig().set("abandon.enabled", false);
+                saveConfig();
+                console.sendMessage(pluginName + ChatColor.RED + "Abandoned TARDISes were disabled as create_worlds is true!");
+            }
             if (getConfig().getBoolean("creation.default_world")) {
                 getConfig().set("creation.default_world", false);
                 saveConfig();
@@ -882,6 +887,11 @@ public class TARDIS extends JavaPlugin {
                 saveConfig();
                 console.sendMessage(pluginName + ChatColor.RED + "Create Worlds was disabled as it requires a multi-world plugin and TARDISChunkGenerator!");
             }
+        }
+        if (getConfig().getBoolean("creation.create_worlds_with_perms") && getConfig().getBoolean("abandon.enabled")) {
+            getConfig().set("abandon.enabled", false);
+            saveConfig();
+            console.sendMessage(pluginName + ChatColor.RED + "Abandoned TARDISes were disabled as create_worlds_with_perms is true!");
         }
     }
 
