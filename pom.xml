@@ -11,7 +11,7 @@
         <netbeans.hint.company>The Nose Fairy</netbeans.hint.company>
         <netbeans.hint.user>eccentric_nz</netbeans.hint.user>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.number>romley_massive</project.build.number>
+        <!--<project.build.number>romley_massive</project.build.number>-->
     </properties>
     <url>http://eccentricdevotion.github.com/TARDIS/</url>
     <repositories>
@@ -81,6 +81,37 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>local</id>
+            <activation>
+                <property>
+                    <name>!env.BUILD_NUMBER</name>
+                </property>
+            </activation>
+            <properties>
+                <project.build.number>${buildNumber}</project.build.number>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>buildnumber-maven-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>create</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <shortRevisionLength>5</shortRevisionLength>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
