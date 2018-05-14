@@ -93,7 +93,7 @@
                 </property>
             </activation>
             <properties>
-                <project.build.number>${buildNumber}</project.build.number>
+                <project.build.number>${myBuildNumber}</project.build.number>
             </properties>
             <build>
                 <plugins>
@@ -101,17 +101,24 @@
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>buildnumber-maven-plugin</artifactId>
                         <version>1.4</version>
+                        <configuration>
+                            <revisionOnScmFailure>no.scm.config.in.pom</revisionOnScmFailure>
+                        </configuration>
                         <executions>
                             <execution>
+                                <id>create-timestamp-id</id>
                                 <phase>validate</phase>
                                 <goals>
-                                    <goal>create</goal>
+                                    <goal>create-timestamp</goal>
                                 </goals>
+                                <configuration>
+                                    <timestampFormat>dd.MM.yy-HH:mm</timestampFormat>
+                                    <timestampPropertyName>myBuildNumber</timestampPropertyName>
+                                    <!-- formats the timestamp all together like 04-12-16-14:17 and puts
+                                    it in the ${myBuildNumber} buildProperty -->
+                                </configuration>
                             </execution>
                         </executions>
-                        <configuration>
-                            <shortRevisionLength>5</shortRevisionLength>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
