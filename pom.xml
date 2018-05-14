@@ -114,8 +114,7 @@
                                 <configuration>
                                     <timestampFormat>dd.MM.yy-HH:mm</timestampFormat>
                                     <timestampPropertyName>myBuildNumber</timestampPropertyName>
-                                    <!-- formats the timestamp all together like 04-12-16-14:17 and puts
-                                    it in the ${myBuildNumber} buildProperty -->
+                                    <!-- formats the timestamp all together like 04.12.16-14:17 and puts it in the ${myBuildNumber} buildProperty -->
                                 </configuration>
                             </execution>
                         </executions>
