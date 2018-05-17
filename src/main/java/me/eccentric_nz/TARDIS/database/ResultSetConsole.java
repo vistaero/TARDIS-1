@@ -134,6 +134,7 @@ public class ResultSetConsole {
                 if (l == null) {
                     return false;
                 }
+                this.sign = l.getBlock();
                 this.artronLevel = rs.getInt("artron_level");
             } else {
                 return false;
