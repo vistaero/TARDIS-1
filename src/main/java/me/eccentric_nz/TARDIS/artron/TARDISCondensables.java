@@ -157,6 +157,7 @@ public class TARDISCondensables {
             condensables.put("FLOWER_POT_ITEM", 15);
             condensables.put("FURNACE", 9);
             condensables.put("GLASS", 30);
+            condensables.put("GLASS_BLOCK", 30);
             condensables.put("GLOWSTONE", 40);
             condensables.put("GLOWSTONE_DUST", 10);
             condensables.put("GOLDEN_APPLE", 100);
