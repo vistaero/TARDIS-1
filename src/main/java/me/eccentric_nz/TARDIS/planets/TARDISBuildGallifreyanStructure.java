@@ -16,10 +16,12 @@
  */
 package me.eccentric_nz.TARDIS.planets;
 
+import com.khorn.terraincontrol.bukkit.BukkitMaterialData;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Loader;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import java.io.File;
 import java.util.HashMap;
 import me.eccentric_nz.TARDIS.JSON.JSONArray;
@@ -171,7 +173,18 @@ public class TARDISBuildGallifreyanStructure {
                     switch (type) {
                         case CHEST:
                             chest = world.getBlockAt(x, y, z);
-                            TARDISBlockSetters.setBlock(world, x, y, z, type, data);
+                            // set chest contents
+                            if (chest != null) {
+                                // get nbt
+                                Plugin tc = plugin.getPM().getPlugin("TerrainControl");
+                                if (tc != null) {
+                                    File f = new File(tc.getDataFolder(), "worlds" + File.separator + "Skaro" + File.separator + "WorldObjects" + File.separator + "NBT");
+                                    NamedBinaryTag tag = BO3Loader.loadMetadata(nbtFiles.next(), f);
+                                    BukkitWorld bw = ((TXPlugin) tc).worlds.get("Gallifrey");
+                                    BukkitMaterialData material = BukkitMaterialData.ofDefaultMaterial(DefaultMaterial.CHEST, 0);
+                                    bw.setBlock(x, y, z, material, tag);
+                                }
+                            }
                             break;
                         case IRON_DOOR_BLOCK:
                             // doors
@@ -288,16 +301,5 @@ public class TARDISBuildGallifreyanStructure {
         });
         setBanners(176, postStandingBanners);
         setBanners(177, postWallBanners);
-        // finished processing - set chest contents
-        if (chest != null) {
-            // get nbt
-            Plugin tc = plugin.getPM().getPlugin("TerrainControl");
-            if (tc != null) {
-                File f = new File(tc.getDataFolder(), "worlds" + File.separator + "Skaro" + File.separator + "WorldObjects" + File.separator + "NBT");
-                NamedBinaryTag tag = BO3Loader.loadMetadata(nbtFiles.next(), f);
-                BukkitWorld bw = ((TXPlugin) tc).worlds.get("Gallifrey");
-                bw.attachMetadata(chest.getX(), chest.getY(), chest.getZ(), tag);
-            }
-        }
     }
 }
