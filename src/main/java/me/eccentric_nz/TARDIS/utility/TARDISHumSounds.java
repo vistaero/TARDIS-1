@@ -92,16 +92,14 @@ public class TARDISHumSounds {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    List<UUID> data;
                     // All the MySQL stuff and what not
                     ResultSetSounds rs = new ResultSetSounds(TARDIS.plugin);
                     if (rs.resultSet()) {
-                        data = rs.getData();
-                        final List<UUID> ret = data;
+                        final List<UUID> data = rs.getData();
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                callback.execute(ret);
+                                callback.execute(data);
                             }
                         }.runTask(TARDIS.plugin);
                     }
