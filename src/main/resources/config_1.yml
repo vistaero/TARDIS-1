@@ -177,13 +177,3 @@ abandon:
 archive:
     enabled: true
     limit: 3
-# don't touch
-conversions:
-    biome_update: false
-    conversion_done: true
-    location_conversion_done: true
-    uuid_conversion_done: false
-    companion_clearing_done: false
-    condenser_done: false
-    lastknownname_conversion_done: false
-    constructs_done: true

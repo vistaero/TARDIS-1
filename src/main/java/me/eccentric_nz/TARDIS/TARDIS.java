@@ -49,17 +49,10 @@ import me.eccentric_nz.TARDIS.chameleon.TARDISChameleonPreset;
 import me.eccentric_nz.TARDIS.chatGUI.TARDISChatGUIJSON;
 import me.eccentric_nz.TARDIS.control.TARDISControlRunnable;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.TARDISBiomeUpdater;
-import me.eccentric_nz.TARDIS.database.TARDISCompanionClearer;
-import me.eccentric_nz.TARDIS.database.TARDISConstructConverter;
 import me.eccentric_nz.TARDIS.database.TARDISDatabaseConnection;
-import me.eccentric_nz.TARDIS.database.TARDISLastKnownNameUpdater;
-import me.eccentric_nz.TARDIS.database.TARDISLocationsConverter;
-import me.eccentric_nz.TARDIS.database.TARDISMaterialIDConverter;
 import me.eccentric_nz.TARDIS.database.TARDISMySQLDatabase;
 import me.eccentric_nz.TARDIS.database.TARDISRecordingTask;
 import me.eccentric_nz.TARDIS.database.TARDISSQLiteDatabase;
-import me.eccentric_nz.TARDIS.database.TARDISUUIDConverter;
 import me.eccentric_nz.TARDIS.database.TARDISWorldRemover;
 import me.eccentric_nz.TARDIS.destroyers.TARDISDestroyerInner;
 import me.eccentric_nz.TARDIS.destroyers.TARDISPresetDestroyerFactory;
@@ -98,7 +91,6 @@ import me.eccentric_nz.TARDIS.utility.TARDISMultiverseHelper;
 import me.eccentric_nz.TARDIS.utility.TARDISPerWorldInventoryChecker;
 import me.eccentric_nz.TARDIS.utility.TARDISPerceptionFilter;
 import me.eccentric_nz.TARDIS.utility.TARDISUtils;
-import me.eccentric_nz.TARDIS.utility.TARDISVaultChecker;
 import me.eccentric_nz.TARDIS.utility.TARDISWorldGuardUtils;
 import me.eccentric_nz.TARDIS.utility.Version;
 import me.eccentric_nz.tardischunkgenerator.TARDISHelper;
@@ -250,47 +242,6 @@ public class TARDIS extends JavaPlugin {
             new TARDISRecipesUpdater(this).addRecipes();
             prefix = getConfig().getString("storage.mysql.prefix");
             loadDatabase();
-            // update database add and populate uuid fields
-            if (!getConfig().getBoolean("conversions.uuid_conversion_done")) {
-                TARDISUUIDConverter uc = new TARDISUUIDConverter(this);
-                if (!uc.convert()) {
-                    // conversion failed
-                    console.sendMessage(pluginName + ChatColor.RED + "UUID conversion failed, disabling...");
-                    hasVersion = false;
-                    pm.disablePlugin(this);
-                    return;
-                } else {
-                    getConfig().set("conversions.uuid_conversion_done", true);
-                    saveConfig();
-                    console.sendMessage(pluginName + "UUID conversion successful :)");
-                }
-            }
-            // update database clear companions to UUIDs
-            if (!getConfig().getBoolean("conversions.companion_clearing_done")) {
-                TARDISCompanionClearer cc = new TARDISCompanionClearer(this);
-                if (!cc.clear()) {
-                    // clearing failed
-                    console.sendMessage(pluginName + ChatColor.RED + "Companion clearing failed, disabling...");
-                    hasVersion = false;
-                    pm.disablePlugin(this);
-                    return;
-                } else {
-                    getConfig().set("conversions.companion_clearing_done", true);
-                    saveConfig();
-                    console.sendMessage(pluginName + "Cleared companion lists as they now use UUIDs!");
-                }
-            }
-            // update database update last known names
-            if (!getConfig().getBoolean("conversions.lastknownname_conversion_done")) {
-                new TARDISLastKnownNameUpdater(this).update();
-                getConfig().set("conversions.lastknownname_conversion_done", true);
-            }
-            // update database convert to constructs
-            if (!getConfig().getBoolean("conversions.constructs_done")) {
-                if (new TARDISConstructConverter(this).convert()) {
-                    getConfig().set("conversions.constructs_done", true);
-                }
-            }
             loadMultiverse();
             loadInventoryManager();
             checkTCG();
@@ -342,12 +293,6 @@ public class TARDIS extends JavaPlugin {
             }
             loadPerms();
             loadBooks();
-            if (!getConfig().getBoolean("conversions.location_conversion_done")) {
-                new TARDISLocationsConverter(this).convert();
-            }
-            if (!getConfig().getBoolean("conversions.condenser_done")) {
-                new TARDISMaterialIDConverter(this).convert();
-            }
             resourcePack = getServerTP();
             // copy maps
             new TARDISChecker(this).checkMapsAndAdvancements();
@@ -384,8 +329,6 @@ public class TARDIS extends JavaPlugin {
             TARDISCondensables cond = new TARDISCondensables(this);
             cond.makeCondensables();
             condensables = cond.getCondensables();
-            checkBiomes();
-            checkDropChests();
             if (artronConfig.getBoolean("artron_furnace.particles")) {
                 new TARDISArtronFurnaceParticle(this).addParticles();
             }
@@ -998,23 +941,6 @@ public class TARDIS extends JavaPlugin {
         if (getPlanetsConfig().getBoolean("planets.Gallifrey.enabled") && getServer().getWorld("Gallifrey") == null) {
             new TARDISGallifrey(this).createTimeLordWorld();
         }
-    }
-
-    /**
-     * Makes sure that the biome field in the current table is not empty.
-     */
-    private void checkBiomes() {
-        if (!getConfig().getBoolean("police_box.set_biome") || getConfig().getBoolean("conversions.biome_update")) {
-            return;
-        }
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new TARDISBiomeUpdater(this), 1200L);
-    }
-
-    /**
-     * Removes unused drop chest database records from the vaults table.
-     */
-    private void checkDropChests() {
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new TARDISVaultChecker(this), 2400L);
     }
 
     /**

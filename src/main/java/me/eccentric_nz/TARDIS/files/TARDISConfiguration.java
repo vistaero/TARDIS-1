@@ -104,14 +104,6 @@ public class TARDISConfiguration {
         boolOptions.put("arch.switch_inventory", true);
         boolOptions.put("archive.enabled", true);
         boolOptions.put("circuits.damage", false);
-        boolOptions.put("conversions.biome_update", false);
-        boolOptions.put("conversions.companion_clearing_done", false);
-        boolOptions.put("conversions.condenser_done", false);
-        boolOptions.put("conversions.constructs_done", false);
-        boolOptions.put("conversions.conversion_done", false);
-        boolOptions.put("conversions.location_conversion_done", false);
-        boolOptions.put("conversions.uuid_conversion_done", false);
-        boolOptions.put("conversions.lastknownname_conversion_done", false);
         boolOptions.put("creation.add_perms", true);
         boolOptions.put("creation.create_worlds", true);
         boolOptions.put("creation.create_worlds_with_perms", false);
@@ -475,84 +467,80 @@ public class TARDISConfiguration {
      * are removed.
      */
     public void checkConfig() {
-        if (!config.contains("creation.create_worlds")) {
-            new TARDISConfigConverter(plugin).convert();
-        } else {
-            int i = 0;
-            if (config.contains("preferences.respect_towny")) {
-                if (plugin.getConfig().getString("preferences.respect_towny").equals("true") || plugin.getConfig().getString("preferences.respect_towny").equals("false")) {
-                    String towny = (plugin.getConfig().getBoolean("preferences.respect_towny")) ? "nation" : "none";
-                    plugin.getConfig().set("preferences.respect_towny", towny);
+        int i = 0;
+        if (config.contains("preferences.respect_towny")) {
+            if (plugin.getConfig().getString("preferences.respect_towny").equals("true") || plugin.getConfig().getString("preferences.respect_towny").equals("false")) {
+                String towny = (plugin.getConfig().getBoolean("preferences.respect_towny")) ? "nation" : "none";
+                plugin.getConfig().set("preferences.respect_towny", towny);
+            }
+        }
+        if (config.contains("preferences.respect_worldguard")) {
+            if (plugin.getConfig().getString("preferences.respect_worldguard").equals("true") || plugin.getConfig().getString("preferences.respect_worldguard").equals("false")) {
+                String guard = (plugin.getConfig().getBoolean("preferences.respect_worldguard")) ? "build" : "none";
+                plugin.getConfig().set("preferences.respect_worldguard", guard);
+            }
+        }
+        // boolean values
+        for (Map.Entry<String, Boolean> entry : boolOptions.entrySet()) {
+            if (!config.contains(entry.getKey())) {
+                plugin.getConfig().set(entry.getKey(), entry.getValue());
+                i++;
+            }
+        }
+        // int values
+        for (Map.Entry<String, Integer> entry : intOptions.entrySet()) {
+            if (!config.contains(entry.getKey())) {
+                plugin.getConfig().set(entry.getKey(), entry.getValue());
+                i++;
+            }
+            if (entry.getKey().equals("preferences.sfx_volume") && plugin.getConfig().getInt("preferences.sfx_volume") == 0) {
+                plugin.getConfig().set("preferences.sfx_volume", 10);
+            }
+        }
+        // string values
+        for (Map.Entry<String, String> entry : strOptions.entrySet()) {
+            if (!config.contains(entry.getKey())) {
+                plugin.getConfig().set(entry.getKey(), entry.getValue());
+                i++;
+            } else if (entry.getKey().equals("creation.custom_creeper_id")) {
+                try {
+                    int id = Integer.parseInt(plugin.getConfig().getString("creation.custom_creeper_id"));
+                    String set = Material.getMaterial(id).toString();
+                    plugin.getConfig().set("creation.custom_creeper_id", set);
+                } catch (NumberFormatException e) {
+                    // no conversion necessary
                 }
             }
-            if (config.contains("preferences.respect_worldguard")) {
-                if (plugin.getConfig().getString("preferences.respect_worldguard").equals("true") || plugin.getConfig().getString("preferences.respect_worldguard").equals("false")) {
-                    String guard = (plugin.getConfig().getBoolean("preferences.respect_worldguard")) ? "build" : "none";
-                    plugin.getConfig().set("preferences.respect_worldguard", guard);
-                }
+        }
+        if (!config.isConfigurationSection("rechargers")) {
+            plugin.getConfig().createSection("rechargers");
+        }
+        removeOptions.forEach((remove) -> {
+            plugin.getConfig().set(remove, null);
+        });
+        if (config.contains("difficulty") && config.getString("difficulty").equals("normal")) {
+            plugin.getConfig().set("difficulty", "hard");
+        }
+        if (config.contains("creation.use_clay") && (!config.getString("creation.use_clay").equals("WOOL") || !config.getString("creation.use_clay").equals("TERRACOTTA") || !config.getString("creation.use_clay").equals("CONCRETE"))) {
+            if (config.getBoolean("creation.use_clay")) {
+                plugin.getConfig().set("creation.use_clay", "TERRACOTTA");
+            } else {
+                plugin.getConfig().set("creation.use_clay", "WOOL");
             }
-            // boolean values
-            for (Map.Entry<String, Boolean> entry : boolOptions.entrySet()) {
-                if (!config.contains(entry.getKey())) {
-                    plugin.getConfig().set(entry.getKey(), entry.getValue());
-                    i++;
-                }
+        }
+        if (config.contains("police_box.default_preset") && config.getString("police_box.default_preset").equals("NEW")) {
+            plugin.getConfig().set("police_box.default_preset", "FACTORY");
+        }
+        if (config.contains("police_box.tardis_lamp") && NumberUtils.isNumber(config.getString("police_box.tardis_lamp"))) {
+            String setlamp = "REDSTONE_LAMP_OFF";
+            int lampint = config.getInt("police_box.tardis_lamp");
+            if (lampint != 50) {
+                setlamp = Material.getMaterial(lampint).toString();
             }
-            // int values
-            for (Map.Entry<String, Integer> entry : intOptions.entrySet()) {
-                if (!config.contains(entry.getKey())) {
-                    plugin.getConfig().set(entry.getKey(), entry.getValue());
-                    i++;
-                }
-                if (entry.getKey().equals("preferences.sfx_volume") && plugin.getConfig().getInt("preferences.sfx_volume") == 0) {
-                    plugin.getConfig().set("preferences.sfx_volume", 10);
-                }
-            }
-            // string values
-            for (Map.Entry<String, String> entry : strOptions.entrySet()) {
-                if (!config.contains(entry.getKey())) {
-                    plugin.getConfig().set(entry.getKey(), entry.getValue());
-                    i++;
-                } else if (entry.getKey().equals("creation.custom_creeper_id")) {
-                    try {
-                        int id = Integer.parseInt(plugin.getConfig().getString("creation.custom_creeper_id"));
-                        String set = Material.getMaterial(id).toString();
-                        plugin.getConfig().set("creation.custom_creeper_id", set);
-                    } catch (NumberFormatException e) {
-                        // no conversion necessary
-                    }
-                }
-            }
-            if (!config.isConfigurationSection("rechargers")) {
-                plugin.getConfig().createSection("rechargers");
-            }
-            removeOptions.forEach((remove) -> {
-                plugin.getConfig().set(remove, null);
-            });
-            if (config.contains("difficulty") && config.getString("difficulty").equals("normal")) {
-                plugin.getConfig().set("difficulty", "hard");
-            }
-            if (config.contains("creation.use_clay") && (!config.getString("creation.use_clay").equals("WOOL") || !config.getString("creation.use_clay").equals("TERRACOTTA") || !config.getString("creation.use_clay").equals("CONCRETE"))) {
-                if (config.getBoolean("creation.use_clay")) {
-                    plugin.getConfig().set("creation.use_clay", "TERRACOTTA");
-                } else {
-                    plugin.getConfig().set("creation.use_clay", "WOOL");
-                }
-            }
-            if (config.contains("police_box.default_preset") && config.getString("police_box.default_preset").equals("NEW")) {
-                plugin.getConfig().set("police_box.default_preset", "FACTORY");
-            }
-            if (config.contains("police_box.tardis_lamp") && NumberUtils.isNumber(config.getString("police_box.tardis_lamp"))) {
-                String setlamp = "REDSTONE_LAMP_OFF";
-                int lampint = config.getInt("police_box.tardis_lamp");
-                if (lampint != 50) {
-                    setlamp = Material.getMaterial(lampint).toString();
-                }
-                plugin.getConfig().set("police_box.tardis_lamp", setlamp);
-            }
-            if (i > 0) {
-                plugin.getConsole().sendMessage(plugin.getPluginName() + "Added " + ChatColor.AQUA + i + ChatColor.RESET + " new items to config");
-            }
+            plugin.getConfig().set("police_box.tardis_lamp", setlamp);
+        }
+        if (i > 0) {
+            plugin.getConsole().sendMessage(plugin.getPluginName() + "Added " + ChatColor.AQUA + i + ChatColor.RESET + " new items to config");
         }
         // worlds
         doWorlds();
