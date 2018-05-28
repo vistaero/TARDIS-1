@@ -92,6 +92,7 @@ public class TARDISUpdateListener implements Listener {
         controls.put("control", 22);
         controls.put("telepathic", 23);
         controls.put("generator", 24);
+        controls.put("handles", 26);
         validBlocks.add(Material.LEVER);
         validBlocks.add(Material.REDSTONE_COMPARATOR_OFF);
         validBlocks.add(Material.REDSTONE_COMPARATOR_ON);

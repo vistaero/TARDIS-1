@@ -44,12 +44,14 @@ import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.enumeration.STORAGE;
+import me.eccentric_nz.TARDIS.handles.TARDISHandlesInventory;
 import me.eccentric_nz.TARDIS.move.TARDISBlackWoolToggler;
 import me.eccentric_nz.TARDIS.rooms.TARDISExteriorRenderer;
 import me.eccentric_nz.TARDIS.travel.TARDISTemporalLocatorInventory;
 import me.eccentric_nz.TARDIS.travel.TARDISTerminalInventory;
 import me.eccentric_nz.TARDIS.utility.TARDISLocationGetters;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISSounds;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -76,7 +78,7 @@ public class TARDISButtonListener implements Listener {
 
     private final TARDIS plugin;
     private final List<Material> validBlocks = new ArrayList<>();
-    private final List<Integer> onlythese = Arrays.asList(1, 8, 9, 10, 11, 12, 13, 14, 16, 17, 20, 21, 22);
+    private final List<Integer> onlythese = Arrays.asList(1, 8, 9, 10, 11, 12, 13, 14, 16, 17, 20, 21, 22, 26);
     private final List<Integer> allow_unpowered = Arrays.asList(13, 17, 22);
     private final List<Integer> no_siege = Arrays.asList(0, 10, 12, 16, 19, 20);
 
@@ -92,6 +94,7 @@ public class TARDISButtonListener implements Listener {
         validBlocks.add(Material.JUKEBOX);
         validBlocks.add(Material.STONE_PLATE);
         validBlocks.add(Material.WOOD_PLATE);
+        validBlocks.add(Material.SILVER_GLAZED_TERRACOTTA);
     }
 
     /**
@@ -353,6 +356,17 @@ public class TARDISButtonListener implements Listener {
                                         Inventory cgui = plugin.getServer().createInventory(player, 54, "§4TARDIS Control Menu");
                                         cgui.setContents(controls);
                                         player.openInventory(cgui);
+                                    }
+                                    break;
+                                case 26:
+                                    // Handles
+                                    TARDISSounds.playTARDISSound(player, "Handles");
+                                    if (player.isSneaking()) {
+                                        // open programming GUI
+                                        ItemStack[] handles = new TARDISHandlesInventory(plugin, 0).getHandles();
+                                        Inventory hgui = plugin.getServer().createInventory(player, 54, "§4Handles Program");
+                                        hgui.setContents(handles);
+                                        player.openInventory(hgui);
                                     }
                                     break;
                                 default:

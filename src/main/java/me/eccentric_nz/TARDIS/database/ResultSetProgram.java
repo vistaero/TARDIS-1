@@ -21,59 +21,71 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.database.data.Program;
 
 /**
  * Many facts, figures, and formulas are contained within the Matrix,
  * including... the locations of the TARDIS vaults.
  *
+ * Control types: 0 = handbrake 1 = random button 2 = x-repeater 3 = z-repeater
+ * 4 = multiplier-repeater 5 = environment-repeater 6 = artron button
+ *
  * @author eccentric_nz
  */
-public class ResultSetTardisID {
+public class ResultSetProgram {
 
     private final TARDISDatabaseConnection service = TARDISDatabaseConnection.getINSTANCE();
     private final Connection connection = service.getConnection();
     private final TARDIS plugin;
+    private final int pid;
     private final String prefix;
-    private int tardis_id;
+    private Program program;
 
     /**
      * Creates a class instance that can be used to retrieve an SQL ResultSet
      * from the vaults table.
      *
      * @param plugin an instance of the main class.
+     * @param pid a HashMap<String, Object> of table fields and values to refine
+     * the search.
      */
-    public ResultSetTardisID(TARDIS plugin) {
+    public ResultSetProgram(TARDIS plugin, int pid) {
         this.plugin = plugin;
+        this.pid = pid;
         this.prefix = this.plugin.getPrefix();
     }
 
     /**
-     * Attempts to see whether the supplied TARDIS id is in the tardis table.
-     * This method builds an SQL query string from the parameters supplied and
-     * then executes the query.
+     * Retrieves an SQL ResultSet from the programs table. This method builds an
+     * SQL query string from the parameters supplied and then executes the
+     * query. Use the getters to retrieve the results.
      *
-     * @param uuid the Time Lord uuid to check
-     *
-     * @return true or false depending on whether the TARDIS id exists in the
-     * table
+     * @return true or false depending on whether any data matches the query
      */
-    public boolean fromUUID(String uuid) {
+    public boolean resultSet() {
         PreparedStatement statement = null;
         ResultSet rs = null;
-        String query = "SELECT tardis_id FROM " + prefix + "tardis WHERE uuid = ? AND abandoned = 0";
+        String query = "SELECT * FROM " + prefix + "programs WHERE program_id = ?";
         try {
             service.testConnection(connection);
             statement = connection.prepareStatement(query);
-            statement.setString(1, uuid);
+            statement.setInt(1, pid);
             rs = statement.executeQuery();
             if (rs.isBeforeFirst()) {
                 rs.next();
-                tardis_id = rs.getInt("tardis_id");
-                return true;
+                program = new Program(
+                        rs.getInt("program_id"),
+                        rs.getString("uuid"),
+                        rs.getString("name"),
+                        rs.getString("inventory"),
+                        rs.getString("parsed"),
+                        rs.getBoolean("checked")
+                );
+            } else {
+                return false;
             }
-            return false;
         } catch (SQLException e) {
-            plugin.debug("ResultSet error for tardis [tardis_id fromUUID] table! " + e.getMessage());
+            plugin.debug("ResultSet error for vaults table! " + e.getMessage());
             return false;
         } finally {
             try {
@@ -84,12 +96,13 @@ public class ResultSetTardisID {
                     statement.close();
                 }
             } catch (SQLException e) {
-                plugin.debug("Error closing tardis [tardis_id fromUUID] table! " + e.getMessage());
+                plugin.debug("Error closing vaults table! " + e.getMessage());
             }
         }
+        return true;
     }
 
-    public int getTardis_id() {
-        return tardis_id;
+    public Program getProgram() {
+        return program;
     }
 }

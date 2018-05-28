@@ -56,6 +56,7 @@ public class TARDISGiveLister {
         art_kits.add(ChatColor.YELLOW + "artron" + ChatColor.RESET + " - " + ChatColor.GOLD + "Artron Energy");
         art_kits.add(ChatColor.YELLOW + "kit" + ChatColor.RESET + " - " + ChatColor.GOLD + "TARDIS Item Kit");
         art_kits.add(ChatColor.YELLOW + "seed" + ChatColor.RESET + " - " + ChatColor.GOLD + "TARDIS Seed Block");
+        art_kits.add(ChatColor.YELLOW + "handles" + ChatColor.RESET + " - " + ChatColor.GOLD + "Handles cyber-companion");
         give_options.put("Artron, Kits and Seeds", art_kits);
         List<String> items = new ArrayList<>();
         items.add(ChatColor.GREEN + "key" + ChatColor.RESET + " - " + ChatColor.DARK_GREEN + "TARDIS Key");
