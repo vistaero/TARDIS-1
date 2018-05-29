@@ -127,7 +127,7 @@ public class TARDISLampsCommand {
                                     set.put("tardis_id", id);
                                     set.put("location", lamp);
                                     qf.doInsert("lamps", set);
-                                    TARDISMessage.send(owner, true, "LAMP_ADD", (xx + ":" + yy + ":" + zz));
+                                    TARDISMessage.send(owner, "LAMP_ADD", (xx + ":" + yy + ":" + zz));
                                 }
                             }
                         }

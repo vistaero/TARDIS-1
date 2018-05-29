@@ -17,6 +17,7 @@
 package me.eccentric_nz.TARDIS.utility;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -61,9 +62,18 @@ public class TARDISMessage {
         message(p, TARDIS.plugin.getPluginName() + local);
     }
 
+    public static void handlesSend(Player p, String message) {
+        message(p, ChatColor.BLUE + "[Handles]" + ChatColor.RESET + message);
+    }
+
     public static void send(Player p, String key, String sub) {
         String local = TARDIS.plugin.getLanguage().getString(key);
         message(p, TARDIS.plugin.getPluginName() + String.format(local, sub));
+    }
+
+    public static void handlesSend(Player p, String key, String sub) {
+        String local = TARDIS.plugin.getLanguage().getString(key);
+        message(p, ChatColor.BLUE + "[Handles]" + ChatColor.RESET + String.format(local, sub));
     }
 
     public static void send(CommandSender cs, String key) {
@@ -112,15 +122,5 @@ public class TARDISMessage {
     public static void send(CommandSender cs, String key, String one, int two, int three) {
         String local = TARDIS.plugin.getLanguage().getString(key);
         message(cs, TARDIS.plugin.getPluginName() + String.format(local, one, two, three));
-    }
-
-    public static void send(Player p, boolean pn, String key) {
-        String local = TARDIS.plugin.getLanguage().getString(key);
-        message(p, local);
-    }
-
-    public static void send(Player p, boolean pn, String key, String sub) {
-        String local = TARDIS.plugin.getLanguage().getString(key);
-        message(p, String.format(local, sub));
     }
 }

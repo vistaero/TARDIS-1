@@ -704,16 +704,16 @@ public class TARDISSonicListener implements Listener {
         TARDISMessage.send(player, "SONIC_SCAN");
         BukkitScheduler bsched = plugin.getServer().getScheduler();
         bsched.scheduleSyncDelayedTask(plugin, () -> {
-            TARDISMessage.send(player, true, "SCAN_WORLD", wn);
-            TARDISMessage.send(player, true, "SONIC_COORDS", scan_loc.getBlockX() + ":" + scan_loc.getBlockY() + ":" + scan_loc.getBlockZ());
+            TARDISMessage.send(player, "SCAN_WORLD", wn);
+            TARDISMessage.send(player, "SONIC_COORDS", scan_loc.getBlockX() + ":" + scan_loc.getBlockY() + ":" + scan_loc.getBlockZ());
         }, 20L);
         // get biome
         final Biome biome = scan_loc.getBlock().getBiome();
         bsched.scheduleSyncDelayedTask(plugin, () -> {
-            TARDISMessage.send(player, true, "BIOME_TYPE", biome.toString());
+            TARDISMessage.send(player, "BIOME_TYPE", biome.toString());
         }, 40L);
         bsched.scheduleSyncDelayedTask(plugin, () -> {
-            TARDISMessage.send(player, true, "SCAN_TIME", daynight + " / " + time);
+            TARDISMessage.send(player, "SCAN_TIME", daynight + " / " + time);
         }, 60L);
         // get weather
         final String weather;
@@ -748,16 +748,16 @@ public class TARDISSonicListener implements Listener {
                 break;
         }
         bsched.scheduleSyncDelayedTask(plugin, () -> {
-            TARDISMessage.send(player, true, "SCAN_WEATHER", weather);
+            TARDISMessage.send(player, "SCAN_WEATHER", weather);
         }, 80L);
         bsched.scheduleSyncDelayedTask(plugin, () -> {
-            TARDISMessage.send(player, true, "SCAN_HUMIDITY", String.format("%.2f", scan_loc.getBlock().getHumidity()));
+            TARDISMessage.send(player, "SCAN_HUMIDITY", String.format("%.2f", scan_loc.getBlock().getHumidity()));
         }, 100L);
         bsched.scheduleSyncDelayedTask(plugin, () -> {
-            TARDISMessage.send(player, true, "SCAN_TEMP", String.format("%.2f", scan_loc.getBlock().getTemperature()));
+            TARDISMessage.send(player, "SCAN_TEMP", String.format("%.2f", scan_loc.getBlock().getTemperature()));
         }, 120L);
         bsched.scheduleSyncDelayedTask(plugin, () -> {
-            TARDISMessage.send(player, true, "SCAN_ENTS");
+            TARDISMessage.send(player, "SCAN_ENTS");
             if (scannedentities.size() > 0) {
                 scannedentities.entrySet().forEach((entry) -> {
                     String message = "";
@@ -772,7 +772,7 @@ public class TARDISSonicListener implements Listener {
                 });
                 scannedentities.clear();
             } else {
-                TARDISMessage.send(player, true, "SCAN_NONE");
+                TARDISMessage.send(player, "SCAN_NONE");
             }
         }, 140L);
     }
