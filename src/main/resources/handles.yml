@@ -1,0 +1,22 @@
+prefix: Hey Handles
+keywords:
+    call: tardis comehere
+    takeoff: handles takeoff @t
+    land: handles land @t
+    hide: tardis hide
+    rebuild: tardis rebuild
+    teleport: tardis rescue @t
+    travel:
+        save: tardistravel @s
+        player: tardistravel @p
+        area: tardistravel @a
+    scan: handles scan @t
+    craft: tardisrecipe @r
+    lock: handles lock @t
+    unlock: handles unlock @t
+    remind: handles remind @p
+    say: handles say @s
+    name: handles name
+    time: handles time
+no_command: Sorry, that command is not available
+radius: 16

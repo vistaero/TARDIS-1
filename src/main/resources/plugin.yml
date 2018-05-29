@@ -330,6 +330,15 @@ permissions:
   tardis.atmospheric:
     description: Allows a player to initiate atmospheric exitation around their TARDIS.
     default: op
+  tardis.handles:
+    description: Allow players to use the Handles companion.
+    children:
+      tardis.handles.use: true
+      tardis.handles.communicator: true
+      tardis.handles.tp: true
+      tardis.handles.remote: true
+      tardis.handles.scan: true
+    default: op
 commands:
   tardis:
     aliases: [tt, ttardis, /tardis, timelord]
@@ -875,3 +884,8 @@ commands:
     aliases: ['t?', tardishelp]
     description: Get help with TARDIS commands.
     usage: /<command> [command] [argument]
+  handles:
+    aliases: [tardishandles, th]
+    description: These commands are used by the console to enable the Handles companion.
+    usage: /<command> [takeoff|land|scan|lock|unlock|remind|say|name|time]
+    permission: tardis.admin

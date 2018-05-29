@@ -40,6 +40,8 @@ import me.eccentric_nz.TARDIS.commands.admin.TARDISAdminCommands;
 import me.eccentric_nz.TARDIS.commands.admin.TARDISAdminTabComplete;
 import me.eccentric_nz.TARDIS.commands.admin.TARDISGiveCommand;
 import me.eccentric_nz.TARDIS.commands.admin.TARDISGiveTabComplete;
+import me.eccentric_nz.TARDIS.commands.handles.TARDISHandlesCommand;
+import me.eccentric_nz.TARDIS.commands.preferences.TARDISHandlesTabComplete;
 import me.eccentric_nz.TARDIS.commands.preferences.TARDISPrefsCommands;
 import me.eccentric_nz.TARDIS.commands.preferences.TARDISPrefsTabComplete;
 import me.eccentric_nz.TARDIS.commands.remote.TARDISRemoteCommands;
@@ -106,5 +108,7 @@ public class TARDISCommandSetter {
         plugin.getCommand("tardisnetherportal").setExecutor(new TARDISNetherPortalCommand(plugin));
         plugin.getCommand("tardis?").setExecutor(new TARDISQuestionMarkCommand(plugin));
         plugin.getCommand("tardis?").setTabCompleter(new TARDISQuestionTabComplete(plugin));
+        plugin.getCommand("handles").setExecutor(new TARDISHandlesCommand(plugin));
+        plugin.getCommand("handles").setTabCompleter(new TARDISHandlesTabComplete());
     }
 }
