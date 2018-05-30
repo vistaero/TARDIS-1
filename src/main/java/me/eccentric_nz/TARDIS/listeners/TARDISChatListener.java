@@ -16,10 +16,9 @@
  */
 package me.eccentric_nz.TARDIS.listeners;
 
-import java.util.UUID;
-import java.util.regex.Pattern;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.flight.TARDISLand;
+import me.eccentric_nz.TARDIS.handles.TARDISHandlesRequest;
 import me.eccentric_nz.TARDIS.howto.TARDISSeedsInventory;
 import me.eccentric_nz.TARDIS.travel.TARDISRescue;
 import me.eccentric_nz.TARDIS.travel.TARDISRescue.RescueData;
@@ -31,6 +30,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Locale;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * In 21st century London, Rory has his father, Brian Williams, over to help fix
@@ -54,7 +57,7 @@ public class TARDISChatListener implements Listener {
      * Listens for player typing "tardis rescue accept". If the player types it
      * within 60 seconds of a Time Lord sending a rescue request, a player
      * rescue attempt is made.
-     *
+     * <p>
      * Also processes questions pertaining to "How to make a TARDIS?" and
      * variations thereof.
      *
@@ -62,18 +65,18 @@ public class TARDISChatListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent event) {
-        final UUID saved = event.getPlayer().getUniqueId();
-        String chat = event.getMessage();
+        UUID saved = event.getPlayer().getUniqueId();
+        String chat = event.getMessage().toLowerCase(Locale.ENGLISH);
         if (chat != null) {
-            if (chat.equalsIgnoreCase("tardis rescue accept") || chat.equalsIgnoreCase("tardis request accept")) {
-                final boolean request = (chat.equalsIgnoreCase("tardis request accept"));
+            if (chat.equals("tardis rescue accept") || chat.equals("tardis request accept")) {
+                boolean request = (chat.equals("tardis request accept"));
                 if (plugin.getTrackerKeeper().getChat().containsKey(saved)) {
-                    final Player rescuer = plugin.getServer().getPlayer(plugin.getTrackerKeeper().getChat().get(saved));
-                    final TARDISRescue res = new TARDISRescue(plugin);
+                    Player rescuer = plugin.getServer().getPlayer(plugin.getTrackerKeeper().getChat().get(saved));
+                    TARDISRescue res = new TARDISRescue(plugin);
                     plugin.getTrackerKeeper().getChat().remove(saved);
                     // delay it so the chat appears before the message
-                    final String player = event.getPlayer().getName();
-                    final String message = (request) ? "REQUEST_RELEASE" : "RESCUE_RELEASE";
+                    String player = event.getPlayer().getName();
+                    String message = (request) ? "REQUEST_RELEASE" : "RESCUE_RELEASE";
                     plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                         RescueData rd = res.tryRescue(rescuer, saved, request);
                         if (rd.success()) {
@@ -92,9 +95,12 @@ public class TARDISChatListener implements Listener {
                         }
                     }, 2L);
                 } else {
-                    final String message = (request) ? "REQUEST_TIMEOUT" : "RESCUE_TIMEOUT";
+                    String message = (request) ? "REQUEST_TIMEOUT" : "RESCUE_TIMEOUT";
                     TARDISMessage.send(event.getPlayer(), message);
                 }
+            } else if (chat.startsWith(plugin.getHandlesConfig().getString("prefix").toLowerCase(Locale.ENGLISH))) {
+                // process handles request
+                new TARDISHandlesRequest(plugin).process(saved, event.getMessage());
             } else {
                 handleChat(event.getPlayer(), event.getMessage());
             }
@@ -105,10 +111,10 @@ public class TARDISChatListener implements Listener {
         if (plugin.getTrackerKeeper().getHowTo().contains(p.getUniqueId())) {
             return;
         }
-        if (this.howToPattern == null) {
-            this.howToPattern = Pattern.compile(HOW_TO_REG_EX, Pattern.CASE_INSENSITIVE);
+        if (howToPattern == null) {
+            howToPattern = Pattern.compile(HOW_TO_REG_EX, Pattern.CASE_INSENSITIVE);
         }
-        if (this.howToPattern.matcher(message).matches()) {
+        if (howToPattern.matcher(message).matches()) {
             plugin.getTrackerKeeper().getHowTo().add(p.getUniqueId());
             // open how to GUI
             ItemStack[] seeds = new TARDISSeedsInventory(p).getMenu();

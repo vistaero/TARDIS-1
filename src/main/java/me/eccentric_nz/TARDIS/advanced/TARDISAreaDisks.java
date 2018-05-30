@@ -16,10 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.advanced;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.ResultSetAreas;
 import me.eccentric_nz.TARDIS.database.ResultSetDiskStorage;
@@ -30,6 +26,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * The visual stabiliser circuit controlled the TARDIS' outward appearance. Its
@@ -53,10 +54,9 @@ public class TARDISAreaDisks {
      * @return an array of item stacks
      */
     public ItemStack[] makeDisks(Player p) {
-
         List<ItemStack> areas = new ArrayList<>();
         // get the areas this player has access to
-        ResultSetAreas rsa = new ResultSetAreas(plugin, null, false, true);
+        ResultSetAreas rsa = new ResultSetAreas(plugin, null, false, false);
         if (rsa.resultSet()) {
             // cycle through areas
             rsa.getData().forEach((a) -> {

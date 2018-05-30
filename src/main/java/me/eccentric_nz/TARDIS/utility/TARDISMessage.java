@@ -35,7 +35,7 @@ public class TARDISMessage {
      * Splits a message into multiple lines if it is longer than the guaranteed
      * chat page width.
      *
-     * @param p the player to send the message
+     * @param p       the player to send the message
      * @param message the message to send
      */
     public static void message(Player p, String message) {
@@ -61,6 +61,10 @@ public class TARDISMessage {
     public static void send(Player p, String key) {
         String local = TARDIS.plugin.getLanguage().getString(key);
         message(p, TARDIS.plugin.getPluginName() + local);
+    }
+
+    public static void handlesMessage(Player p, String message) {
+        message(p, HANDLES + message);
     }
 
     public static void handlesSend(Player p, String key) {

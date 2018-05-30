@@ -16,22 +16,22 @@
  */
 package me.eccentric_nz.TARDIS.commands.handles;
 
+import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
+import org.bukkit.entity.Player;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
-import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
-import org.bukkit.entity.Player;
 
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHandlesTimeCommand {
 
-    public boolean sayTime(Player player, String[] args) {
+    public boolean sayTime(Player player) {
         long minecraftTime = player.getWorld().getTime();
         String daynight = TARDISStaticUtils.getTime(minecraftTime);
         TARDISMessage.handlesSend(player, "HANDLES_TIME", minecraftTime, daynight, parseTime(minecraftTime));

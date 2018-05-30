@@ -1,11 +1,11 @@
 prefix: Hey Handles
 keywords:
-    call: tardis comehere
+    call: tardis comehere @t
     takeoff: handles takeoff @t
     land: handles land @t
-    hide: tardis hide
-    rebuild: tardis rebuild
-    teleport: tardis rescue @t
+    hide: tardis hide @t
+    rebuild: tardis rebuild @t
+    teleport: tardis rescue @p
     travel:
         save: tardistravel @s
         player: tardistravel @p
@@ -14,7 +14,7 @@ keywords:
     craft: tardisrecipe @r
     lock: handles lock @t
     unlock: handles unlock @t
-    remind: handles remind @p
+    remind: handles remind @s @t
     say: handles say @s
     name: handles name
     time: handles time

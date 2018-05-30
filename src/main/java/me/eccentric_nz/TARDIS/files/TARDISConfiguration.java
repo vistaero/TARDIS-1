@@ -16,14 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.files;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import me.eccentric_nz.TARDIS.TARDIS;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.ChatColor;
@@ -31,6 +23,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * The Alpha Centauran Table Tennis Club is a club established by the Alpha
@@ -42,13 +38,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class TARDISConfiguration {
 
     private final TARDIS plugin;
-    private FileConfiguration config = null;
-    private FileConfiguration artron_config = null;
-    private FileConfiguration blocks_config = null;
-    private FileConfiguration rooms_config = null;
-    private FileConfiguration signs_config = null;
-    private FileConfiguration chameleon_config = null;
-    private FileConfiguration planets_config = null;
+    private final FileConfiguration config;
+    private final FileConfiguration artron_config;
+    private final FileConfiguration blocks_config;
+    private final FileConfiguration rooms_config;
+    private final FileConfiguration signs_config;
+    private final FileConfiguration chameleon_config;
+    private final FileConfiguration planets_config;
+    //    private FileConfiguration handles_config;
     private File configFile = null;
     HashMap<String, String> strOptions = new HashMap<>();
     HashMap<String, Integer> intOptions = new HashMap<>();
@@ -67,14 +64,15 @@ public class TARDISConfiguration {
 
     public TARDISConfiguration(TARDIS plugin) {
         this.plugin = plugin;
-        this.configFile = new File(plugin.getDataFolder(), "config.yml");
-        this.config = YamlConfiguration.loadConfiguration(configFile);
-        this.artron_config = plugin.getArtronConfig();
-        this.blocks_config = plugin.getBlocksConfig();
-        this.rooms_config = plugin.getRoomsConfig();
-        this.signs_config = plugin.getSigns();
-        this.chameleon_config = plugin.getChameleonGuis();
-        this.planets_config = plugin.getPlanetsConfig();
+        configFile = new File(plugin.getDataFolder(), "config.yml");
+        config = YamlConfiguration.loadConfiguration(configFile);
+        artron_config = plugin.getArtronConfig();
+        blocks_config = plugin.getBlocksConfig();
+        rooms_config = plugin.getRoomsConfig();
+        signs_config = plugin.getSigns();
+        chameleon_config = plugin.getChameleonGuis();
+        planets_config = plugin.getPlanetsConfig();
+//        handles_config = plugin.getHandlesConfig();
         // boolean
         boolOptions.put("abandon.enabled", true);
         boolOptions.put("abandon.reduce_count", true);

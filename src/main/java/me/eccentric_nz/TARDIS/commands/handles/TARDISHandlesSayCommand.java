@@ -17,10 +17,10 @@
 package me.eccentric_nz.TARDIS.commands.handles;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.entity.Player;
 
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHandlesSayCommand {
@@ -31,8 +31,13 @@ public class TARDISHandlesSayCommand {
         this.plugin = plugin;
     }
 
-    public boolean doAbort(Player player, String[] args) {
-        //
+    public boolean say(Player player, String[] args) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 2; i < args.length; i++) {
+            sb.append(args[i]).append(" ");
+        }
+        String message = sb.toString();
+        TARDISMessage.handlesMessage(player, message);
         return true;
     }
 }

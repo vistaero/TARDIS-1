@@ -16,10 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.commands.handles;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
@@ -29,7 +25,6 @@ import me.eccentric_nz.TARDIS.database.ResultSetNextLocation;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
-import static me.eccentric_nz.TARDIS.listeners.TARDISScannerListener.getNearbyEntities;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISSounds;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
@@ -43,8 +38,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static me.eccentric_nz.TARDIS.listeners.TARDISScannerListener.getNearbyEntities;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHandlesScanCommand {
@@ -52,7 +53,7 @@ public class TARDISHandlesScanCommand {
     private final TARDIS plugin;
     private final Player player;
     private final int id;
-    private boolean inTARDIS = false;
+    private final boolean inTARDIS;
 
     public TARDISHandlesScanCommand(TARDIS plugin, Player player, int id) {
         this.plugin = plugin;
@@ -63,39 +64,39 @@ public class TARDISHandlesScanCommand {
 
     public boolean sayScan() {
         TARDISSounds.playTARDISSound(player.getLocation(), "handles_scanner");
-        final Location scan_loc;
-        String whereisit;
-        final COMPASS tardisDirection;
-        HashMap<String, Object> wherenl = new HashMap<>();
-        wherenl.put("tardis_id", id);
+        Location scan_loc;
+        String whereIsIt;
+        COMPASS tardisDirection;
+        HashMap<String, Object> where = new HashMap<>();
+        where.put("tardis_id", id);
         if (inTARDIS) {
             if (plugin.getTrackerKeeper().getHasDestination().containsKey(id)) {
-                ResultSetNextLocation rsn = new ResultSetNextLocation(plugin, wherenl);
+                ResultSetNextLocation rsn = new ResultSetNextLocation(plugin, where);
                 if (!rsn.resultSet()) {
                     TARDISMessage.handlesSend(player, "NEXT_NOT_FOUND");
                     return true;
                 }
                 scan_loc = new Location(rsn.getWorld(), rsn.getX(), rsn.getY(), rsn.getZ());
                 tardisDirection = rsn.getDirection();
-                whereisit = plugin.getLanguage().getString("SCAN_NEXT");
+                whereIsIt = plugin.getLanguage().getString("SCAN_NEXT");
             } else {
-                ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, wherenl);
+                ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, where);
                 if (!rsc.resultSet()) {
                     TARDISMessage.handlesSend(player, "CURRENT_NOT_FOUND");
                     return true;
                 }
                 scan_loc = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
                 tardisDirection = rsc.getDirection();
-                whereisit = plugin.getLanguage().getString("SCAN_CURRENT");
+                whereIsIt = plugin.getLanguage().getString("SCAN_CURRENT");
             }
         } else {
             scan_loc = player.getLocation();
             tardisDirection = COMPASS.valueOf(TARDISStaticUtils.getPlayersDirection(player, false));
-            whereisit = plugin.getLanguage().getString("SCAN_PLAYER");
+            whereIsIt = plugin.getLanguage().getString("SCAN_PLAYER");
         }
         // record nearby entities
-        final HashMap<EntityType, Integer> scannedentities = new HashMap<>();
-        final List<String> playernames = new ArrayList<>();
+        HashMap<EntityType, Integer> scannedEntities = new HashMap<>();
+        List<String> playerNames = new ArrayList<>();
         for (Entity k : getNearbyEntities(scan_loc, 16)) {
             EntityType et = k.getType();
             if (TARDISConstants.ENTITY_TYPES.contains(et)) {
@@ -103,7 +104,7 @@ public class TARDISHandlesScanCommand {
                 if (et.equals(EntityType.PLAYER)) {
                     Player entPlayer = (Player) k;
                     if (player.canSee(entPlayer)) {
-                        playernames.add(entPlayer.getName());
+                        playerNames.add(entPlayer.getName());
                     } else {
                         visible = false;
                     }
@@ -139,17 +140,17 @@ public class TARDISHandlesScanCommand {
                     // silent
                     et = EntityType.SPLASH_POTION;
                 }
-                Integer entity_count = (scannedentities.containsKey(et)) ? scannedentities.get(et) : 0;
+                Integer entity_count = (scannedEntities.containsKey(et)) ? scannedEntities.get(et) : 0;
                 if (visible) {
-                    scannedentities.put(et, entity_count + 1);
+                    scannedEntities.put(et, entity_count + 1);
                 }
             }
         }
-        final long time = scan_loc.getWorld().getTime();
-        final String daynight = TARDISStaticUtils.getTime(time);
+        long time = scan_loc.getWorld().getTime();
+        String daynight = TARDISStaticUtils.getTime(time);
         // message the player
         if (inTARDIS) {
-            TARDISMessage.handlesSend(player, "SCAN_RESULT", whereisit);
+            TARDISMessage.handlesSend(player, "SCAN_RESULT", whereIsIt);
         } else {
             TARDISMessage.handlesSend(player, "SCAN_PLAYER");
         }
@@ -167,8 +168,8 @@ public class TARDISHandlesScanCommand {
         }, 20L);
         // get biome
         Biome tmb;
-        if (whereisit.equals(plugin.getLanguage().getString("SCAN_CURRENT"))) {
-            // adjsut for current location as it will always return SKY if set_biome is true
+        if (whereIsIt.equals(plugin.getLanguage().getString("SCAN_CURRENT"))) {
+            // adjust for current location as it will always return SKY if set_biome is true
             switch (tardisDirection) {
                 case NORTH:
                     tmb = scan_loc.getBlock().getRelative(BlockFace.SOUTH, 2).getBiome();
@@ -186,7 +187,7 @@ public class TARDISHandlesScanCommand {
         } else {
             tmb = scan_loc.getBlock().getBiome();
         }
-        final Biome biome = tmb;
+        Biome biome = tmb;
         bsched.scheduleSyncDelayedTask(plugin, () -> {
             TARDISMessage.handlesSend(player, "BIOME_TYPE", biome.toString());
         }, 40L);
@@ -194,7 +195,7 @@ public class TARDISHandlesScanCommand {
             TARDISMessage.handlesSend(player, "SCAN_TIME", daynight + " / " + time);
         }, 60L);
         // get weather
-        final String weather;
+        String weather;
         switch (biome) {
             case DESERT:
             case DESERT_HILLS:
@@ -235,13 +236,13 @@ public class TARDISHandlesScanCommand {
             TARDISMessage.handlesSend(player, "SCAN_TEMP", String.format("%.2f", scan_loc.getBlock().getTemperature()));
         }, 120L);
         bsched.scheduleSyncDelayedTask(plugin, () -> {
-            if (scannedentities.size() > 0) {
+            if (scannedEntities.size() > 0) {
                 TARDISMessage.handlesSend(player, "SCAN_ENTS");
-                for (Map.Entry<EntityType, Integer> entry : scannedentities.entrySet()) {
+                for (Map.Entry<EntityType, Integer> entry : scannedEntities.entrySet()) {
                     String message = "";
                     StringBuilder buf = new StringBuilder();
-                    if (entry.getKey().equals(EntityType.PLAYER) && playernames.size() > 0) {
-                        playernames.forEach((p) -> {
+                    if (entry.getKey().equals(EntityType.PLAYER) && playerNames.size() > 0) {
+                        playerNames.forEach((p) -> {
                             buf.append(", ").append(p);
                         });
                         message = " (" + buf.toString().substring(2) + ")";
@@ -285,7 +286,7 @@ public class TARDISHandlesScanCommand {
                             break;
                     }
                 }
-                scannedentities.clear();
+                scannedEntities.clear();
             } else {
                 TARDISMessage.handlesSend(player, "SCAN_NONE");
             }

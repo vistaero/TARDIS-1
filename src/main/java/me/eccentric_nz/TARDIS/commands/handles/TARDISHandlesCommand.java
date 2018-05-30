@@ -16,7 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.commands.handles;
 
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
@@ -25,8 +24,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHandlesCommand implements CommandExecutor {
@@ -43,6 +43,8 @@ public class TARDISHandlesCommand implements CommandExecutor {
             TARDISMessage.send(sender, "NO_PERM_AREA");
             return true;
         }
+        UUID uuid = UUID.fromString(args[1]);
+        Player player = plugin.getServer().getPlayer(uuid);
         if (args[0].equals("land")) {
 
         }
@@ -50,17 +52,15 @@ public class TARDISHandlesCommand implements CommandExecutor {
 
         }
         if (args[0].equals("name")) {
-
+            TARDISMessage.handlesSend(player, "HANDLES_NAME", player.getName());
         }
         if (args[0].equals("remind")) {
-
+            return new TARDISHandlesRemindCommand(plugin).doReminder(player, args);
         }
         if (args[0].equals("say")) {
-
+            return new TARDISHandlesSayCommand(plugin).say(player, args);
         }
         if (args[0].equals("scan")) {
-            UUID uuid = UUID.fromString(args[1]);
-            Player player = plugin.getServer().getPlayer(uuid);
             ResultSetTardisID rs = new ResultSetTardisID(plugin);
             if (rs.fromUUID(args[1])) {
                 return new TARDISHandlesScanCommand(plugin, player, rs.getTardis_id()).sayScan();
@@ -70,7 +70,7 @@ public class TARDISHandlesCommand implements CommandExecutor {
 
         }
         if (args[0].equals("time")) {
-
+            return new TARDISHandlesTimeCommand().sayTime(player);
         }
         if (args[0].equals("unlock")) {
 

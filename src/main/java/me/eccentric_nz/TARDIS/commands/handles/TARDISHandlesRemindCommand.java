@@ -20,7 +20,6 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import org.bukkit.entity.Player;
 
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHandlesRemindCommand {
@@ -31,7 +30,7 @@ public class TARDISHandlesRemindCommand {
         this.plugin = plugin;
     }
 
-    public boolean doAbort(Player player, String[] args) {
+    public boolean doReminder(Player player, String[] args) {
         //
         return true;
     }
