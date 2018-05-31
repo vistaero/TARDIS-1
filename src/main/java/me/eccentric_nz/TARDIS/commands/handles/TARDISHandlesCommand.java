@@ -17,8 +17,8 @@
 package me.eccentric_nz.TARDIS.commands.handles;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -46,13 +46,14 @@ public class TARDISHandlesCommand implements CommandExecutor {
         UUID uuid = UUID.fromString(args[1]);
         Player player = plugin.getServer().getPlayer(uuid);
         if (args[0].equals("land")) {
-
+            return new TARDISHandlesTakeoffCommand(plugin).enterVortex(player, args);
         }
-        if (args[0].equals("lock")) {
-
+        if (args[0].equals("lock") || args[0].equals("unlock")) {
+            return new TARDISHandlesLockUnlockCommand(plugin).toggleLock(player, TARDISNumberParsers.parseInt(args[2]), Boolean.valueOf(args[3]));
         }
         if (args[0].equals("name")) {
             TARDISMessage.handlesSend(player, "HANDLES_NAME", player.getName());
+            return true;
         }
         if (args[0].equals("remind")) {
             return new TARDISHandlesRemindCommand(plugin).doReminder(player, args);
@@ -61,19 +62,13 @@ public class TARDISHandlesCommand implements CommandExecutor {
             return new TARDISHandlesSayCommand(plugin).say(player, args);
         }
         if (args[0].equals("scan")) {
-            ResultSetTardisID rs = new ResultSetTardisID(plugin);
-            if (rs.fromUUID(args[1])) {
-                return new TARDISHandlesScanCommand(plugin, player, rs.getTardis_id()).sayScan();
-            }
+            return new TARDISHandlesScanCommand(plugin, player, TARDISNumberParsers.parseInt(args[2])).sayScan();
         }
         if (args[0].equals("takeoff")) {
-
+            return new TARDISHandlesTakeoffCommand(plugin).enterVortex(player, args);
         }
         if (args[0].equals("time")) {
             return new TARDISHandlesTimeCommand().sayTime(player);
-        }
-        if (args[0].equals("unlock")) {
-
         }
         return false;
     }

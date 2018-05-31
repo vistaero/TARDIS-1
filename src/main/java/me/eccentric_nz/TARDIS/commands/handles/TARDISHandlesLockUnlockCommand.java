@@ -17,10 +17,17 @@
 package me.eccentric_nz.TARDIS.commands.handles;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.database.QueryFactory;
+import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.ResultSetDoors;
+import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISSounds;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHandlesLockUnlockCommand {
@@ -31,8 +38,31 @@ public class TARDISHandlesLockUnlockCommand {
         this.plugin = plugin;
     }
 
-    public boolean doAbort(Player player, String[] args) {
-        //
+    public boolean toggleLock(Player player, int id, boolean lock) {
+        // get the TARDIS current location
+        HashMap<String, Object> wherec = new HashMap<>();
+        wherec.put("tardis_id", id);
+        ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, wherec);
+        if (rsc.resultSet()) {
+            Location l = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
+            QueryFactory qf = new QueryFactory(plugin);
+            HashMap<String, Object> whered = new HashMap<>();
+            whered.put("tardis_id", id);
+            ResultSetDoors rsd = new ResultSetDoors(plugin, whered, false);
+            if (rsd.resultSet()) {
+                // toggle door lock
+                int locked = (!lock) ? 0 : 1;
+                HashMap<String, Object> setl = new HashMap<>();
+                setl.put("locked", locked);
+                HashMap<String, Object> wherel = new HashMap<>();
+                wherel.put("tardis_id", id);
+                // always lock / unlock both doors
+                qf.doUpdate("doors", setl, wherel);
+                String message = (!lock) ? plugin.getLanguage().getString("DOOR_UNLOCK") : plugin.getLanguage().getString("DOOR_DEADLOCK");
+                TARDISMessage.handlesSend(player, "DOOR_LOCK", message);
+                TARDISSounds.playTARDISSound(l, "tardis_lock");
+            }
+        }
         return true;
     }
 }

@@ -17,6 +17,7 @@
 package me.eccentric_nz.TARDIS.handles;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.commands.handles.TARDISHandlesTeleportCommand;
 import me.eccentric_nz.TARDIS.database.ResultSetAreas;
 import me.eccentric_nz.TARDIS.database.ResultSetDestinations;
 import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
@@ -43,88 +44,78 @@ public class TARDISHandlesRequest {
                 player.performCommand("tardisrecipe " + " ");
             }
             return;
-        }
-        if (split.contains("remind")) {
+        } else if (split.contains("remind")) {
 
-        }
-        if (split.contains("say")) {
+        } else if (split.contains("say")) {
             plugin.getServer().dispatchCommand(plugin.getConsole(), "handles say " + uuid.toString() + " " + chat);
-        }
-        if (split.contains("name")) {
+        } else if (split.contains("name")) {
             plugin.getServer().dispatchCommand(plugin.getConsole(), "handles name " + uuid.toString());
-        }
-        if (split.contains("time")) {
+        } else if (split.contains("time")) {
             plugin.getServer().dispatchCommand(plugin.getConsole(), "handles time " + uuid.toString());
-        }
-        HashMap<String, Object> where = new HashMap<>();
-        where.put("uuid", uuid.toString());
-        ResultSetTardisID rs = new ResultSetTardisID(plugin);
-        if (rs.fromUUID(uuid.toString())) {
-            int id = rs.getTardis_id();
-            if (split.contains("call")) {
-                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles call " + uuid.toString() + " " + id);
-            }
-            if (split.contains("takeoff")) {
-                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles takeoff " + uuid.toString() + " " + id);
-            }
-            if (split.contains("land")) {
-                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles land " + uuid.toString() + " " + id);
-            }
-            if (split.contains("lock")) {
-
-            }
-            if (split.contains("unlock")) {
-
-            }
-            Player player = plugin.getServer().getPlayer(uuid);
-            if (player != null && player.isOnline()) {
-                if (split.contains("hide")) {
-                    player.performCommand("tardis hide");
-                }
-                if (split.contains("rebuild")) {
-                    player.performCommand("tardis rebuild");
-                }
-                if (split.contains("teleport")) {
-
-                }
-                if (split.contains("travel")) {
-                    if (split.contains("save")) {
-                        HashMap<String, Object> wheres = new HashMap<>();
-                        wheres.put("tardis_id", id);
-                        ResultSetDestinations rsd = new ResultSetDestinations(plugin, wheres, true);
-                        if (rsd.resultSet()) {
-                            for (HashMap<String, String> map : rsd.getData()) {
-                                String dest = map.get("dest_name");
-                                if (split.contains(dest) && player.hasPermission("tardis.timetravel")) {
-                                    player.performCommand("tardistravel " + "");
-                                    return;
+        } else {
+            HashMap<String, Object> where = new HashMap<>();
+            where.put("uuid", uuid.toString());
+            ResultSetTardisID rs = new ResultSetTardisID(plugin);
+            if (rs.fromUUID(uuid.toString())) {
+                int id = rs.getTardis_id();
+                if (split.contains("call")) {
+                    plugin.getServer().dispatchCommand(plugin.getConsole(), "handles call " + uuid.toString() + " " + id);
+                } else if (split.contains("takeoff")) {
+                    plugin.getServer().dispatchCommand(plugin.getConsole(), "handles takeoff " + uuid.toString() + " " + id);
+                } else if (split.contains("land")) {
+                    plugin.getServer().dispatchCommand(plugin.getConsole(), "handles land " + uuid.toString() + " " + id);
+                } else {
+                    if (split.contains("lock")) {
+                        plugin.getServer().dispatchCommand(plugin.getConsole(), "handles lock " + uuid.toString() + " " + id + " true");
+                    } else if (split.contains("unlock")) {
+                        plugin.getServer().dispatchCommand(plugin.getConsole(), "handles unlock " + uuid.toString() + " " + id + " false");
+                    } else {
+                        Player player = plugin.getServer().getPlayer(uuid);
+                        if (player != null && player.isOnline()) {
+                            if (split.contains("hide")) {
+                                player.performCommand("tardis hide");
+                            } else if (split.contains("rebuild")) {
+                                player.performCommand("tardis rebuild");
+                            } else if (split.contains("travel")) {
+                                if (split.contains("save")) {
+                                    HashMap<String, Object> wheres = new HashMap<>();
+                                    wheres.put("tardis_id", id);
+                                    ResultSetDestinations rsd = new ResultSetDestinations(plugin, wheres, true);
+                                    if (rsd.resultSet()) {
+                                        for (HashMap<String, String> map : rsd.getData()) {
+                                            String dest = map.get("dest_name");
+                                            if (split.contains(dest) && player.hasPermission("tardis.timetravel")) {
+                                                player.performCommand("tardistravel " + "");
+                                                return;
+                                            }
+                                        }
+                                    }
+                                } else if (split.contains("player")) {
+                                    for (Player p : plugin.getServer().getOnlinePlayers()) {
+                                        String name = p.getName();
+                                        if (split.contains(name) && player.hasPermission("tardis.timetravel.player")) {
+                                            player.performCommand("tardistravel " + name);
+                                            return;
+                                        }
+                                    }
+                                } else if (split.contains("area")) {
+                                    ResultSetAreas rsa = new ResultSetAreas(plugin, null, false, true);
+                                    if (rsa.resultSet()) {
+                                        // cycle through areas
+                                        rsa.getNames().forEach((name) -> {
+                                            if (split.contains(name) && (player.hasPermission("tardis.area." + name) || player.hasPermission("tardis.area.*"))) {
+                                                player.performCommand("tardistravel " + name);
+                                                return;
+                                            }
+                                        });
+                                    }
                                 }
+                            } else if (split.contains("scan")) {
+                                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles scan " + uuid.toString() + " " + id);
+                            } else if (split.contains("teleport")) {
+                                new TARDISHandlesTeleportCommand(plugin).beamMeUp(player);
                             }
                         }
-                    }
-                    if (split.contains("player")) {
-                        for (Player p : plugin.getServer().getOnlinePlayers()) {
-                            String name = p.getName();
-                            if (split.contains(name) && player.hasPermission("tardis.timetravel.player")) {
-                                player.performCommand("tardistravel " + name);
-                                return;
-                            }
-                        }
-                    }
-                    if (split.contains("area")) {
-                        ResultSetAreas rsa = new ResultSetAreas(plugin, null, false, true);
-                        if (rsa.resultSet()) {
-                            // cycle through areas
-                            rsa.getNames().forEach((name) -> {
-                                if (split.contains(name) && (player.hasPermission("tardis.area." + name) || player.hasPermission("tardis.area.*"))) {
-                                    player.performCommand("tardistravel " + name);
-                                    return;
-                                }
-                            });
-                        }
-                    }
-                    if (split.contains("scan")) {
-                        plugin.getServer().dispatchCommand(plugin.getConsole(), "handles scan " + uuid.toString());
                     }
                 }
             }

@@ -16,21 +16,12 @@
  */
 package me.eccentric_nz.TARDIS.flight;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitDamager;
 import me.eccentric_nz.TARDIS.artron.TARDISArtronIndicator;
 import me.eccentric_nz.TARDIS.artron.TARDISArtronLevels;
-import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.ResultSetControls;
-import me.eccentric_nz.TARDIS.database.ResultSetDoors;
-import me.eccentric_nz.TARDIS.database.ResultSetJunk;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
@@ -39,6 +30,7 @@ import me.eccentric_nz.TARDIS.utility.TARDISLocationGetters;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import me.eccentric_nz.TARDIS.utility.TARDISSounds;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -51,6 +43,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.material.Lever;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * The handbrake was a utensil on the TARDIS used for quick stops. River song
@@ -79,18 +75,18 @@ public class TARDISHandbrakeListener implements Listener {
         if (event.getHand() == null || event.getHand().equals(EquipmentSlot.OFF_HAND)) {
             return;
         }
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         Block block = event.getClickedBlock();
         if (block != null) {
             Material blockType = block.getType();
             if (blockType == Material.LEVER) {
-                final UUID uuid = player.getUniqueId();
+                UUID uuid = player.getUniqueId();
                 HashMap<String, Object> whereu = new HashMap<>();
                 whereu.put("uuid", uuid.toString());
                 ResultSetTravellers rsv = new ResultSetTravellers(plugin, whereu, false);
                 boolean inside = rsv.resultSet();
                 // check handbrake location against the database.
-                final Location handbrake_loc = block.getLocation();
+                Location handbrake_loc = block.getLocation();
                 HashMap<String, Object> where = new HashMap<>();
                 boolean found = false;
                 int tmp_id = -1;
@@ -113,7 +109,7 @@ public class TARDISHandbrakeListener implements Listener {
                 }
                 if (found) {
                     event.setCancelled(true);
-                    final int id = tmp_id;
+                    int id = tmp_id;
                     TARDISCircuitChecker tcc = null;
                     if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(player, event.getAction().equals(Action.LEFT_CLICK_BLOCK))) {
                         tcc = new TARDISCircuitChecker(plugin, id);
@@ -136,7 +132,7 @@ public class TARDISHandbrakeListener implements Listener {
                     ResultSetTardis rs = new ResultSetTardis(plugin, wherei, "", false, 2);
                     if (rs.resultSet()) {
                         Tardis tardis = rs.getTardis();
-                        final PRESET preset = tardis.getPreset();
+                        PRESET preset = tardis.getPreset();
                         if (preset.equals(PRESET.JUNK)) {
                             return;
                         }
@@ -169,7 +165,7 @@ public class TARDISHandbrakeListener implements Listener {
                                 flight_mode = rsp.getFlightMode();
                                 bar = rsp.isTravelbarOn();
                             }
-                            final QueryFactory qf = new QueryFactory(plugin);
+                            QueryFactory qf = new QueryFactory(plugin);
                             if (action == Action.RIGHT_CLICK_BLOCK) {
                                 if (tardis.isHandbrake_on()) {
                                     if (preset.equals(PRESET.JUNK_MODE) && !plugin.getTrackerKeeper().getHasDestination().containsKey(id)) {
@@ -250,9 +246,9 @@ public class TARDISHandbrakeListener implements Listener {
         }
     }
 
-    private void toggleBeacon(String str, boolean on) {
+    public static void toggleBeacon(String str, boolean on) {
         String[] beaconData = str.split(":");
-        World w = plugin.getServer().getWorld(beaconData[0]);
+        World w = Bukkit.getServer().getWorld(beaconData[0]);
         int bx = TARDISNumberParsers.parseInt(beaconData[1]);
         int by = TARDISNumberParsers.parseInt(beaconData[2]);
         int bz = TARDISNumberParsers.parseInt(beaconData[3]);
@@ -261,7 +257,6 @@ public class TARDISHandbrakeListener implements Listener {
         b.setType((on) ? Material.GLASS : Material.REDSTONE_BLOCK);
     }
 
-    @SuppressWarnings("deprecation")
     private boolean isDoorOpen(int id) {
         HashMap<String, Object> where = new HashMap<>();
         where.put("tardis_id", id);
