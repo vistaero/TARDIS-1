@@ -16,19 +16,10 @@
  */
 package me.eccentric_nz.TARDIS.databasetool;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.*;
+import java.sql.*;
 
 /**
- *
  * @author eccentric_nz
  */
 public class Main {
@@ -42,9 +33,9 @@ public class Main {
      * file.
      *
      * @param console the output window of the tool
-     * @param sqlite the SQLite file to migrate
-     * @param mysql the SQL file to write to
-     * @param prefix the desired table prefix
+     * @param sqlite  the SQLite file to migrate
+     * @param mysql   the SQL file to write to
+     * @param prefix  the desired table prefix
      * @throws IOException
      */
     public static void process(PrintWriter console, File sqlite, File mysql, String prefix) throws IOException {
@@ -228,6 +219,10 @@ public class Main {
                                     break;
                                 case programs:
                                     str = String.format(SQL.VALUES.get(i), rs.getInt("program_id"), rs.getString("uuid"), rs.getString("name"), rs.getString("inventory"), rs.getString("parsed"), rs.getInt("checked")) + end;
+                                    bw.write(str);
+                                    break;
+                                case reminders:
+                                    str = String.format(SQL.VALUES.get(i), rs.getInt("reminder_id"), rs.getString("uuid"), rs.getString("reminder"), rs.getLong("time")) + end;
                                     bw.write(str);
                                     break;
                                 case siege:

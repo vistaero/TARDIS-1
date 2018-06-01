@@ -17,7 +17,7 @@
 package me.eccentric_nz.TARDIS.database;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.data.Program;
+import me.eccentric_nz.TARDIS.database.data.Reminder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Many facts, figures, and formulas are contained within the Matrix,
@@ -35,32 +36,28 @@ import java.util.List;
  *
  * @author eccentric_nz
  */
-public class ResultSetPrograms {
+public class ResultSetReminders {
 
     private final TARDISDatabaseConnection service = TARDISDatabaseConnection.getINSTANCE();
     private final Connection connection = service.getConnection();
     private final TARDIS plugin;
-    private final String uuid;
     private final String prefix;
-    private final List<Program> programs;
+    private final List<Reminder> reminders;
 
     /**
      * Creates a class instance that can be used to retrieve an SQL ResultSet
-     * from the programs table.
+     * from the reminders table.
      *
      * @param plugin an instance of the main class.
-     * @param uuid   a HashMap<String, Object> of table fields and values to
-     *               refine the search.
      */
-    public ResultSetPrograms(TARDIS plugin, String uuid) {
+    public ResultSetReminders(TARDIS plugin) {
         this.plugin = plugin;
-        this.uuid = uuid;
         prefix = this.plugin.getPrefix();
-        programs = new ArrayList<>();
+        reminders = new ArrayList<>();
     }
 
     /**
-     * Retrieves an SQL ResultSet from the programs table. This method builds an
+     * Retrieves an SQL ResultSet from the reminders table. This method builds an
      * SQL query string from the parameters supplied and then executes the
      * query. Use the getters to retrieve the results.
      *
@@ -70,29 +67,26 @@ public class ResultSetPrograms {
         PreparedStatement statement = null;
         ResultSet rs = null;
 
-        String query = "SELECT program_id, name, checked FROM " + prefix + "programs WHERE uuid = ?";
+        String query = "SELECT * FROM " + prefix + "reminders";
         try {
             service.testConnection(connection);
             statement = connection.prepareStatement(query);
-            statement.setString(1, uuid);
             rs = statement.executeQuery();
             if (rs.isBeforeFirst()) {
                 while (rs.next()) {
-                    Program program = new Program(
-                            rs.getInt("program_id"),
-                            "",
-                            rs.getString("name"),
-                            "",
-                            "",
-                            rs.getBoolean("checked")
+                    Reminder reminder = new Reminder(
+                            rs.getInt("reminder_id"),
+                            UUID.fromString(rs.getString("uuid")),
+                            rs.getString("reminder"),
+                            rs.getLong("time")
                     );
-                    programs.add(program);
+                    reminders.add(reminder);
                 }
             } else {
                 return false;
             }
         } catch (SQLException e) {
-            plugin.debug("ResultSet error for programs table! " + e.getMessage());
+            plugin.debug("ResultSet error for reminders table! " + e.getMessage());
             return false;
         } finally {
             try {
@@ -103,13 +97,13 @@ public class ResultSetPrograms {
                     statement.close();
                 }
             } catch (SQLException e) {
-                plugin.debug("Error closing programs table! " + e.getMessage());
+                plugin.debug("Error closing reminders table! " + e.getMessage());
             }
         }
         return true;
     }
 
-    public List<Program> getPrograms() {
-        return programs;
+    public List<Reminder> getReminders() {
+        return reminders;
     }
 }

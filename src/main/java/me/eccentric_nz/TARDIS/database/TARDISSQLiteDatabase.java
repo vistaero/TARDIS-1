@@ -16,15 +16,16 @@
  */
 package me.eccentric_nz.TARDIS.database;
 
+import me.eccentric_nz.TARDIS.TARDIS;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import me.eccentric_nz.TARDIS.TARDIS;
 
 /**
  * SQLite database creator and updater.
- *
+ * <p>
  * Many facts, figures, and formulas are contained within the Matrix - a
  * supercomputer and micro-universe used by the High Council of the Time Lords
  * as a storehouse of knowledge to predict future events.
@@ -41,7 +42,7 @@ public class TARDISSQLiteDatabase {
 
     public TARDISSQLiteDatabase(TARDIS plugin) {
         this.plugin = plugin;
-        this.prefix = this.plugin.getPrefix();
+        prefix = this.plugin.getPrefix();
     }
 
     /**
@@ -151,6 +152,10 @@ public class TARDISSQLiteDatabase {
             // Table structure for table 'programs'
             String queryHandles = "CREATE TABLE IF NOT EXISTS " + prefix + "programs (program_id INTEGER PRIMARY KEY NOT NULL, uuid TEXT DEFAULT '', name TEXT DEFAULT '', inventory TEXT DEFAULT '', parsed TEXT DEFAULT '', checked INTEGER DEFAULT 1)";
             statement.executeUpdate(queryHandles);
+
+            // Table structure for table 'reminders'
+            String queryReminders = "CREATE TABLE IF NOT EXISTS " + prefix + "reminders (reminder_id INTEGER PRIMARY KEY NOT NULL, uuid TEXT DEFAULT '', reminder TEXT DEFAULT '', time INTEGER DEFAULT '0')";
+            statement.executeUpdate(queryReminders);
 
             // Table structure for table 'siege'
             String querySiege = "CREATE TABLE IF NOT EXISTS " + prefix + "siege (siege_id INTEGER PRIMARY KEY NOT NULL, uuid TEXT DEFAULT '', tardis_id INTEGER DEFAULT 0)";
