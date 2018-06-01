@@ -16,16 +16,16 @@
  */
 package me.eccentric_nz.TARDIS.files;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import me.eccentric_nz.TARDIS.TARDIS;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISRecipesUpdater {
@@ -38,47 +38,47 @@ public class TARDISRecipesUpdater {
 
     public TARDISRecipesUpdater(TARDIS plugin) {
         this.plugin = plugin;
-        this.recipes_config = plugin.getRecipesConfig();
-        this.flavours.put("Licorice", 0);
-        this.flavours.put("Raspberry", 1);
-        this.flavours.put("Apple", 2);
-        this.flavours.put("Cappuccino", 3);
-        this.flavours.put("Blueberry", 4);
-        this.flavours.put("Grape", 5);
-        this.flavours.put("Island Punch", 6);
-        this.flavours.put("Vodka", 7);
-        this.flavours.put("Earl Grey", 8);
-        this.flavours.put("Strawberry", 9);
-        this.flavours.put("Lime", 10);
-        this.flavours.put("Lemon", 11);
-        this.flavours.put("Bubblegum", 12);
-        this.flavours.put("Watermelon", 13);
-        this.flavours.put("Orange", 14);
-        this.flavours.put("Vanilla", 15);
-        this.colours.put("White", 0);
-        this.colours.put("Orange", 1);
-        this.colours.put("Magenta", 2);
-        this.colours.put("Light Blue", 3);
-        this.colours.put("Yellow", 4);
-        this.colours.put("Lime", 5);
-        this.colours.put("Pink", 6);
-        this.colours.put("Grey", 7);
-        this.colours.put("Light Grey", 8);
-        this.colours.put("Cyan", 9);
-        this.colours.put("Purple", 10);
-        this.colours.put("Blue", 11);
-        this.colours.put("Brown", 12);
-        this.colours.put("Green", 13);
-        this.colours.put("Red", 14);
-        this.colours.put("Black", 15);
-        this.damage.put("shaped.TARDIS ARS Circuit.lore", 20);
-        this.damage.put("shaped.TARDIS Chameleon Circuit.lore", 25);
-        this.damage.put("shaped.TARDIS Input Circuit.lore", 50);
-        this.damage.put("shaped.TARDIS Materialisation Circuit.lore", 50);
-        this.damage.put("shaped.TARDIS Memory Circuit.lore", 20);
-        this.damage.put("shaped.TARDIS Randomiser Circuit.lore", 50);
-        this.damage.put("shaped.TARDIS Scanner Circuit.lore", 20);
-        this.damage.put("shaped.TARDIS Temporal Circuit.lore", 20);
+        recipes_config = plugin.getRecipesConfig();
+        flavours.put("Licorice", 0);
+        flavours.put("Raspberry", 1);
+        flavours.put("Apple", 2);
+        flavours.put("Cappuccino", 3);
+        flavours.put("Blueberry", 4);
+        flavours.put("Grape", 5);
+        flavours.put("Island Punch", 6);
+        flavours.put("Vodka", 7);
+        flavours.put("Earl Grey", 8);
+        flavours.put("Strawberry", 9);
+        flavours.put("Lime", 10);
+        flavours.put("Lemon", 11);
+        flavours.put("Bubblegum", 12);
+        flavours.put("Watermelon", 13);
+        flavours.put("Orange", 14);
+        flavours.put("Vanilla", 15);
+        colours.put("White", 0);
+        colours.put("Orange", 1);
+        colours.put("Magenta", 2);
+        colours.put("Light Blue", 3);
+        colours.put("Yellow", 4);
+        colours.put("Lime", 5);
+        colours.put("Pink", 6);
+        colours.put("Grey", 7);
+        colours.put("Light Grey", 8);
+        colours.put("Cyan", 9);
+        colours.put("Purple", 10);
+        colours.put("Blue", 11);
+        colours.put("Brown", 12);
+        colours.put("Green", 13);
+        colours.put("Red", 14);
+        colours.put("Black", 15);
+        damage.put("shaped.TARDIS ARS Circuit.lore", 20);
+        damage.put("shaped.TARDIS Chameleon Circuit.lore", 25);
+        damage.put("shaped.TARDIS Input Circuit.lore", 50);
+        damage.put("shaped.TARDIS Materialisation Circuit.lore", 50);
+        damage.put("shaped.TARDIS Memory Circuit.lore", 20);
+        damage.put("shaped.TARDIS Randomiser Circuit.lore", 50);
+        damage.put("shaped.TARDIS Scanner Circuit.lore", 20);
+        damage.put("shaped.TARDIS Temporal Circuit.lore", 20);
     }
 
     public void addRecipes() {
@@ -86,6 +86,20 @@ public class TARDISRecipesUpdater {
         // fix lore
         recipes_config.set("shaped.Stattenheim Remote.lore", "Right-click block~to call TARDIS");
         recipes_config.set("shaped.Artron Storage Cell.lore", "Charge Level~0");
+        if (!recipes_config.contains("shaped.TARDIS Communicator")) {
+            recipes_config.set("shaped.TARDIS Communicator.easy_shape", "N--,IIH,--I");
+            recipes_config.set("shaped.TARDIS Communicator.easy_ingredients.N", "NOTE_BLOCK");
+            recipes_config.set("shaped.TARDIS Communicator.easy_ingredients.I", "IRON_INGOT");
+            recipes_config.set("shaped.TARDIS Communicator.easy_ingredients.H", "HOPPER");
+            recipes_config.set("shaped.TARDIS Communicator.hard_shape", "N--,IIH,--D");
+            recipes_config.set("shaped.TARDIS Communicator.hard_ingredients.N", "NOTE_BLOCK");
+            recipes_config.set("shaped.TARDIS Communicator.hard_ingredients.I", "IRON_INGOT");
+            recipes_config.set("shaped.TARDIS Communicator.hard_ingredients.H", "HOPPER");
+            recipes_config.set("shaped.TARDIS Communicator.hard_ingredients.D", "DIAMOND");
+            recipes_config.set("shaped.TARDIS Communicator.result", "LEATHER_HELMET");
+            recipes_config.set("shaped.TARDIS Communicator.amount", 1);
+            recipes_config.set("shaped.TARDIS Communicator.lore", "");
+        }
         if (!recipes_config.contains("shaped.Rust Plague Sword")) {
             recipes_config.set("shaped.Rust Plague Sword.easy_shape", "RIR,RIR,-S-");
             recipes_config.set("shaped.Rust Plague Sword.easy_ingredients.R", "LAVA_BUCKET");
