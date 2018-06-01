@@ -16,24 +16,24 @@
  */
 package me.eccentric_nz.TARDIS.commands.admin;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISSetBooleanCommand {
 
     private final TARDIS plugin;
-    private final List<String> require_restart = Arrays.asList("use_block_stack", "use_worldguard", "wg_flag_set", "walk_in_tardis", "zero_room", "open_door_policy", "particles", "switch_resource_packs");
+    private final List<String> require_restart = Arrays.asList("use_block_stack", "use_worldguard", "wg_flag_set", "walk_in_tardis", "zero_room", "open_door_policy", "particles", "switch_resource_packs", "handles");
 
     public TARDISSetBooleanCommand(TARDIS plugin) {
         this.plugin = plugin;

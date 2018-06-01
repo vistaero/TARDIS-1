@@ -29,9 +29,8 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * The Alpha Centauran Table Tennis Club is a club established by the Alpha
- * Centaurans for the play of table tennis. The species is naturally gifted at
- * the game, since they possess six arms. The Doctor is a member of the Club.
+ * The Alpha Centauran Table Tennis Club is a club established by the Alpha Centaurans for the play of table tennis. The
+ * species is naturally gifted at the game, since they possess six arms. The Doctor is a member of the Club.
  *
  * @author eccentric_nz
  */
@@ -45,7 +44,6 @@ public class TARDISConfiguration {
     private final FileConfiguration signs_config;
     private final FileConfiguration chameleon_config;
     private final FileConfiguration planets_config;
-    //    private FileConfiguration handles_config;
     private File configFile = null;
     HashMap<String, String> strOptions = new HashMap<>();
     HashMap<String, Integer> intOptions = new HashMap<>();
@@ -72,7 +70,6 @@ public class TARDISConfiguration {
         signs_config = plugin.getSigns();
         chameleon_config = plugin.getChameleonGuis();
         planets_config = plugin.getPlanetsConfig();
-//        handles_config = plugin.getHandlesConfig();
         // boolean
         boolOptions.put("abandon.enabled", true);
         boolOptions.put("abandon.reduce_count", true);
@@ -84,6 +81,7 @@ public class TARDISConfiguration {
         boolOptions.put("allow.external_gravity", false);
         boolOptions.put("allow.guardians", false);
         boolOptions.put("allow.hads", true);
+        boolOptions.put("allow.handles", true);
         boolOptions.put("allow.invisibility", true);
         boolOptions.put("allow.mob_farming", true);
         boolOptions.put("allow.perception_filter", true);
@@ -115,6 +113,7 @@ public class TARDISConfiguration {
         boolOptions.put("desktop.check_blocks_before_upgrade", false);
         boolOptions.put("growth.return_room_seed", true);
         boolOptions.put("growth.rooms_require_blocks", false);
+        boolOptions.put("handles.reminders.enabled", true);
         boolOptions.put("junk.enabled", true);
         boolOptions.put("junk.particles", true);
         boolOptions.put("police_box.name_tardis", false);
@@ -293,6 +292,7 @@ public class TARDISConfiguration {
         intOptions.put("growth.gravity_max_velocity", 5);
         intOptions.put("growth.room_speed", 4);
         intOptions.put("growth.rooms_condenser_percent", 100);
+        intOptions.put("handles.reminders.schedule", 1200);
         intOptions.put("junk.return", -1);
         intOptions.put("police_box.confirm_timeout", 15);
         intOptions.put("police_box.rebuild_cooldown", 10000);
@@ -384,6 +384,7 @@ public class TARDISConfiguration {
         strOptions.put("creation.default_world_name", "TARDIS_TimeVortex");
         strOptions.put("creation.gamemode", "survival");
         strOptions.put("creation.use_clay", "WOOL");
+        strOptions.put("handles.prefix", "Hey Handles");
         strOptions.put("police_box.default_preset", "FACTORY");
         strOptions.put("police_box.tardis_lamp", "REDSTONE_LAMP_OFF");
         strOptions.put("police_box.sign_colour", "WHITE");
@@ -459,10 +460,9 @@ public class TARDISConfiguration {
     }
 
     /**
-     * Checks that the config file contains all the required entries. If entries
-     * are missing, then they are added with default values. Also checks that
-     * all current server worlds are added to the config, and any deleted worlds
-     * are removed.
+     * Checks that the config file contains all the required entries. If entries are missing, then they are added with
+     * default values. Also checks that all current server worlds are added to the config, and any deleted worlds are
+     * removed.
      */
     public void checkConfig() {
         int i = 0;

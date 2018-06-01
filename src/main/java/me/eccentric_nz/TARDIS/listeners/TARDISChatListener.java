@@ -36,10 +36,9 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
- * In 21st century London, Rory has his father, Brian Williams, over to help fix
- * a light bulb. After saying the fixture may be the problem, the sound of the
- * TARDIS materialisation is heard. The TARDIS materialises around them,
- * shocking Brian in place.
+ * In 21st century London, Rory has his father, Brian Williams, over to help fix a light bulb. After saying the fixture
+ * may be the problem, the sound of the TARDIS materialisation is heard. The TARDIS materialises around them, shocking
+ * Brian in place.
  *
  * @author eccentric_nz
  */
@@ -54,12 +53,10 @@ public class TARDISChatListener implements Listener {
     }
 
     /**
-     * Listens for player typing "tardis rescue accept". If the player types it
-     * within 60 seconds of a Time Lord sending a rescue request, a player
-     * rescue attempt is made.
+     * Listens for player typing "tardis rescue accept". If the player types it within 60 seconds of a Time Lord sending
+     * a rescue request, a player rescue attempt is made.
      * <p>
-     * Also processes questions pertaining to "How to make a TARDIS?" and
-     * variations thereof.
+     * Also processes questions pertaining to "How to make a TARDIS?" and variations thereof.
      *
      * @param event a player typing in chat
      */
@@ -98,7 +95,7 @@ public class TARDISChatListener implements Listener {
                     String message = (request) ? "REQUEST_TIMEOUT" : "RESCUE_TIMEOUT";
                     TARDISMessage.send(event.getPlayer(), message);
                 }
-            } else if (chat.startsWith(plugin.getHandlesConfig().getString("prefix").toLowerCase(Locale.ENGLISH))) {
+            } else if (chat.startsWith(plugin.getConfig().getString("handles.prefix").toLowerCase(Locale.ENGLISH))) {
                 // process handles request
                 new TARDISHandlesRequest(plugin).process(saved, event.getMessage());
             } else {
