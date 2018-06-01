@@ -16,9 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.handles;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.database.ResultSetControls;
@@ -33,8 +30,11 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHandlesListener implements Listener {
@@ -90,15 +90,13 @@ public class TARDISHandlesListener implements Listener {
             }
             UUID uuid = event.getPlayer().getUniqueId();
             // must have a TARDIS
-            HashMap<String, Object> where = new HashMap<>();
-            where.put("uuid", uuid.toString());
             ResultSetTardisID rs = new ResultSetTardisID(plugin);
             if (rs.fromUUID(uuid.toString())) {
                 // check if they have a handles block
-                HashMap<String, Object> wherec = new HashMap<>();
-                wherec.put("tardis_id", rs.getTardis_id());
-                wherec.put("type", 26);
-                ResultSetControls rsc = new ResultSetControls(plugin, wherec, false);
+                HashMap<String, Object> where = new HashMap<>();
+                where.put("tardis_id", rs.getTardis_id());
+                where.put("type", 26);
+                ResultSetControls rsc = new ResultSetControls(plugin, where, false);
                 if (!rsc.resultSet()) {
                     String l = event.getBlock().getLocation().toString();
                     new QueryFactory(plugin).insertControl(rs.getTardis_id(), 26, l, 0);

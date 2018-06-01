@@ -39,6 +39,7 @@ import me.eccentric_nz.TARDIS.enumeration.LANGUAGE;
 import me.eccentric_nz.TARDIS.files.*;
 import me.eccentric_nz.TARDIS.flight.TARDISVortexPersister;
 import me.eccentric_nz.TARDIS.hads.TARDISHadsPersister;
+import me.eccentric_nz.TARDIS.handles.TARDISHandlesRunnable;
 import me.eccentric_nz.TARDIS.junk.TARDISJunkReturnRunnable;
 import me.eccentric_nz.TARDIS.move.TARDISMonsterRunnable;
 import me.eccentric_nz.TARDIS.move.TARDISPortalPersister;
@@ -78,10 +79,9 @@ import java.util.regex.Pattern;
 /**
  * The main class where everything is enabled and disabled.
  * <p>
- * "TARDIS" is an acronym meaning "Time And Relative Dimension In Space".
- * TARDISes move through time and space by "disappearing there and reappearing
- * here", a process known as "de- and re-materialisation". TARDISes are used for
- * the observation of various places and times.
+ * "TARDIS" is an acronym meaning "Time And Relative Dimension In Space". TARDISes move through time and space by
+ * "disappearing there and reappearing here", a process known as "de- and re-materialisation". TARDISes are used for the
+ * observation of various places and times.
  *
  * @author eccentric_nz
  */
@@ -107,7 +107,6 @@ public class TARDIS extends JavaPlugin {
     private FileConfiguration roomsConfig;
     private FileConfiguration tagConfig;
     private FileConfiguration planetsConfig;
-    private FileConfiguration handlesConfig;
     private HashMap<String, Integer> condensables;
     private int standbyTask;
     private PluginDescriptionFile pdfFile;
@@ -244,9 +243,11 @@ public class TARDIS extends JavaPlugin {
             new TARDISListenerRegisterer(this).registerListeners();
             new TARDISCommandSetter(this).loadCommands();
             startSound();
+            startReminders();
             loadWorldGuard();
             loadPluginRespect();
             startZeroHealing();
+            startSiegeTicks();
 
             new TARDISCreeperChecker(this).startCreeperCheck();
             if (pm.isPluginEnabled("TARDISChunkGenerator")) {
@@ -532,7 +533,6 @@ public class TARDIS extends JavaPlugin {
         tardisCopier.copy("blocks.yml");
         tardisCopier.copy("condensables.yml");
         tardisCopier.copy("custom_consoles.yml");
-        tardisCopier.copy("handles.yml");
         tardisCopier.copy("kits.yml");
         tardisCopier.copy("planets.yml");
         tardisCopier.copy("recipes.yml");
@@ -551,7 +551,6 @@ public class TARDIS extends JavaPlugin {
         blocksConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "blocks.yml"));
         condensablesConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "condensables.yml"));
         customConsolesConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "custom_consoles.yml"));
-        handlesConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "handles.yml"));
         kitsConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "kits.yml"));
         planetsConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "planets.yml"));
         recipesConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "recipes.yml"));
@@ -560,8 +559,7 @@ public class TARDIS extends JavaPlugin {
     }
 
     /**
-     * Builds the schematics used to create TARDISes and rooms. Also loads the
-     * quotes from the quotes file.
+     * Builds the schematics used to create TARDISes and rooms. Also loads the quotes from the quotes file.
      */
     private void loadFiles() {
         tardisCopier.copyFiles();
@@ -590,8 +588,7 @@ public class TARDIS extends JavaPlugin {
     }
 
     /**
-     * Starts a repeating task that plays TARDIS sound effects to players while
-     * they are inside the TARDIS.
+     * Starts a repeating task that plays TARDIS sound effects to players while they are inside the TARDIS.
      */
     private void startSound() {
         getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
@@ -600,9 +597,18 @@ public class TARDIS extends JavaPlugin {
     }
 
     /**
-     * Starts a repeating task that removes Artron Energy from the TARDIS while
-     * it is in standby mode (ie not travelling). Only runs if `standby_time` in
-     * artron.yml is greater than 0 (the default is 6000 or every 5 minutes).
+     * Starts a repeating task that schedules reminders added to a players Handles cyberhead companion.
+     */
+    private void startReminders() {
+        if (getConfig().getBoolean("handles.reminders.enabled")) {
+            getServer().getScheduler().scheduleSyncRepeatingTask(this, new TARDISHandlesRunnable(this), 120L, getConfig().getLong("handles.reminders.schedule"));
+        }
+    }
+
+    /**
+     * Starts a repeating task that removes Artron Energy from the TARDIS while it is in standby mode (ie not
+     * travelling). Only runs if `standby_time` in artron.yml is greater than 0 (the default is 6000 or every 5
+     * minutes).
      */
     public void startStandBy() {
         if (getConfig().getBoolean("allow.power_down")) {
@@ -615,9 +621,8 @@ public class TARDIS extends JavaPlugin {
     }
 
     /**
-     * Starts a repeating task that removes Artron Energy from the TARDIS while
-     * it is in Siege Mode. Only runs if `siege_ticks` in artron.yml is greater
-     * than 0 (the default is 1500 or every 1 minute 15 seconds).
+     * Starts a repeating task that removes Artron Energy from the TARDIS while it is in Siege Mode. Only runs if
+     * `siege_ticks` in artron.yml is greater than 0 (the default is 1500 or every 1 minute 15 seconds).
      */
     public void startSiegeTicks() {
         if (getConfig().getBoolean("siege.enabled")) {
@@ -630,8 +635,7 @@ public class TARDIS extends JavaPlugin {
     }
 
     /**
-     * Starts a repeating task that heals players 1/2 a heart per cycle when
-     * they are in the Zero room.
+     * Starts a repeating task that heals players 1/2 a heart per cycle when they are in the Zero room.
      */
     private void startZeroHealing() {
         if (getConfig().getBoolean("allow.zero_room")) {
@@ -671,8 +675,7 @@ public class TARDIS extends JavaPlugin {
     }
 
     /**
-     * Checks if the Multiverse-Core plugin is available, and loads support if
-     * it is.
+     * Checks if the Multiverse-Core plugin is available, and loads support if it is.
      */
     private void loadMultiverse() {
         if (pm.isPluginEnabled("Multiverse-Core")) {
@@ -692,8 +695,7 @@ public class TARDIS extends JavaPlugin {
     }
 
     /**
-     * Checks if the TARDISChunkGenerator plugin is available, and loads support
-     * if it is.
+     * Checks if the TARDISChunkGenerator plugin is available, and loads support if it is.
      */
     private void loadHelper() {
         if (pm.getPlugin("TARDISChunkGenerator") != null) {
@@ -716,9 +718,8 @@ public class TARDIS extends JavaPlugin {
     }
 
     /**
-     * Loads the permissions handler for TARDIS worlds if the relevant
-     * permissions plugin is enabled. Currently supports GroupManager and
-     * bPermissions (as they have per world config files).
+     * Loads the permissions handler for TARDIS worlds if the relevant permissions plugin is enabled. Currently supports
+     * GroupManager and bPermissions (as they have per world config files).
      */
     private void loadPerms() {
         if (pm.getPlugin("GroupManager") != null || pm.getPlugin("bPermissions") != null || pm.getPlugin("PermissionsEx") != null) {
@@ -765,8 +766,7 @@ public class TARDIS extends JavaPlugin {
     }
 
     /**
-     * Reads the config file and places the configured seed material for each
-     * room type into a HashMap.
+     * Reads the config file and places the configured seed material for each room type into a HashMap.
      */
     private HashMap<Material, String> getSeeds() {
         HashMap<Material, String> map = new HashMap<>();
@@ -817,9 +817,8 @@ public class TARDIS extends JavaPlugin {
     }
 
     /**
-     * Gets the server default resource pack. Will use the Minecraft default
-     * pack if none is specified. Until Minecraft/Bukkit lets us set the RP back
-     * to Default, we'll have to host it on DropBox
+     * Gets the server default resource pack. Will use the Minecraft default pack if none is specified. Until
+     * Minecraft/Bukkit lets us set the RP back to Default, we'll have to host it on DropBox
      *
      * @return The server specified texture pack.
      */
@@ -995,10 +994,6 @@ public class TARDIS extends JavaPlugin {
 
     public FileConfiguration getChameleonGuis() {
         return chameleonGuis;
-    }
-
-    public FileConfiguration getHandlesConfig() {
-        return handlesConfig;
     }
 
     public TARDISUtils getUtils() {

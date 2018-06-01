@@ -17,7 +17,12 @@
 package me.eccentric_nz.TARDIS.commands.handles;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.database.QueryFactory;
+import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import org.bukkit.entity.Player;
+
+import java.util.HashMap;
 
 /**
  * @author eccentric_nz
@@ -31,7 +36,28 @@ public class TARDISHandlesRemindCommand {
     }
 
     public boolean doReminder(Player player, String[] args) {
-        //
+        StringBuilder sb = new StringBuilder();
+        for (int i = 2; i < args.length - 1; i++) {
+            sb.append(args[i]).append(" ");
+        }
+        String message = sb.toString();
+        // the last argument should be a number
+        long when = TARDISNumberParsers.parseLong(args[args.length - 1]);
+        if (when == 0) {
+            TARDISMessage.handlesMessage(player, "HANDLES_NUMBER");
+            return true;
+        }
+        TARDISMessage.handlesSend(player, "HANDLES_OK", "" + when);
+        // convert minutes to milliseconds
+        when *= 60000;
+        // add the current time in milliseconds
+        when = when + System.currentTimeMillis();
+        // create a reminder record
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("uuid", player.getUniqueId().toString());
+        data.put("reminder", message);
+        data.put("time", when);
+        new QueryFactory(plugin).doInsert("reminders", data);
         return true;
     }
 }
