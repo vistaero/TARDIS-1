@@ -16,7 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.listeners;
 
-import java.util.HashMap;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.Material;
@@ -30,8 +29,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.HashMap;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISAnvilListener implements Listener {
@@ -47,9 +47,9 @@ public class TARDISAnvilListener implements Listener {
             String[] result = plugin.getRecipesConfig().getString("shapeless." + q + ".result").split(":");
             disallow.put(q, Material.valueOf(result[0]));
         });
+        disallow.put("Handles", Material.SILVER_GLAZED_TERRACOTTA);
     }
 
-    @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.HIGH)
     public void onInteract(InventoryClickEvent event) {
         Inventory inv = event.getView().getTopInventory();
