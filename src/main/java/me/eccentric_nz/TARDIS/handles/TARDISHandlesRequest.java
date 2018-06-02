@@ -17,6 +17,7 @@
 package me.eccentric_nz.TARDIS.handles;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.commands.TARDISRecipeTabComplete;
 import me.eccentric_nz.TARDIS.commands.handles.TARDISHandlesTeleportCommand;
 import me.eccentric_nz.TARDIS.database.ResultSetAreas;
 import me.eccentric_nz.TARDIS.database.ResultSetControls;
@@ -33,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class TARDISHandlesRequest {
 
@@ -65,35 +67,54 @@ public class TARDISHandlesRequest {
                     // player must have communicator
                     PlayerInventory pi = player.getInventory();
                     ItemStack communicator = pi.getHelmet();
-                    if (!communicator.hasItemMeta() || !communicator.getType().equals(Material.LEATHER_HELMET) || !communicator.getItemMeta().getDisplayName().equals("TARDIS Communicator")) {
+                    if (communicator == null || !communicator.hasItemMeta() || !communicator.getType().equals(Material.LEATHER_HELMET) || !communicator.getItemMeta().getDisplayName().equals("TARDIS Communicator")) {
+                        TARDISMessage.send(player, "HANDLES_COMMUNICATOR");
                         return;
                     }
                 }
             } else {
                 // Handles must be in inventory
                 if (!player.getInventory().contains(handles)) {
-                    TARDISMessage.send(player, "HANLES_INVENTORY");
+                    TARDISMessage.send(player, "HANDLES_INVENTORY");
                     return;
                 }
             }
             // remove the prefix
-            String removed = chat.replace(plugin.getConfig().getString("handles.prefix") + " ", "");
+            String removed = chat.replaceAll("(?i)" + Pattern.quote(plugin.getConfig().getString("handles.prefix") + " "), "");
             List<String> split = Arrays.asList(removed.toLowerCase().split(" "));
             if (split.contains("craft")) {
-                player.performCommand("tardisrecipe " + " ");
+                if (split.contains("tardis")) {
+                    for (String seed : TARDISRecipeTabComplete.TARDIS_TYPES) {
+                        if (split.contains(seed)) {
+                            player.performCommand("tardisrecipe tardis " + seed);
+                            return;
+                        }
+                    }
+                    // default to budget
+                    player.performCommand("tardisrecipe tardis budget");
+                } else {
+                    for (String item : TARDISRecipeTabComplete.ROOT_SUBS) {
+                        if (split.contains(item)) {
+                            player.performCommand("tardisrecipe " + item);
+                            return;
+                        }
+                    }
+                    // don't understand
+                    TARDISMessage.handlesSend(player, "HANDLES_NO_COMMAND");
+                }
             } else if (split.contains("remind")) {
                 if (!plugin.getConfig().getBoolean("handles.reminders.enabled")) {
                     TARDISMessage.handlesSend(player, "HANDLES_NO_COMMAND");
                     return;
                 }
                 // remove 'me to '
-                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles remind " + uuid.toString() + " " + removed.replace("me to ", ""));
+                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles remind " + uuid.toString() + " " + removed.replaceAll("(?i)" + Pattern.quote("me to "), ""));
             } else if (split.contains("say")) {
                 // remove 'say '
-                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles say " + uuid.toString() + " " + removed.replace("say ", ""));
-            } else if (split.contains("name")) {
+                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles say " + uuid.toString() + " " + removed.replaceAll("(?i)" + Pattern.quote("say "), ""));
+            } else if (split.contains("name") || split.contains("name?")) {
                 plugin.getServer().dispatchCommand(plugin.getConsole(), "handles name " + uuid.toString());
-            } else if (split.contains("time")) {
+            } else if (split.contains("time") || split.contains("time?")) {
                 plugin.getServer().dispatchCommand(plugin.getConsole(), "handles time " + uuid.toString());
             } else if (split.contains("call")) {
                 plugin.getServer().dispatchCommand(plugin.getConsole(), "handles call " + uuid.toString() + " " + id);
@@ -130,6 +151,8 @@ public class TARDISHandlesRequest {
                             player.performCommand("tardistravel " + name);
                             return;
                         }
+                        // don't understand
+                        TARDISMessage.handlesSend(player, "HANDLES_NO_COMMAND");
                     }
                 } else if (split.contains("area")) {
                     ResultSetAreas rsa = new ResultSetAreas(plugin, null, false, true);
@@ -141,9 +164,17 @@ public class TARDISHandlesRequest {
                                 return;
                             }
                         });
+                        // don't understand
+                        TARDISMessage.handlesSend(player, "HANDLES_NO_COMMAND");
                     }
+                }
+                if (split.contains("home")) {
+                    // travel home
+                    player.performCommand("tardistravel home");
+                    return;
                 } else {
                     // don't understand
+                    TARDISMessage.handlesSend(player, "HANDLES_NO_COMMAND");
                 }
             } else if (split.contains("scan")) {
                 plugin.getServer().dispatchCommand(plugin.getConsole(), "handles scan " + uuid.toString() + " " + id);
@@ -151,6 +182,7 @@ public class TARDISHandlesRequest {
                 new TARDISHandlesTeleportCommand(plugin).beamMeUp(player);
             } else {
                 // don't understand
+                TARDISMessage.handlesSend(player, "HANDLES_NO_COMMAND");
             }
         }
     }
