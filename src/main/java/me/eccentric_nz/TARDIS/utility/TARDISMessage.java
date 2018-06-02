@@ -17,6 +17,7 @@
 package me.eccentric_nz.TARDIS.utility;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -32,8 +33,7 @@ public class TARDISMessage {
     private static final String HANDLES = ChatColor.BLUE + "[Handles]" + ChatColor.RESET;
 
     /**
-     * Splits a message into multiple lines if it is longer than the guaranteed
-     * chat page width.
+     * Splits a message into multiple lines if it is longer than the guaranteed chat page width.
      *
      * @param p       the player to send the message
      * @param message the message to send
@@ -64,12 +64,16 @@ public class TARDISMessage {
     }
 
     public static void handlesMessage(Player p, String message) {
-        message(p, HANDLES + message);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(TARDIS.plugin, () -> {
+            message(p, HANDLES + message);
+        }, 2L);
     }
 
     public static void handlesSend(Player p, String key) {
         String local = TARDIS.plugin.getLanguage().getString(key);
-        message(p, HANDLES + local);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(TARDIS.plugin, () -> {
+            message(p, HANDLES + local);
+        }, 2L);
     }
 
     public static void send(Player p, String key, String sub) {
@@ -79,7 +83,9 @@ public class TARDISMessage {
 
     public static void handlesSend(Player p, String key, String sub) {
         String local = TARDIS.plugin.getLanguage().getString(key);
-        message(p, HANDLES + String.format(local, sub));
+        Bukkit.getScheduler().scheduleSyncDelayedTask(TARDIS.plugin, () -> {
+            message(p, HANDLES + String.format(local, sub));
+        }, 2L);
     }
 
     public static void send(CommandSender cs, String key) {
