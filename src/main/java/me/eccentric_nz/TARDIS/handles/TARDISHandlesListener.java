@@ -83,6 +83,10 @@ public class TARDISHandlesListener implements Listener {
         }
         ItemMeta im = is.getItemMeta();
         if (im.hasDisplayName() && im.getDisplayName().equals("Handles")) {
+            if (!event.getPlayer().hasPermission("tardis.handles.use")) {
+                TARDISMessage.send(event.getPlayer(), "NO_PERM");
+                return;
+            }
             // cannot place unless inside the TARDIS
             if (!plugin.getUtils().inTARDISWorld(event.getPlayer())) {
                 event.setCancelled(true);

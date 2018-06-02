@@ -52,6 +52,10 @@ public class TARDISHandlesRequest {
         if (player == null || !player.isOnline()) {
             return;
         }
+        if (!player.hasPermission("tardis.handles.use")) {
+            TARDISMessage.send(player, "NO_PERM");
+            return;
+        }
         // must have a TARDIS
         ResultSetTardisID rs = new ResultSetTardisID(plugin);
         if (rs.fromUUID(uuid.toString())) {
@@ -65,6 +69,10 @@ public class TARDISHandlesRequest {
                 // if placed player must be in TARDIS or be wearing a communicator
                 if (!plugin.getUtils().inTARDISWorld(player)) {
                     // player must have communicator
+                    if (!player.hasPermission("tardis.handles.communicator")) {
+                        TARDISMessage.send(player, "NO_PERM_COMMUNICATOR");
+                        return;
+                    }
                     PlayerInventory pi = player.getInventory();
                     ItemStack communicator = pi.getHelmet();
                     if (communicator == null || !communicator.hasItemMeta() || !communicator.getType().equals(Material.LEATHER_HELMET) || !communicator.getItemMeta().getDisplayName().equals("TARDIS Communicator")) {

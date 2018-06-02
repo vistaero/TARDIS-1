@@ -349,7 +349,15 @@ public class TARDISButtonListener implements Listener {
                                     break;
                                 case 26:
                                     // Handles
+                                    if (!player.hasPermission("tardis.handles.use")) {
+                                        TARDISMessage.send(player, "NO_PERM");
+                                        return;
+                                    }
                                     TARDISSounds.playTARDISSound(player, "Handles");
+                                    if (!player.hasPermission("tardis.handles.program")) {
+                                        TARDISMessage.send(player, "NO_PERM");
+                                        return;
+                                    }
                                     if (player.isSneaking()) {
                                         // open programming GUI
                                         ItemStack[] handles = new TARDISHandlesProgramInventory(plugin, 0).getHandles();
