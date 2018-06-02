@@ -17,8 +17,6 @@
 package me.eccentric_nz.TARDIS.commands.admin;
 
 import com.google.common.collect.ImmutableList;
-import java.util.List;
-import java.util.Set;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.commands.TARDISCompleter;
 import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
@@ -26,21 +24,24 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * TabCompleter for /tardisgive
  */
 public class TARDISGiveTabComplete extends TARDISCompleter implements TabCompleter {
 
-    private final ImmutableList<String> GIVE_SUBS = ImmutableList.of("artron", "kit", "a-circuit", "acid-battery", "ars-circuit", "battery", "blaster", "bow-tie", "bio-circuit", "biome-disk", "blank", "c-circuit", "cell", "custard", "d-circuit", "e-circuit", "filter", "fish-finger", "furnace", "generator", "glasses", "i-circuit", "ignite-circuit", "invisible", "jammy-dodger", "jelly-baby", "key", "l-circuit", "locator", "m-circuit", "memory-circuit", "oscillator", "pad", "painter", "player-disk", "preset-disk", "p-circuit", "r-circuit", "r-key", "randomiser-circuit", "reader", "remote", "rift-circuit", "rift-manipulator", "rust", "s-circuit", "save-disk", "scanner-circuit", "seed", "sonic", "t-circuit", "telepathic", "tachyon", "vortex", "watch");
+    private final ImmutableList<String> GIVE_SUBS = ImmutableList.of("artron", "kit", "a-circuit", "acid-battery", "ars-circuit", "battery", "blaster", "bow-tie", "bio-circuit", "biome-disk", "blank", "c-circuit", "cell", "communicator", "custard", "d-circuit", "e-circuit", "filter", "fish-finger", "furnace", "generator", "glasses", "handles", "i-circuit", "ignite-circuit", "invisible", "jammy-dodger", "jelly-baby", "key", "l-circuit", "locator", "m-circuit", "memory-circuit", "oscillator", "pad", "painter", "player-disk", "preset-disk", "p-circuit", "r-circuit", "r-key", "randomiser-circuit", "reader", "remote", "rift-circuit", "rift-manipulator", "rust", "s-circuit", "save-disk", "scanner-circuit", "seed", "sonic", "t-circuit", "telepathic", "tachyon", "vortex", "watch");
     private final ImmutableList<String> GIVE_KNOWLEDGE = ImmutableList.of("knowledge", "1", "2", "64");
     private final Set<String> kits;
     private final ImmutableList<String> KIT_SUBS;
     private final ImmutableList<String> SEED_SUBS;
 
     public TARDISGiveTabComplete(TARDIS plugin) {
-        this.kits = plugin.getKitsConfig().getConfigurationSection("kits").getKeys(false);
-        this.KIT_SUBS = ImmutableList.copyOf(kits);
-        this.SEED_SUBS = ImmutableList.copyOf(CONSOLES.getBY_NAMES().keySet());
+        kits = plugin.getKitsConfig().getConfigurationSection("kits").getKeys(false);
+        KIT_SUBS = ImmutableList.copyOf(kits);
+        SEED_SUBS = ImmutableList.copyOf(CONSOLES.getBY_NAMES().keySet());
     }
 
     @Override

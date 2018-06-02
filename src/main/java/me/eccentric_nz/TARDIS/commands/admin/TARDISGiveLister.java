@@ -16,15 +16,15 @@
  */
 package me.eccentric_nz.TARDIS.commands.admin;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import me.eccentric_nz.TARDIS.TARDIS;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISGiveLister {
@@ -36,7 +36,7 @@ public class TARDISGiveLister {
     public TARDISGiveLister(TARDIS plugin, CommandSender sender) {
         this.plugin = plugin;
         this.sender = sender;
-        this.options = createGiveOptions();
+        options = createGiveOptions();
     }
 
     public void list() {
@@ -115,6 +115,8 @@ public class TARDISGiveLister {
         List<String> accessories = new ArrayList<>();
         accessories.add(ChatColor.GREEN + "bow-tie" + ChatColor.RESET + " - " + ChatColor.DARK_GREEN + "Bow Tie");
         accessories.add(ChatColor.GREEN + "glasses" + ChatColor.RESET + " - " + ChatColor.DARK_GREEN + "3-D Glasses");
+        accessories.add(ChatColor.GREEN + "communicator" + ChatColor.RESET + " - " + ChatColor.DARK_GREEN + "TARDIS Communicator");
+        accessories.add(ChatColor.GREEN + "handles" + ChatColor.RESET + " - " + ChatColor.DARK_GREEN + "Handles Companion");
         accessories.add(ChatColor.GREEN + "acid-battery" + ChatColor.RESET + " - " + ChatColor.DARK_GREEN + "Acid Battery");
         accessories.add(ChatColor.GREEN + "rift-manipulator" + ChatColor.RESET + " - " + ChatColor.DARK_GREEN + "Rift Manipulator");
         accessories.add(ChatColor.GREEN + "rust" + ChatColor.RESET + " - " + ChatColor.DARK_GREEN + "Rust Plague Sword");
