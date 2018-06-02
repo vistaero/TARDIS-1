@@ -16,10 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.handles;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISSerializeInventory;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
@@ -35,8 +31,12 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHandlesGUIListener implements Listener {
@@ -51,8 +51,8 @@ public class TARDISHandlesGUIListener implements Listener {
     }
 
     /**
-     * Listens for player clicking inside an inventory. If the inventory is a
-     * TARDIS GUI, then the click is processed accordingly.
+     * Listens for player clicking inside an inventory. If the inventory is a TARDIS GUI, then the click is processed
+     * accordingly.
      *
      * @param event a player clicking an inventory slot
      */
@@ -61,7 +61,7 @@ public class TARDISHandlesGUIListener implements Listener {
         Inventory inv = event.getInventory();
         String name = inv.getTitle();
         if (name.equals("§4Handles Program")) {
-            final Player player = (Player) event.getWhoClicked();
+            Player player = (Player) event.getWhoClicked();
             UUID uuid = player.getUniqueId();
             if (!scroll_list.containsKey(uuid)) {
                 scroll_list.put(uuid, TARDISHandlesBlock.getControls());
@@ -219,14 +219,12 @@ public class TARDISHandlesGUIListener implements Listener {
     }
 
     /**
-     * Sets an ItemStack to the specified inventory slot updating the display
-     * name and setting any lore.
+     * Sets an ItemStack to the specified inventory slot updating the display name and setting any lore.
      *
-     * @param inv the inventory to update
-     * @param slot the slot number to update
+     * @param inv   the inventory to update
+     * @param slot  the slot number to update
      * @param block the program block
      */
-    @SuppressWarnings("deprecation")
     public void setSlot(Inventory inv, int slot, TARDISHandlesBlock block) {
         ItemStack is = new ItemStack(Material.BOWL, 1);
         ItemMeta im = is.getItemMeta();
@@ -264,6 +262,7 @@ public class TARDISHandlesGUIListener implements Listener {
             set.put("uuid", uuid);
             set.put("name", "Untitled disk");
             set.put("inventory", serialized);
+            set.put("checked", 1);
             pid = new QueryFactory(plugin).doSyncInsert("programs", set);
         }
         return pid;
@@ -274,7 +273,7 @@ public class TARDISHandlesGUIListener implements Listener {
      *
      * @param p the player using the GUI
      */
-    public void close(final Player p) {
+    public void close(Player p) {
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             p.closeInventory();
         }, 1L);

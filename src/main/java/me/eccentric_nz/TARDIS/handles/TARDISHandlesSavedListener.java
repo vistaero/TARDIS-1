@@ -16,9 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.handles;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.listeners.TARDISMenuListener;
@@ -34,8 +31,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHandlesSavedListener extends TARDISMenuListener implements Listener {
@@ -49,8 +49,8 @@ public class TARDISHandlesSavedListener extends TARDISMenuListener implements Li
     }
 
     /**
-     * Listens for player clicking inside an inventory. If the inventory is a
-     * TARDIS GUI, then the click is processed accordingly.
+     * Listens for player clicking inside an inventory. If the inventory is a TARDIS GUI, then the click is processed
+     * accordingly.
      *
      * @param event a player clicking an inventory slot
      */
@@ -59,7 +59,7 @@ public class TARDISHandlesSavedListener extends TARDISMenuListener implements Li
         Inventory inv = event.getInventory();
         String name = inv.getTitle();
         if (name.equals("§4Saved Programs")) {
-            final Player player = (Player) event.getWhoClicked();
+            Player player = (Player) event.getWhoClicked();
             UUID uuid = player.getUniqueId();
             int slot = event.getRawSlot();
             if (slot < 54) {
@@ -154,6 +154,13 @@ public class TARDISHandlesSavedListener extends TARDISMenuListener implements Li
                     selectedSlot.put(uuid, null);
                     ItemStack clone = is.clone();
                     player.getWorld().dropItemNaturally(player.getLocation(), clone);
+                    // ckeck out
+                    int pid = TARDISNumberParsers.parseInt(lore.get(1));
+                    HashMap<String, Object> set = new HashMap<>();
+                    set.put("checked", 1);
+                    HashMap<String, Object> where = new HashMap<>();
+                    where.put("program_id", pid);
+                    new QueryFactory(plugin).doUpdate("programs", set, where);
                 } else {
                     TARDISMessage.send(player, "HANDLES_SELECT");
                 }
@@ -167,13 +174,11 @@ public class TARDISHandlesSavedListener extends TARDISMenuListener implements Li
     }
 
     /**
-     * Sets an ItemStack to the specified inventory slot updating the display
-     * name and setting any lore.
+     * Sets an ItemStack to the specified inventory slot updating the display name and setting any lore.
      *
-     * @param inv the inventory to update
+     * @param inv  the inventory to update
      * @param slot the slot number to add a line of lore to
      */
-    @SuppressWarnings("deprecation")
     public void setSlots(Inventory inv, int slot) {
         for (int s = 0; s < 45; s++) {
             ItemStack is = inv.getItem(s);
