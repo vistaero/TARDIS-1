@@ -20,6 +20,7 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
+import me.eccentric_nz.TARDIS.utility.TARDISSounds;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -48,6 +49,7 @@ public class TARDISHandlesRemindCommand {
             return true;
         }
         TARDISMessage.handlesSend(player, "HANDLES_OK", "" + when);
+        TARDISSounds.playTARDISSound(player, "handles_confirmed");
         // convert minutes to milliseconds
         when *= 60000;
         // add the current time in milliseconds

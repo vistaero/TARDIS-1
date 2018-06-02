@@ -108,7 +108,7 @@ public class TARDISHandlesRequest {
                     return;
                 }
                 // remove 'me to '
-                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles remind " + uuid.toString() + " " + removed.replaceAll("(?i)" + Pattern.quote("me to "), ""));
+                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles remind " + uuid.toString() + " " + removed.replaceAll("(?i)" + Pattern.quote("remind "), "").replaceAll("(?i)" + Pattern.quote("me to "), ""));
             } else if (split.contains("say")) {
                 // remove 'say '
                 plugin.getServer().dispatchCommand(plugin.getConsole(), "handles say " + uuid.toString() + " " + removed.replaceAll("(?i)" + Pattern.quote("say "), ""));

@@ -16,17 +16,17 @@
  */
 package me.eccentric_nz.TARDIS.database;
 
+import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISSQLInsert implements Runnable {
@@ -39,19 +39,18 @@ public class TARDISSQLInsert implements Runnable {
     private final String prefix;
 
     /**
-     * Inserts data into an SQLite database table. This method builds a prepared
-     * SQL statement from the parameters supplied and then executes the insert.
+     * Inserts data into an SQLite database table. This method builds a prepared SQL statement from the parameters
+     * supplied and then executes the insert.
      *
      * @param plugin an instance of the main plugin class
-     * @param table the database table name to insert the data into.
-     * @param data a HashMap<String, Object> of table fields and values to
-     * insert.
+     * @param table  the database table name to insert the data into.
+     * @param data   a HashMap<String, Object> of table fields and values to insert.
      */
     public TARDISSQLInsert(TARDIS plugin, String table, HashMap<String, Object> data) {
         this.plugin = plugin;
         this.table = table;
         this.data = data;
-        this.prefix = this.plugin.getPrefix();
+        prefix = this.plugin.getPrefix();
     }
 
     @Override
@@ -77,6 +76,8 @@ public class TARDISSQLInsert implements Runnable {
                 } else {
                     if (entry.getValue().getClass().getName().contains("Double")) {
                         ps.setDouble(i, TARDISNumberParsers.parseDouble(entry.getValue().toString()));
+                    } else if (entry.getValue().getClass().getName().contains("Long")) {
+                        ps.setLong(i, TARDISNumberParsers.parseLong(entry.getValue().toString()));
                     } else {
                         ps.setInt(i, TARDISNumberParsers.parseInt(entry.getValue().toString()));
                     }
