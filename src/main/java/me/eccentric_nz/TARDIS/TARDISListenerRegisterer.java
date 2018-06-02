@@ -39,8 +39,8 @@ import me.eccentric_nz.TARDIS.enumeration.INVENTORY_MANAGER;
 import me.eccentric_nz.TARDIS.flight.TARDISHandbrakeListener;
 import me.eccentric_nz.TARDIS.flight.TARDISManualFlightListener;
 import me.eccentric_nz.TARDIS.flight.TARDISRegulatorListener;
-import me.eccentric_nz.TARDIS.handles.TARDISHandlesGUIListener;
 import me.eccentric_nz.TARDIS.handles.TARDISHandlesListener;
+import me.eccentric_nz.TARDIS.handles.TARDISHandlesProgramListener;
 import me.eccentric_nz.TARDIS.handles.TARDISHandlesSavedListener;
 import me.eccentric_nz.TARDIS.howto.TARDISChameleonWallMenuListener;
 import me.eccentric_nz.TARDIS.howto.TARDISRecipeMenuListener;
@@ -156,7 +156,7 @@ public class TARDISListenerRegisterer {
         plugin.getPM().registerEvents(new TARDISHandbrakeListener(plugin), plugin);
         if (plugin.getConfig().getBoolean("allow.handles")) {
             plugin.getPM().registerEvents(new TARDISHandlesListener(plugin), plugin);
-            plugin.getPM().registerEvents(new TARDISHandlesGUIListener(plugin), plugin);
+            plugin.getPM().registerEvents(new TARDISHandlesProgramListener(plugin), plugin);
             plugin.getPM().registerEvents(new TARDISHandlesSavedListener(plugin), plugin);
         }
         if (plugin.getConfig().getBoolean("preferences.nerf_pistons.enabled")) {

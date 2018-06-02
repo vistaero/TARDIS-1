@@ -24,19 +24,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 /**
- *
  * @author eccentric_nz
  */
-public class TARDISHandlesInventory {
+public class TARDISHandlesProgramInventory {
 
     private final TARDIS plugin;
     private final int program_id;
     private final ItemStack[] handles;
 
-    public TARDISHandlesInventory(TARDIS plugin, int program_id) {
+    public TARDISHandlesProgramInventory(TARDIS plugin, int program_id) {
         this.plugin = plugin;
         this.program_id = program_id;
-        this.handles = getItemStack();
+        handles = getItemStack();
     }
 
     /**
@@ -68,11 +67,11 @@ public class TARDISHandlesInventory {
             stack[i] = is;
             i++;
             if (i > 45) {
-                i = 53;
+                i = 52;
             }
         }
 
-        i = 46;
+        i = 45;
         for (TARDISHandlesBlock b : TARDISHandlesBlock.getControls()) {
             ItemStack is = new ItemStack(Material.BOWL, 1);
             ItemMeta im = is.getItemMeta();
@@ -83,7 +82,7 @@ public class TARDISHandlesInventory {
             is.setItemMeta(im);
             stack[i] = is;
             i++;
-            if (i > 52) {
+            if (i > 51) {
                 break;
             }
         }

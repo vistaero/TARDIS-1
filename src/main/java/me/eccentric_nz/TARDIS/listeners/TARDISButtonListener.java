@@ -29,8 +29,8 @@ import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.enumeration.STORAGE;
-import me.eccentric_nz.TARDIS.handles.TARDISHandlesInventory;
 import me.eccentric_nz.TARDIS.handles.TARDISHandlesProcessor;
+import me.eccentric_nz.TARDIS.handles.TARDISHandlesProgramInventory;
 import me.eccentric_nz.TARDIS.move.TARDISBlackWoolToggler;
 import me.eccentric_nz.TARDIS.rooms.TARDISExteriorRenderer;
 import me.eccentric_nz.TARDIS.travel.TARDISTemporalLocatorInventory;
@@ -352,7 +352,7 @@ public class TARDISButtonListener implements Listener {
                                     TARDISSounds.playTARDISSound(player, "Handles");
                                     if (player.isSneaking()) {
                                         // open programming GUI
-                                        ItemStack[] handles = new TARDISHandlesInventory(plugin, 0).getHandles();
+                                        ItemStack[] handles = new TARDISHandlesProgramInventory(plugin, 0).getHandles();
                                         Inventory hgui = plugin.getServer().createInventory(player, 54, "§4Handles Program");
                                         hgui.setContents(handles);
                                         player.openInventory(hgui);

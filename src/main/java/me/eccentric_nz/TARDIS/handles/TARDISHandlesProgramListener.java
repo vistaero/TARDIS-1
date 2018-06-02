@@ -39,14 +39,14 @@ import java.util.UUID;
 /**
  * @author eccentric_nz
  */
-public class TARDISHandlesGUIListener implements Listener {
+public class TARDISHandlesProgramListener implements Listener {
 
     private final TARDIS plugin;
     public final HashMap<UUID, Integer> scroll_start = new HashMap<>();
     public final HashMap<UUID, List<TARDISHandlesBlock>> scroll_list = new HashMap<>();
     public final HashMap<UUID, TARDISHandlesCategory> scroll_category = new HashMap<>();
 
-    public TARDISHandlesGUIListener(TARDIS plugin) {
+    public TARDISHandlesProgramListener(TARDIS plugin) {
         this.plugin = plugin;
     }
 
@@ -136,6 +136,25 @@ public class TARDISHandlesGUIListener implements Listener {
                     }
                     break;
                 case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                    // duplicate Item stack on cursor
+                    ItemStack is = inv.getItem(slot);
+                    ItemStack cursor = player.getItemOnCursor();
+                    if (cursor != null && ((is != null && cursor.isSimilar(is)) || is == null)) {
+                        player.setItemOnCursor(null);
+                    } else {
+                        player.setItemOnCursor(is.clone());
+                    }
+                    if (is != null) {
+                        is.setAmount(1);
+                    }
+                    break;
+                case 52:
                     // scroll left
                     if (scroll_category.get(uuid).getSize() > 7) {
                         int startl;
@@ -151,27 +170,8 @@ public class TARDISHandlesGUIListener implements Listener {
                         scroll_start.put(uuid, startl);
                         for (int i = 0; i < 7; i++) {
                             // setSlot(Inventory inv, int slot, TARDISHandlesBlock block)
-                            setSlot(inv, (46 + i), scroll_list.get(uuid).get(startl + i));
+                            setSlot(inv, (45 + i), scroll_list.get(uuid).get(startl + i));
                         }
-                    }
-                    break;
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                    // duplicate Item stack on cursor
-                    ItemStack is = inv.getItem(slot);
-                    ItemStack cursor = player.getItemOnCursor();
-                    if (cursor != null && ((is != null && cursor.isSimilar(is)) || is == null)) {
-                        player.setItemOnCursor(null);
-                    } else {
-                        player.setItemOnCursor(is.clone());
-                    }
-                    if (is != null) {
-                        is.setAmount(1);
                     }
                     break;
                 case 53:
@@ -189,7 +189,7 @@ public class TARDISHandlesGUIListener implements Listener {
                         scroll_start.put(uuid, startr);
                         for (int i = 0; i < 7; i++) {
                             // setSlot(Inventory inv, int slot, TARDISHandlesBlock block)
-                            setSlot(inv, (46 + i), scroll_list.get(uuid).get(startr + i));
+                            setSlot(inv, (45 + i), scroll_list.get(uuid).get(startr + i));
                         }
                     }
                     break;
@@ -240,9 +240,9 @@ public class TARDISHandlesGUIListener implements Listener {
         scroll_category.put(uuid, category);
         for (int i = 0; i < 7; i++) {
             if (i < category.getSize()) {
-                setSlot(inv, (46 + i), scroll_list.get(uuid).get(i));
+                setSlot(inv, (45 + i), scroll_list.get(uuid).get(i));
             } else {
-                inv.setItem(46 + i, null);
+                inv.setItem(45 + i, null);
             }
         }
     }

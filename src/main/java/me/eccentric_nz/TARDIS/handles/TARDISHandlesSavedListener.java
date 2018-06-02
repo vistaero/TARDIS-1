@@ -96,7 +96,7 @@ public class TARDISHandlesSavedListener extends TARDISMenuListener implements Li
                 // back to editor
                 close(player);
                 plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                    TARDISHandlesInventory thi = new TARDISHandlesInventory(plugin, 0);
+                    TARDISHandlesProgramInventory thi = new TARDISHandlesProgramInventory(plugin, 0);
                     ItemStack[] items = thi.getHandles();
                     Inventory chaminv = plugin.getServer().createInventory(player, 54, "§4Handles Program");
                     chaminv.setContents(items);
@@ -111,7 +111,7 @@ public class TARDISHandlesSavedListener extends TARDISMenuListener implements Li
                     selectedSlot.put(uuid, null);
                     close(player);
                     plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                        TARDISHandlesInventory thi = new TARDISHandlesInventory(plugin, pid);
+                        TARDISHandlesProgramInventory thi = new TARDISHandlesProgramInventory(plugin, pid);
                         ItemStack[] items = thi.getHandles();
                         Inventory handlesinv = plugin.getServer().createInventory(player, 54, "§4Handles Program");
                         handlesinv.setContents(items);
