@@ -138,12 +138,12 @@ public class TARDISRecipeCommands implements CommandExecutor {
                 return false;
             }
             Player player = null;
+            if (sender instanceof Player) {
+                player = (Player) sender;
+            }
             if (player == null) {
                 TARDISMessage.send(sender, "CMD_PLAYER");
                 return true;
-            }
-            if (sender instanceof Player) {
-                player = (Player) sender;
             }
             if (args.length == 0 || !recipeItems.containsKey(args[0].toLowerCase(Locale.ENGLISH))) {
                 new TARDISRecipeLister(plugin, sender).list();
