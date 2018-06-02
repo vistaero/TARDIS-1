@@ -30,7 +30,7 @@ import org.bukkit.entity.Player;
 public class TARDISMessage {
 
     private static final int LINE_LENGTH = TARDISChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH;
-    private static final String HANDLES = ChatColor.BLUE + "[Handles]" + ChatColor.RESET;
+    private static final String HANDLES = ChatColor.BLUE + "[Handles] " + ChatColor.RESET;
 
     /**
      * Splits a message into multiple lines if it is longer than the guaranteed chat page width.
