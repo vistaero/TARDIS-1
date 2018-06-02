@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
  * @author eccentric_nz
  */
 public enum TARDISHandlesBlock {
@@ -44,6 +43,8 @@ public enum TARDISHandlesBlock {
     BREAK(TARDISHandlesCategory.CONTROL, "BREAK", Arrays.asList("Use to break", "out of a loop")),
     MATERIALISE(TARDISHandlesCategory.EVENT, "TARDIS materialisation event", null),
     DEMATERIALISE(TARDISHandlesCategory.EVENT, "TARDIS dematerialisation event", null),
+    ARTRON(TARDISHandlesCategory.EVENT, "Artron Level event", Arrays.asList("Use with Operator", "and Number blocks")),
+    DEATH(TARDISHandlesCategory.EVENT, "Time Lord Death event", null),
     LOG_OUT(TARDISHandlesCategory.EVENT, "Player log out event", null),
     ZERO(TARDISHandlesCategory.NUMBER, "0", Arrays.asList("The number zero")),
     ONE(TARDISHandlesCategory.NUMBER, "1", Arrays.asList("The number one")),
@@ -74,11 +75,23 @@ public enum TARDISHandlesBlock {
     PLAYER(TARDISHandlesCategory.SELECTOR, "Target Time Lord", null),
     COMPANIONS(TARDISHandlesCategory.SELECTOR, "Target companions", null),
     TARDIS(TARDISHandlesCategory.SELECTOR, "The TARDIS", null),
+    DOOR(TARDISHandlesCategory.SELECTOR, "TARDIS Door", Arrays.asList("Use with an", "Open, Close", "Lock or Unlock block")),
+    LIGHTS(TARDISHandlesCategory.SELECTOR, "TARDIS Lights", Arrays.asList("Use with an", "On or Off block")),
+    POWER(TARDISHandlesCategory.SELECTOR, "TARDIS Power action", Arrays.asList("Use with a Show,", "On or Off block")),
+    SIEGE(TARDISHandlesCategory.SELECTOR, "Siege Mode action", Arrays.asList("Use with an", "On or Off block")),
     VARIABLE(TARDISHandlesCategory.VARIABLE, "Variable", Arrays.asList("A generic container", "to hold a value")),
     X(TARDISHandlesCategory.VARIABLE, "X coordinate", Arrays.asList("Use with a number", "to specify a location")),
     Y(TARDISHandlesCategory.VARIABLE, "Y coordinate", Arrays.asList("Use with a number", "to specify a location")),
     Z(TARDISHandlesCategory.VARIABLE, "Z coordinate", Arrays.asList("Use with a number", "to specify a location")),
-    BIOME(TARDISHandlesCategory.VARIABLE, "Biome", Arrays.asList("A biome variable,", "for use with", "a Biome Disk")),
+    OPEN(TARDISHandlesCategory.VARIABLE, "Door Open action", null),
+    CLOSE(TARDISHandlesCategory.VARIABLE, "Door Close action", null),
+    LOCK(TARDISHandlesCategory.VARIABLE, "Door Lock action", null),
+    UNLOCK(TARDISHandlesCategory.VARIABLE, "Door Unlock action", null),
+    ON(TARDISHandlesCategory.VARIABLE, "On action", null),
+    OFF(TARDISHandlesCategory.VARIABLE, "Off action", null),
+    SHOW(TARDISHandlesCategory.VARIABLE, "Show Artron Levels action", null),
+    HOME(TARDISHandlesCategory.VARIABLE, "Home Location", null),
+    RECHARGER(TARDISHandlesCategory.VARIABLE, "Travel to recharger", null),
     CONTROL(TARDISHandlesCategory.BUTTON, "Show control blocks", null),
     OPERATOR(TARDISHandlesCategory.BUTTON, "Show operator blocks", null),
     VAR(TARDISHandlesCategory.BUTTON, "Show variable blocks", null),
@@ -103,7 +116,7 @@ public enum TARDISHandlesBlock {
     private final static List<TARDISHandlesBlock> variables = new ArrayList<>();
     private final static List<TARDISHandlesBlock> buttons = new ArrayList<>();
 
-    private TARDISHandlesBlock(TARDISHandlesCategory category, String displayName, List<String> lore) {
+    TARDISHandlesBlock(TARDISHandlesCategory category, String displayName, List<String> lore) {
         this.category = category;
         this.displayName = displayName;
         this.lore = lore;

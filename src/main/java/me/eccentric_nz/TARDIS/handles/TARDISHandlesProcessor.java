@@ -16,33 +16,25 @@
  */
 package me.eccentric_nz.TARDIS.handles;
 
+import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.database.data.Program;
+
 /**
+ * Programming is a process used by Cybermen to control humans. To program a human, the person has to be dead. A control
+ * is installed in the person, powered by electricity, turning the person into an agent of the Cybermen. Control over
+ * programmed humans can be shorted out by another signal, but that kills whatever might be left of the person.
+ *
  * @author eccentric_nz
  */
-public enum TARDISHandlesCategory {
+public class TARDISHandlesProcessor {
 
-    BUTTON("Buttons", 11),
-    COMMAND("TARDIS commands and actions", 8),
-    CONTROL("Control and loop statements", 8),
-    EVENT("TARDIS events", 5),
-    NUMBER("Numbers", 12),
-    OPERATOR("Operators", 14),
-    SELECTOR("Selectors", 7),
-    VARIABLE("Variables", 13);
+    private final TARDIS plugin;
 
-    private final String lore;
-    private final int size;
-
-    private TARDISHandlesCategory(String lore, int size) {
-        this.lore = lore;
-        this.size = size;
+    public TARDISHandlesProcessor(TARDIS plugin) {
+        this.plugin = plugin;
     }
 
-    public String getLore() {
-        return lore;
-    }
+    public void processDisk(Program program) {
 
-    public int getSize() {
-        return size;
     }
 }
