@@ -188,7 +188,7 @@ public class TARDISHandlesRequest {
     }
 
     private ItemStack getHandles() {
-        ItemStack is = new ItemStack(Material.SILVER_GLAZED_TERRACOTTA);
+        ItemStack is = new ItemStack(Material.GRAY_GLAZED_TERRACOTTA);
         ItemMeta im = is.getItemMeta();
         im.setDisplayName("Handles");
         im.setLore(Arrays.asList("Cyberhead from the", "Maldovarium Market"));

@@ -96,7 +96,7 @@ public class TARDISRecipesUpdater {
             recipes_config.set("shaped.Handles.hard_ingredients.D", "DIAMOND");
             recipes_config.set("shaped.Handles.hard_ingredients.S", "SKULL_ITEM");
             recipes_config.set("shaped.Handles.hard_ingredients.R", "REDSTONE");
-            recipes_config.set("shaped.Handles.result", "SILVER_GLAZED_TERRACOTTA");
+            recipes_config.set("shaped.Handles.result", "GRAY_GLAZED_TERRACOTTA");
             recipes_config.set("shaped.Handles.amount", 1);
             recipes_config.set("shaped.Handles.lore", "Cyberhead from the~Maldovarium Market");
         }
