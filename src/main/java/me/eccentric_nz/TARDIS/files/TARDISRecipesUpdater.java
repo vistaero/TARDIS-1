@@ -86,6 +86,20 @@ public class TARDISRecipesUpdater {
         // fix lore
         recipes_config.set("shaped.Stattenheim Remote.lore", "Right-click block~to call TARDIS");
         recipes_config.set("shaped.Artron Storage Cell.lore", "Charge Level~0");
+        if (!recipes_config.contains("shaped.Handles")) {
+            recipes_config.set("shaped.Handles.easy_shape", "III,ISI,IRI");
+            recipes_config.set("shaped.Handles.easy_ingredients.I", "IRON_INGOT");
+            recipes_config.set("shaped.Handles.easy_ingredients.S", "SKULL_ITEM");
+            recipes_config.set("shaped.Handles.easy_ingredients.R", "REDSTONE");
+            recipes_config.set("shaped.Handles.hard_shape", "IDI,ISI,IRI");
+            recipes_config.set("shaped.Handles.hard_ingredients.I", "IRON_INGOT");
+            recipes_config.set("shaped.Handles.hard_ingredients.D", "DIAMOND");
+            recipes_config.set("shaped.Handles.hard_ingredients.S", "SKULL_ITEM");
+            recipes_config.set("shaped.Handles.hard_ingredients.R", "REDSTONE");
+            recipes_config.set("shaped.Handles.result", "SILVER_GLAZED_TERRACOTTA");
+            recipes_config.set("shaped.Handles.amount", 1);
+            recipes_config.set("shaped.Handles.lore", "Cyberhead from the~Maldovarium Market");
+        }
         if (!recipes_config.contains("shaped.TARDIS Communicator")) {
             recipes_config.set("shaped.TARDIS Communicator.easy_shape", "N--,IIH,--I");
             recipes_config.set("shaped.TARDIS Communicator.easy_ingredients.N", "NOTE_BLOCK");

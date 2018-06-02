@@ -807,6 +807,21 @@ shaped:
         result: IRON_SWORD
         amount: 1
         lore: Dalek Virus Dispenser
+    Handles:
+        easy_shape: III,ISI,IRI
+        easy_ingredients:
+            I: IRON_INGOT
+            S: SKULL_ITEM
+            R: REDSTONE
+        hard_shape: IDI,ISI,IRI
+        hard_ingredients:
+            I: IRON_INGOT
+            D: DIAMOND
+            S: SKULL_ITEM
+            R: REDSTONE
+        result: SILVER_GLAZED_TERRACOTTA
+        amount: 1
+        lore: "Cyberhead from the~Maldovarium Market"
     TARDIS Communicator:
         easy_shape: N--,IIH,--I
         easy_ingredients:
