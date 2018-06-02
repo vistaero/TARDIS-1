@@ -335,9 +335,7 @@ permissions:
     children:
       tardis.handles.use: true
       tardis.handles.communicator: true
-      tardis.handles.tp: true
-      tardis.handles.remote: true
-      tardis.handles.scan: true
+      tardis.handles.program: true
     default: op
 commands:
   tardis:
@@ -887,5 +885,34 @@ commands:
   handles:
     aliases: [tardishandles, th]
     description: These commands are used by the console to enable the Handles companion.
-    usage: /<command> [takeoff|land|scan|lock|unlock|remind|say|name|time]
-    permission: tardis.admin
+    usage: /<command> [takeoff|land|scan|lock|unlock|remind|say|name|time|disk]
+    takeoff:
+      description: Make the TARDIS enter the Time Vortex
+      permission: tardis.admin
+    land:
+      description: Make the TARDIS leave the Time Vortex
+      permission: tardis.admin
+    scan:
+      description: Make Handles scan the environment around the player
+      permission: tardis.admin
+    lock:
+      description: Make Handles lock the TARDIS door
+      permission: tardis.admin
+    unlock:
+      description: Make Handles unlock the TARDIS door
+      permission: tardis.admin
+    remind:
+      description: Add a Handles reminder
+      permission: tardis.admin
+    say:
+      description: Make Handles say a phrase
+      permission: tardis.admin
+    name:
+      description: Make Handles tell a player their in-game name
+      permission: tardis.admin
+    time:
+      description: Make Handles say the time
+      permission: tardis.admin
+    disk:
+      description: Name a Handles Program Disk
+      permission: tardis.handles.program

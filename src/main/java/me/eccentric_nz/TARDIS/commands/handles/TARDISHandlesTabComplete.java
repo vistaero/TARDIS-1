@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 eccentric_nz
+ * Copyright (C) 2018 eccentric_nz
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,21 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package me.eccentric_nz.TARDIS.commands.preferences;
+package me.eccentric_nz.TARDIS.commands.handles;
 
 import com.google.common.collect.ImmutableList;
-import java.util.List;
 import me.eccentric_nz.TARDIS.commands.TARDISCompleter;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
+import java.util.List;
+
 /**
- * TabCompleter for /tardisprefs
+ * TabCompleter for /handles
  */
 public class TARDISHandlesTabComplete extends TARDISCompleter implements TabCompleter {
 
-    private final ImmutableList<String> ROOT_SUBS = ImmutableList.of("takeoff", "land", "scan", "lock", "unlock", "remind", "say", "name", "time");
+    private final ImmutableList<String> ROOT_SUBS = ImmutableList.of("disk", "takeoff", "land", "scan", "lock", "unlock", "remind", "say", "name", "time");
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {

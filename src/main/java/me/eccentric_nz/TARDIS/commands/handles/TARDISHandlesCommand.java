@@ -39,36 +39,36 @@ public class TARDISHandlesCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        Player player;
+        if (args[0].equals("disk")) {
+            player = (Player) sender;
+            return new TARDISHandlesDiskCommand(plugin).renameDisk(player, args);
+        }
         if (!sender.hasPermission("tardis.admin")) {
-            TARDISMessage.send(sender, "NO_PERM_AREA");
+            TARDISMessage.send(sender, "CMD_ADMIN");
             return true;
         }
         UUID uuid = UUID.fromString(args[1]);
-        Player player = plugin.getServer().getPlayer(uuid);
-        if (args[0].equals("land")) {
-            return new TARDISHandlesTakeoffCommand(plugin).enterVortex(player, args);
-        }
-        if (args[0].equals("lock") || args[0].equals("unlock")) {
-            return new TARDISHandlesLockUnlockCommand(plugin).toggleLock(player, TARDISNumberParsers.parseInt(args[2]), Boolean.valueOf(args[3]));
-        }
-        if (args[0].equals("name")) {
-            TARDISMessage.handlesSend(player, "HANDLES_NAME", player.getName());
-            return true;
-        }
-        if (args[0].equals("remind")) {
-            return new TARDISHandlesRemindCommand(plugin).doReminder(player, args);
-        }
-        if (args[0].equals("say")) {
-            return new TARDISHandlesSayCommand(plugin).say(player, args);
-        }
-        if (args[0].equals("scan")) {
-            return new TARDISHandlesScanCommand(plugin, player, TARDISNumberParsers.parseInt(args[2])).sayScan();
-        }
-        if (args[0].equals("takeoff")) {
-            return new TARDISHandlesTakeoffCommand(plugin).enterVortex(player, args);
-        }
-        if (args[0].equals("time")) {
-            return new TARDISHandlesTimeCommand().sayTime(player);
+        player = plugin.getServer().getPlayer(uuid);
+        switch (args[0]) {
+            case "land":
+                return new TARDISHandlesTakeoffCommand(plugin).enterVortex(player, args);
+            case "lock":
+            case "unlock":
+                return new TARDISHandlesLockUnlockCommand(plugin).toggleLock(player, TARDISNumberParsers.parseInt(args[2]), Boolean.valueOf(args[3]));
+            case "name":
+                TARDISMessage.handlesSend(player, "HANDLES_NAME", player.getName());
+                return true;
+            case "remind":
+                return new TARDISHandlesRemindCommand(plugin).doReminder(player, args);
+            case "say":
+                return new TARDISHandlesSayCommand(plugin).say(player, args);
+            case "scan":
+                return new TARDISHandlesScanCommand(plugin, player, TARDISNumberParsers.parseInt(args[2])).sayScan();
+            case "takeoff":
+                return new TARDISHandlesTakeoffCommand(plugin).enterVortex(player, args);
+            case "time":
+                return new TARDISHandlesTimeCommand().sayTime(player);
         }
         return false;
     }
