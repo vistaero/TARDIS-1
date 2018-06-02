@@ -66,7 +66,7 @@ public class TARDISHandlesProgramInventory {
             is.setItemMeta(im);
             stack[i] = is;
             i++;
-            if (i > 45) {
+            if (i == 45) {
                 i = 52;
             }
         }

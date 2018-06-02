@@ -76,36 +76,43 @@ public class TARDISHandlesProgramListener implements Listener {
                     // set control blocks
                     scroll_list.put(uuid, TARDISHandlesBlock.getControls());
                     setList(uuid, TARDISHandlesCategory.CONTROL, inv);
+                    scroll_start.put(uuid, 0);
                     break;
                 case 37:
                     // set operator blocks
                     scroll_list.put(uuid, TARDISHandlesBlock.getOperators());
                     setList(uuid, TARDISHandlesCategory.OPERATOR, inv);
+                    scroll_start.put(uuid, 0);
                     break;
                 case 38:
                     // set variable blocks
                     scroll_list.put(uuid, TARDISHandlesBlock.getVariables());
                     setList(uuid, TARDISHandlesCategory.VARIABLE, inv);
+                    scroll_start.put(uuid, 0);
                     break;
                 case 39:
                     // set number blocks
                     scroll_list.put(uuid, TARDISHandlesBlock.getNumbers());
                     setList(uuid, TARDISHandlesCategory.NUMBER, inv);
+                    scroll_start.put(uuid, 0);
                     break;
                 case 40:
                     // set event blocks
                     scroll_list.put(uuid, TARDISHandlesBlock.getEvents());
                     setList(uuid, TARDISHandlesCategory.EVENT, inv);
+                    scroll_start.put(uuid, 0);
                     break;
                 case 41:
                     // set command blocks
                     scroll_list.put(uuid, TARDISHandlesBlock.getCommands());
                     setList(uuid, TARDISHandlesCategory.COMMAND, inv);
+                    scroll_start.put(uuid, 0);
                     break;
                 case 42:
                     // set selector blocks
                     scroll_list.put(uuid, TARDISHandlesBlock.getSelectors());
                     setList(uuid, TARDISHandlesCategory.SELECTOR, inv);
+                    scroll_start.put(uuid, 0);
                     break;
                 case 43:
                     // go to saved disks
