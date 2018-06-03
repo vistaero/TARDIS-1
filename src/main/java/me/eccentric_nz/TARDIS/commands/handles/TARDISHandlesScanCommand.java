@@ -247,44 +247,48 @@ public class TARDISHandlesScanCommand {
                         });
                         message = " (" + buf.toString().substring(2) + ")";
                     }
-                    switch (entry.getKey()) {
-                        case AREA_EFFECT_CLOUD:
-                            player.sendMessage("    Cyberman: " + entry.getValue());
-                            break;
-                        case COMPLEX_PART:
-                            player.sendMessage("    Dalek: " + entry.getValue());
-                            break;
-                        case ARMOR_STAND:
-                            player.sendMessage("    Empty Child: " + entry.getValue());
-                            break;
-                        case ARROW:
-                            player.sendMessage("    Ice Warrior: " + entry.getValue());
-                            break;
-                        case SPLASH_POTION:
-                            player.sendMessage("    Silent: " + entry.getValue());
-                            break;
-                        case BOAT:
-                            player.sendMessage("    Silurian: " + entry.getValue());
-                            break;
-                        case FIREWORK:
-                            player.sendMessage("    Sontaran: " + entry.getValue());
-                            break;
-                        case EGG:
-                            player.sendMessage("    Strax: " + entry.getValue());
-                            break;
-                        case ENDER_CRYSTAL:
-                            player.sendMessage("    Vashta Nerada: " + entry.getValue());
-                            break;
-                        case DRAGON_FIREBALL:
-                            player.sendMessage("    Weeping Angel: " + entry.getValue());
-                            break;
-                        case FISHING_HOOK:
-                            player.sendMessage("    Zygon: " + entry.getValue());
-                            break;
-                        default:
-                            player.sendMessage("    " + entry.getKey() + ": " + entry.getValue() + message);
-                            break;
-                    }
+                    // delay
+                    String m = message;
+                    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                        switch (entry.getKey()) {
+                            case AREA_EFFECT_CLOUD:
+                                player.sendMessage("    Cyberman: " + entry.getValue());
+                                break;
+                            case COMPLEX_PART:
+                                player.sendMessage("    Dalek: " + entry.getValue());
+                                break;
+                            case ARMOR_STAND:
+                                player.sendMessage("    Empty Child: " + entry.getValue());
+                                break;
+                            case ARROW:
+                                player.sendMessage("    Ice Warrior: " + entry.getValue());
+                                break;
+                            case SPLASH_POTION:
+                                player.sendMessage("    Silent: " + entry.getValue());
+                                break;
+                            case BOAT:
+                                player.sendMessage("    Silurian: " + entry.getValue());
+                                break;
+                            case FIREWORK:
+                                player.sendMessage("    Sontaran: " + entry.getValue());
+                                break;
+                            case EGG:
+                                player.sendMessage("    Strax: " + entry.getValue());
+                                break;
+                            case ENDER_CRYSTAL:
+                                player.sendMessage("    Vashta Nerada: " + entry.getValue());
+                                break;
+                            case DRAGON_FIREBALL:
+                                player.sendMessage("    Weeping Angel: " + entry.getValue());
+                                break;
+                            case FISHING_HOOK:
+                                player.sendMessage("    Zygon: " + entry.getValue());
+                                break;
+                            default:
+                                player.sendMessage("    " + entry.getKey() + ": " + entry.getValue() + m);
+                                break;
+                        }
+                    }, 3L);
                 }
                 scannedEntities.clear();
             } else {
