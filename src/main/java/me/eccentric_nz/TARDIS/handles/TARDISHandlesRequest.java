@@ -25,6 +25,7 @@ import me.eccentric_nz.TARDIS.database.ResultSetDestinations;
 import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -147,15 +148,19 @@ public class TARDISHandlesRequest {
                         for (HashMap<String, String> map : rsd.getData()) {
                             String dest = map.get("dest_name");
                             if (split.contains(dest) && player.hasPermission("tardis.timetravel")) {
-                                player.performCommand("tardistravel " + "");
+                                player.performCommand("tardistravel dest " + dest);
                                 return;
                             }
                         }
                     }
                 } else if (split.contains("player")) {
+                    if (!player.hasPermission("tardis.timetravel.player")) {
+                        TARDISMessage.handlesSend(player, "NO_PERM_PLAYER");
+                        return;
+                    }
                     for (Player p : plugin.getServer().getOnlinePlayers()) {
                         String name = p.getName();
-                        if (split.contains(name) && player.hasPermission("tardis.timetravel.player")) {
+                        if (split.contains(name)) {
                             player.performCommand("tardistravel " + name);
                             return;
                         }
@@ -168,15 +173,29 @@ public class TARDISHandlesRequest {
                         // cycle through areas
                         rsa.getNames().forEach((name) -> {
                             if (split.contains(name) && (player.hasPermission("tardis.area." + name) || player.hasPermission("tardis.area.*"))) {
-                                player.performCommand("tardistravel " + name);
+                                player.performCommand("tardistravel area " + name);
                                 return;
                             }
                         });
                         // don't understand
                         TARDISMessage.handlesSend(player, "HANDLES_NO_COMMAND");
                     }
-                }
-                if (split.contains("home")) {
+                } else if (split.contains("biome")) {
+                    if (!player.hasPermission("tardis.timetravel.biome")) {
+                        TARDISMessage.handlesSend(player, "TRAVEL_NO_PERM_BIOME");
+                        return;
+                    }
+                    // cycle through biomes
+                    for (Biome biome : Biome.values()) {
+                        String b = biome.toString();
+                        if (split.contains(b)) {
+                            player.performCommand("tardistravel biome " + b);
+                            return;
+                        }
+                    }
+                    // don't understand
+                    TARDISMessage.handlesSend(player, "HANDLES_NO_COMMAND");
+                } else if (split.contains("home")) {
                     // travel home
                     player.performCommand("tardistravel home");
                     return;
