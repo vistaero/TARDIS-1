@@ -18,6 +18,8 @@ package me.eccentric_nz.TARDIS.handles;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.data.Program;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Programming is a process used by Cybermen to control humans. To program a human, the person has to be dead. A control
@@ -29,12 +31,34 @@ import me.eccentric_nz.TARDIS.database.data.Program;
 public class TARDISHandlesProcessor {
 
     private final TARDIS plugin;
+    private final Program program;
+    private final Player player;
 
-    public TARDISHandlesProcessor(TARDIS plugin) {
+    public TARDISHandlesProcessor(TARDIS plugin, Program program, Player player) {
         this.plugin = plugin;
+        this.program = program;
+        this.player = player;
     }
 
-    public void processDisk(Program program) {
-
+    public void processDisk() {
+        int i = 0;
+        for (ItemStack is : program.getInventory()) {
+            if (is != null) {
+                TARDISHandlesBlock thb = TARDISHandlesBlock.BY_NAME.get(is.getItemMeta().getDisplayName());
+                switch (thb) {
+                    case FOR:
+                        break;
+                    case IF:
+                        break;
+                    case VARIABLE:
+                        break;
+                    case X:
+                    case Y:
+                    case Z:
+                        break;
+                }
+            }
+            i++;
+        }
     }
 }

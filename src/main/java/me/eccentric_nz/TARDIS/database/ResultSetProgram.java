@@ -16,19 +16,19 @@
  */
 package me.eccentric_nz.TARDIS.database;
 
+import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.database.data.Program;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.data.Program;
 
 /**
- * Many facts, figures, and formulas are contained within the Matrix,
- * including... the locations of the TARDIS vaults.
- *
- * Control types: 0 = handbrake 1 = random button 2 = x-repeater 3 = z-repeater
- * 4 = multiplier-repeater 5 = environment-repeater 6 = artron button
+ * Many facts, figures, and formulas are contained within the Matrix, including... the locations of the TARDIS vaults.
+ * <p>
+ * Control types: 0 = handbrake 1 = random button 2 = x-repeater 3 = z-repeater 4 = multiplier-repeater 5 =
+ * environment-repeater 6 = artron button
  *
  * @author eccentric_nz
  */
@@ -42,23 +42,20 @@ public class ResultSetProgram {
     private Program program;
 
     /**
-     * Creates a class instance that can be used to retrieve an SQL ResultSet
-     * from the vaults table.
+     * Creates a class instance that can be used to retrieve an SQL ResultSet from the vaults table.
      *
      * @param plugin an instance of the main class.
-     * @param pid a HashMap<String, Object> of table fields and values to refine
-     * the search.
+     * @param pid    a HashMap<String, Object> of table fields and values to refine the search.
      */
     public ResultSetProgram(TARDIS plugin, int pid) {
         this.plugin = plugin;
         this.pid = pid;
-        this.prefix = this.plugin.getPrefix();
+        prefix = this.plugin.getPrefix();
     }
 
     /**
-     * Retrieves an SQL ResultSet from the programs table. This method builds an
-     * SQL query string from the parameters supplied and then executes the
-     * query. Use the getters to retrieve the results.
+     * Retrieves an SQL ResultSet from the programs table. This method builds an SQL query string from the parameters
+     * supplied and then executes the query. Use the getters to retrieve the results.
      *
      * @return true or false depending on whether any data matches the query
      */
@@ -73,12 +70,16 @@ public class ResultSetProgram {
             rs = statement.executeQuery();
             if (rs.isBeforeFirst()) {
                 rs.next();
+                String parsed = rs.getString("parsed");
+                if (rs.wasNull()) {
+                    parsed = "";
+                }
                 program = new Program(
                         rs.getInt("program_id"),
                         rs.getString("uuid"),
                         rs.getString("name"),
                         rs.getString("inventory"),
-                        rs.getString("parsed"),
+                        parsed,
                         rs.getBoolean("checked")
                 );
             } else {

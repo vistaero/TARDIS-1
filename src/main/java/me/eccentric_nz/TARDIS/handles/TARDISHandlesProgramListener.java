@@ -127,13 +127,13 @@ public class TARDISHandlesProgramListener implements Listener {
                     break;
                 case 44:
                     // save program
-                    int pid = saveDisk(inv, uuid.toString());
+                    int pid = saveDisk(inv, uuid.toString(), player);
                     if (pid != -1) {
                         close(player);
                         ItemStack is = new ItemStack(Material.RECORD_10, 1);
                         ItemMeta im = is.getItemMeta();
                         im.setDisplayName("Handles Program Disk");
-                        im.setLore(Arrays.asList("Untitled disk", pid + "", "Checked OUT"));
+                        im.setLore(Arrays.asList("Untitled Disk", pid + "", "Checked OUT"));
                         im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                         is.setItemMeta(im);
                         player.getWorld().dropItemNaturally(player.getLocation(), is);
@@ -254,7 +254,7 @@ public class TARDISHandlesProgramListener implements Listener {
         }
     }
 
-    private int saveDisk(Inventory inv, String uuid) {
+    private int saveDisk(Inventory inv, String uuid, Player player) {
         int pid = -1;
         ItemStack[] stack = new ItemStack[36];
         for (int i = 0; i < 36; i++) {
@@ -263,14 +263,22 @@ public class TARDISHandlesProgramListener implements Listener {
                 pid++;
             }
         }
-        if (pid > -1) {
-            String serialized = TARDISSerializeInventory.itemStacksToString(stack);
-            HashMap<String, Object> set = new HashMap<>();
-            set.put("uuid", uuid);
-            set.put("name", "Untitled disk");
-            set.put("inventory", serialized);
-            set.put("checked", 1);
-            pid = new QueryFactory(plugin).doSyncInsert("programs", set);
+        // there should be a minimum size for a valid program e.g. selector + command
+        if (pid > 1) {
+            // validate the program
+            TARDISHandlesValidator validator = new TARDISHandlesValidator(plugin, stack, player);
+            if (validator.validateDisk()) {
+                String serialized = TARDISSerializeInventory.itemStacksToString(stack);
+                HashMap<String, Object> set = new HashMap<>();
+                set.put("uuid", uuid);
+                set.put("name", "Untitled Disk");
+                set.put("inventory", serialized);
+                set.put("checked", 1);
+                pid = new QueryFactory(plugin).doSyncInsert("programs", set);
+            } else {
+                // not valid so reset pid
+                pid = -1;
+            }
         }
         return pid;
     }

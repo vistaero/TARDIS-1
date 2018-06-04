@@ -18,6 +18,7 @@ package me.eccentric_nz.TARDIS.handles;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -26,7 +27,6 @@ import java.util.List;
 public enum TARDISHandlesBlock {
 
     COMEHERE(TARDISHandlesCategory.COMMAND, "/tardis comehere command", Arrays.asList("Make the TARDIS", "travel to you")),
-    HADS(TARDISHandlesCategory.COMMAND, "TARDIS H.A.D.S command", Arrays.asList("Make the TARDIS", "initiate H.A.D.S")),
     HIDE(TARDISHandlesCategory.COMMAND, "/tardis hide command", Arrays.asList("Make the TARDIS", "exterior invisible")),
     REBUILD(TARDISHandlesCategory.COMMAND, "/tardis rebuild command", Arrays.asList("Rebuild the", "TARDIS exterior")),
     SCAN(TARDISHandlesCategory.COMMAND, "TARDIS scan command", Arrays.asList("Scan the environment", "outside the TARDIS")),
@@ -35,7 +35,7 @@ public enum TARDISHandlesBlock {
     LAND(TARDISHandlesCategory.COMMAND, "TARDIS land command", Arrays.asList("Make the TARDIS exit", "the Time Vortex")),
     FOR(TARDISHandlesCategory.CONTROL, "FOR loop", Arrays.asList("Use to start a loop", "with a counter")),
     TO(TARDISHandlesCategory.CONTROL, "TO", Arrays.asList("Use with a FOR loop", "to specify the number", "of loops")),
-    DO(TARDISHandlesCategory.CONTROL, "DO", Arrays.asList("Use after an", "IF, FOR or", "WHILE loop")),
+    DO(TARDISHandlesCategory.CONTROL, "DO", Arrays.asList("Use after an", "IF or FOR loop")),
     END(TARDISHandlesCategory.CONTROL, "END", Arrays.asList("Use to finish", "a conditional or", "loop statement")),
     IF(TARDISHandlesCategory.CONTROL, "IF", Arrays.asList("Check whether a", "condition is", "true or false")),
     ELSE(TARDISHandlesCategory.CONTROL, "ELSE", Arrays.asList("Use to run actions", "if an IF is false")),
@@ -45,6 +45,11 @@ public enum TARDISHandlesBlock {
     DEMATERIALISE(TARDISHandlesCategory.EVENT, "TARDIS dematerialisation event", null),
     ARTRON(TARDISHandlesCategory.EVENT, "Artron Level event", Arrays.asList("Use with Operator", "and Number blocks")),
     DEATH(TARDISHandlesCategory.EVENT, "Time Lord Death event", null),
+    ENTER(TARDISHandlesCategory.EVENT, "TARDIS Entry event", null),
+    EXIT(TARDISHandlesCategory.EVENT, "TARDIS Exit event", null),
+    HADS(TARDISHandlesCategory.EVENT, "TARDIS H.A.D.S event", null),
+    SIEGE_ON(TARDISHandlesCategory.EVENT, "Siege Mode On event", null),
+    SIEGE_OFF(TARDISHandlesCategory.EVENT, "Siege Mode Off event", null),
     LOG_OUT(TARDISHandlesCategory.EVENT, "Player log out event", null),
     ZERO(TARDISHandlesCategory.NUMBER, "0", Arrays.asList("The number zero")),
     ONE(TARDISHandlesCategory.NUMBER, "1", Arrays.asList("The number one")),
@@ -72,7 +77,7 @@ public enum TARDISHandlesBlock {
     GREATER_THAN(TARDISHandlesCategory.OPERATOR, "Greater than operator", Arrays.asList("Checks if one number", "is bigger than another")),
     GREATER_THAN_EQUAL(TARDISHandlesCategory.OPERATOR, "Greater than or equal to operator", Arrays.asList("Checks if one number", "is bigger than or", "equal to another")),
     MODULO(TARDISHandlesCategory.OPERATOR, "Modulo operator", Arrays.asList("Gets the remainder", "left over after", "dividing two numbers")),
-    PLAYER(TARDISHandlesCategory.SELECTOR, "Target Time Lord", null),
+    TIME_LORD(TARDISHandlesCategory.SELECTOR, "Target Time Lord", null),
     COMPANIONS(TARDISHandlesCategory.SELECTOR, "Target companions", null),
     TARDIS(TARDISHandlesCategory.SELECTOR, "The TARDIS", null),
     DOOR(TARDISHandlesCategory.SELECTOR, "TARDIS Door", Arrays.asList("Use with an", "Open, Close", "Lock or Unlock block")),
@@ -115,6 +120,7 @@ public enum TARDISHandlesBlock {
     private final static List<TARDISHandlesBlock> selectors = new ArrayList<>();
     private final static List<TARDISHandlesBlock> variables = new ArrayList<>();
     private final static List<TARDISHandlesBlock> buttons = new ArrayList<>();
+    public final static HashMap<String, TARDISHandlesBlock> BY_NAME = new HashMap<>();
 
     TARDISHandlesBlock(TARDISHandlesCategory category, String displayName, List<String> lore) {
         this.category = category;
@@ -150,6 +156,7 @@ public enum TARDISHandlesBlock {
                     variables.add(block);
                     break;
             }
+            BY_NAME.put(block.displayName, block);
         }
     }
 

@@ -376,7 +376,7 @@ public class TARDISButtonListener implements Listener {
                                                 ResultSetProgram rsp = new ResultSetProgram(plugin, pid);
                                                 if (rsp.resultSet()) {
                                                     // send program to processor
-                                                    new TARDISHandlesProcessor(plugin).processDisk(rsp.getProgram());
+                                                    new TARDISHandlesProcessor(plugin, rsp.getProgram(), player).processDisk();
                                                     // check in the disk
                                                     HashMap<String, Object> set = new HashMap<>();
                                                     set.put("checked", 0);
