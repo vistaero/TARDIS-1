@@ -68,7 +68,7 @@ public class TARDISHandlesCommand implements CommandExecutor {
             case "takeoff":
                 return new TARDISHandlesTakeoffCommand(plugin).enterVortex(player, args);
             case "time":
-                return new TARDISHandlesTimeCommand().sayTime(player);
+                return new TARDISHandlesTimeCommand(plugin).sayTime(player);
         }
         return false;
     }

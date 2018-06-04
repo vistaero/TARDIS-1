@@ -16,44 +16,46 @@
  */
 package me.eccentric_nz.TARDIS.commands.handles;
 
+import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.bukkit.entity.Player;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  * @author eccentric_nz
  */
 public class TARDISHandlesTimeCommand {
 
+    private final TARDIS plugin;
+
+    public TARDISHandlesTimeCommand(TARDIS plugin) {
+        this.plugin = plugin;
+    }
+
     public boolean sayTime(Player player) {
         long minecraftTime = player.getWorld().getTime();
         String daynight = TARDISStaticUtils.getTime(minecraftTime);
-        TARDISMessage.handlesSend(player, "HANDLES_TIME", minecraftTime, daynight, parseTime(minecraftTime));
         // get current server time (in a nice format)
-        String utc = Instant.now().toString();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
-        String localTimeToDisplay = LocalDateTime.parse(utc, formatter)
-                .atOffset(ZoneOffset.UTC)
-                .atZoneSameInstant(ZoneId.systemDefault())
-                .format(formatter);
+        Date date = new Date();
+        String formatted = DateFormatUtils.format(date, "h:mm a");
         // send message to player with current time
-        TARDISMessage.handlesSend(player, "HANDLES_SERVER_TIME", localTimeToDisplay);
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            TARDISMessage.handlesSend(player, "HANDLES_TIME", minecraftTime, daynight, parseTime(minecraftTime));
+            TARDISMessage.handlesSend(player, "HANDLES_SERVER_TIME", formatted);
+        }, 2L);
         return true;
     }
 
     private static String parseTime(long time) {
         long hours = time / 1000 + 6;
         long minutes = (time % 1000) * 60 / 1000;
-        String ampm = "am";
+        String ampm = "AM";
         if (hours >= 12) {
             hours -= 12;
-            ampm = "pm";
+            ampm = "PM";
         }
         if (hours == 0) {
             hours = 12;
