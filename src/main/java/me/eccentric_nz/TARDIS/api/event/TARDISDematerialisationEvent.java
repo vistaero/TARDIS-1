@@ -21,7 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 /**
- *
  * @author eccentric_nz
  */
 public final class TARDISDematerialisationEvent extends TARDISEvent {
@@ -34,8 +33,7 @@ public final class TARDISDematerialisationEvent extends TARDISEvent {
     }
 
     /**
-     * Returns the Bukkit Location of the TARDIS exterior preset where it
-     * dematerialise from.
+     * Returns the Bukkit Location of the TARDIS exterior preset where it dematerialised from.
      *
      * @return the location of the dematerialisation event
      */
