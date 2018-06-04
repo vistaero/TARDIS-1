@@ -17,7 +17,6 @@
 package me.eccentric_nz.TARDIS.enumeration;
 
 /**
- *
  * @author eccentric_nz
  */
 public enum COMPASS {
@@ -29,7 +28,7 @@ public enum COMPASS {
 
     public byte upperData;
 
-    private COMPASS(byte upperData) {
+    COMPASS(byte upperData) {
         this.upperData = upperData;
     }
 

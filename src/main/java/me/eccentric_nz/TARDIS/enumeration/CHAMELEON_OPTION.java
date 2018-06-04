@@ -19,7 +19,6 @@ package me.eccentric_nz.TARDIS.enumeration;
 import org.bukkit.ChatColor;
 
 /**
- *
  * @author eccentric_nz
  */
 public enum CHAMELEON_OPTION {
@@ -36,7 +35,7 @@ public enum CHAMELEON_OPTION {
     public String off;
     public ChatColor offColour;
 
-    private CHAMELEON_OPTION(int slot, String on, ChatColor onColour, String off, ChatColor offColour) {
+    CHAMELEON_OPTION(int slot, String on, ChatColor onColour, String off, ChatColor offColour) {
         this.slot = slot;
         this.on = on;
         this.off = off;

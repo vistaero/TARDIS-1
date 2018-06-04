@@ -16,13 +16,13 @@
  */
 package me.eccentric_nz.TARDIS.enumeration;
 
-import java.util.ArrayList;
-import java.util.List;
 import me.eccentric_nz.TARDIS.TARDIS;
 import org.bukkit.Material;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- *
  * @author eccentric_nz
  */
 public enum DISK_CIRCUIT {
@@ -48,7 +48,7 @@ public enum DISK_CIRCUIT {
     Material material;
     static final List<String> circuitNames = new ArrayList<>();
 
-    private DISK_CIRCUIT(String name, Material material) {
+    DISK_CIRCUIT(String name, Material material) {
         this.name = name;
         this.material = material;
     }

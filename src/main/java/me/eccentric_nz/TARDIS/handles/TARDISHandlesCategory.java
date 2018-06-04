@@ -22,9 +22,9 @@ package me.eccentric_nz.TARDIS.handles;
 public enum TARDISHandlesCategory {
 
     BUTTON("Buttons", 11),
-    COMMAND("TARDIS commands and actions", 8),
+    COMMAND("TARDIS commands and actions", 7),
     CONTROL("Control and loop statements", 8),
-    EVENT("TARDIS events", 5),
+    EVENT("TARDIS events", 10),
     NUMBER("Numbers", 12),
     OPERATOR("Operators", 14),
     SELECTOR("Selectors", 7),
@@ -33,7 +33,7 @@ public enum TARDISHandlesCategory {
     private final String lore;
     private final int size;
 
-    private TARDISHandlesCategory(String lore, int size) {
+    TARDISHandlesCategory(String lore, int size) {
         this.lore = lore;
         this.size = size;
     }

@@ -19,7 +19,6 @@ package me.eccentric_nz.TARDIS.enumeration;
 import org.bukkit.Material;
 
 /**
- *
  * @author eccentric_nz
  */
 public enum USE_CLAY {
@@ -30,7 +29,7 @@ public enum USE_CLAY {
 
     Material material;
 
-    private USE_CLAY(Material material) {
+    USE_CLAY(Material material) {
         this.material = material;
     }
 

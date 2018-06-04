@@ -19,7 +19,6 @@ package me.eccentric_nz.TARDIS.enumeration;
 import org.bukkit.ChatColor;
 
 /**
- *
  * @author eccentric_nz
  */
 public enum ADAPTION {
@@ -30,7 +29,7 @@ public enum ADAPTION {
 
     public ChatColor colour;
 
-    private ADAPTION(ChatColor colour) {
+    ADAPTION(ChatColor colour) {
         this.colour = colour;
     }
 

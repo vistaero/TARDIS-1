@@ -17,7 +17,6 @@
 package me.eccentric_nz.TARDIS.enumeration;
 
 /**
- *
  * @author eccentric_nz
  */
 public enum ROOM {
@@ -50,5 +49,5 @@ public enum ROOM {
     VILLAGE,
     WOOD,
     WORKSHOP,
-    ZERO;
+    ZERO
 }

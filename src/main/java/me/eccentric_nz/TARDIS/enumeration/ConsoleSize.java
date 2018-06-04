@@ -17,7 +17,6 @@
 package me.eccentric_nz.TARDIS.enumeration;
 
 /**
- *
  * @author eccentric_nz
  */
 public enum ConsoleSize {
@@ -29,7 +28,7 @@ public enum ConsoleSize {
     private final String configPath;
     private final String blocks;
 
-    private ConsoleSize(String configPath, String blocks) {
+    ConsoleSize(String configPath, String blocks) {
         this.configPath = configPath;
         this.blocks = blocks;
     }
