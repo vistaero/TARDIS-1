@@ -24,6 +24,7 @@ import me.eccentric_nz.TARDIS.database.ResultSetControls;
 import me.eccentric_nz.TARDIS.database.ResultSetDestinations;
 import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
@@ -89,7 +90,7 @@ public class TARDISHandlesRequest {
                 }
             }
             // remove the prefix
-            String removed = chat.replaceAll("(?i)" + Pattern.quote(plugin.getConfig().getString("handles.prefix") + " "), "");
+            String removed = chat.replaceAll("(?i)" + Pattern.quote(plugin.getConfig().getString("handles.prefix")), "").trim();
             List<String> split = Arrays.asList(removed.toLowerCase().split(" "));
             if (split.contains("craft")) {
                 if (split.contains("tardis")) {
@@ -116,11 +117,11 @@ public class TARDISHandlesRequest {
                     TARDISMessage.handlesSend(player, "HANDLES_NO_COMMAND");
                     return;
                 }
-                // remove 'me to '
-                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles remind " + uuid.toString() + " " + removed.replaceAll("(?i)" + Pattern.quote("remind "), "").replaceAll("(?i)" + Pattern.quote("me to "), ""));
+                // remove 'remind me to '
+                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles remind " + uuid.toString() + " " + StringUtils.normalizeSpace(removed.replaceAll("(?i)" + Pattern.quote("remind"), "").replaceAll("(?i)" + Pattern.quote("me to"), "")));
             } else if (split.contains("say")) {
                 // remove 'say '
-                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles say " + uuid.toString() + " " + removed.replaceAll("(?i)" + Pattern.quote("say "), ""));
+                plugin.getServer().dispatchCommand(plugin.getConsole(), "handles say " + uuid.toString() + " " + StringUtils.normalizeSpace(removed.replaceAll("(?i)" + Pattern.quote("say"), "")));
             } else if (split.contains("name") || split.contains("name?")) {
                 plugin.getServer().dispatchCommand(plugin.getConsole(), "handles name " + uuid.toString());
             } else if (split.contains("time") || split.contains("time?")) {
