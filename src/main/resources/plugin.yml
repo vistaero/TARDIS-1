@@ -948,4 +948,5 @@ commands:
       permission: tardis.admin
     disk:
       description: Name a Handles Program Disk
+      usage: /<command> disk [new name]
       permission: tardis.handles.program
