@@ -16,7 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.handles;
 
-import java.util.Arrays;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.ResultSetPrograms;
 import me.eccentric_nz.TARDIS.database.data.Program;
@@ -25,8 +24,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHandlesSavedInventory {
@@ -38,7 +38,7 @@ public class TARDISHandlesSavedInventory {
     public TARDISHandlesSavedInventory(TARDIS plugin, String uuid) {
         this.plugin = plugin;
         this.uuid = uuid;
-        this.programs = getItemStack();
+        programs = getItemStack();
     }
 
     /**
