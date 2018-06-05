@@ -195,7 +195,7 @@ public class TARDIS extends JavaPlugin {
                 }
                 if (plg.getKey().equals("Multiverse-Inventories")) {
                     if (!checkMVI()) {
-                        console.sendMessage(pluginName + ChatColor.RED + "This plugin requires Multiverse-Inventories to be v2.5-b344 or higher, disabling...");
+                        console.sendMessage(pluginName + ChatColor.RED + "This plugin requires Multiverse-Inventories to be v2.5-b431 or higher, disabling...");
                         hasVersion = false;
                         pm.disablePlugin(this);
                         return;

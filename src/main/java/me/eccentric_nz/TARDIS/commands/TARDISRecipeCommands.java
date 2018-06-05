@@ -17,7 +17,6 @@
 package me.eccentric_nz.TARDIS.commands;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.enumeration.INVENTORY_MANAGER;
 import me.eccentric_nz.TARDIS.enumeration.MAP;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.ChatColor;
@@ -297,7 +296,7 @@ public class TARDISRecipeCommands implements CommandExecutor {
             lore.set(1, uses);
             im.setLore(lore);
         }
-        if ((str.equals("Save Storage Disk") || str.equals("Preset Storage Disk") || str.equals("Biome Storage Disk") || str.equals("Player Storage Disk") || str.equals("Sonic Blaster")) && !plugin.getInvManager().equals(INVENTORY_MANAGER.MULTIVERSE)) {
+        if ((str.equals("Save Storage Disk") || str.equals("Preset Storage Disk") || str.equals("Biome Storage Disk") || str.equals("Player Storage Disk") || str.equals("Sonic Blaster"))) {
             im.addItemFlags(ItemFlag.values());
         }
         result.setAmount(1);
@@ -327,7 +326,7 @@ public class TARDISRecipeCommands implements CommandExecutor {
         ItemStack result = recipe.getResult();
         ItemMeta im = result.getItemMeta();
         im.setDisplayName(str);
-        if ((str.equals("Save Storage Disk") || str.equals("Preset Storage Disk") || str.equals("Biome Storage Disk") || str.equals("Player Storage Disk") || str.equals("Sonic Blaster")) && !plugin.getInvManager().equals(INVENTORY_MANAGER.MULTIVERSE)) {
+        if ((str.equals("Save Storage Disk") || str.equals("Preset Storage Disk") || str.equals("Biome Storage Disk") || str.equals("Player Storage Disk") || str.equals("Sonic Blaster"))) {
             im.addItemFlags(ItemFlag.values());
         }
         result.setAmount(1);

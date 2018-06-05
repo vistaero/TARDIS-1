@@ -16,15 +16,10 @@
  */
 package me.eccentric_nz.TARDIS.artron;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
 import me.eccentric_nz.TARDIS.database.ResultSetTardisArtron;
-import me.eccentric_nz.TARDIS.enumeration.INVENTORY_MANAGER;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import org.bukkit.command.Command;
@@ -36,8 +31,12 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISArtronStorageCommand implements CommandExecutor {
@@ -47,8 +46,8 @@ public class TARDISArtronStorageCommand implements CommandExecutor {
 
     public TARDISArtronStorageCommand(TARDIS plugin) {
         this.plugin = plugin;
-        this.firstArgs.add("tardis");
-        this.firstArgs.add("timelord");
+        firstArgs.add("tardis");
+        firstArgs.add("timelord");
     }
 
     @Override
@@ -143,9 +142,7 @@ public class TARDISArtronStorageCommand implements CommandExecutor {
             lore.set(1, "" + new_amount);
             im.setLore(lore);
             im.addEnchant(Enchantment.DURABILITY, 1, true);
-            if (!plugin.getInvManager().equals(INVENTORY_MANAGER.MULTIVERSE)) {
-                im.addItemFlags(ItemFlag.values());
-            }
+            im.addItemFlags(ItemFlag.values());
             is.setItemMeta(im);
             // remove the energy from the tardis/timelord
             HashMap<String, Object> where = new HashMap<>();

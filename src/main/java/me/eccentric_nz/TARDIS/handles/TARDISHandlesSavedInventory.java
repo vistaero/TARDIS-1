@@ -60,7 +60,7 @@ public class TARDISHandlesSavedInventory {
                 im.setDisplayName("Handles Program Disk");
                 String checked = (p.isCheckedOut()) ? "Checked OUT" : "Checked IN";
                 im.setLore(Arrays.asList(p.getName(), p.getProgram_id() + "", checked));
-                im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                im.addItemFlags(ItemFlag.values());
                 is.setItemMeta(im);
                 stack[i] = is;
                 i++;

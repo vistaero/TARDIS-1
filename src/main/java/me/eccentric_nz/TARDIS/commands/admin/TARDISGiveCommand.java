@@ -21,7 +21,6 @@ import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.database.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
-import me.eccentric_nz.TARDIS.enumeration.INVENTORY_MANAGER;
 import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.ChatColor;
@@ -250,7 +249,7 @@ public class TARDISGiveCommand implements CommandExecutor {
             im.setLore(lore);
             result.setItemMeta(im);
         }
-        if ((item.equals("save-disk") || item.equals("preset-disk") || item.equals("biome-disk") || item.equals("player-disk") || item.equals("blaster")) && !plugin.getInvManager().equals(INVENTORY_MANAGER.MULTIVERSE)) {
+        if ((item.equals("save-disk") || item.equals("preset-disk") || item.equals("biome-disk") || item.equals("player-disk") || item.equals("blaster"))) {
             ItemMeta im = result.getItemMeta();
             im.addItemFlags(ItemFlag.values());
         }
@@ -379,9 +378,7 @@ public class TARDISGiveCommand implements CommandExecutor {
         lore.set(1, "" + max);
         im.setLore(lore);
         im.addEnchant(Enchantment.DURABILITY, 1, true);
-        if (!plugin.getInvManager().equals(INVENTORY_MANAGER.MULTIVERSE)) {
-            im.addItemFlags(ItemFlag.values());
-        }
+        im.addItemFlags(ItemFlag.values());
         result.setItemMeta(im);
         player.getInventory().addItem(result);
         player.updateInventory();
