@@ -576,10 +576,43 @@ commands:
       permission: tardis.timetravel
   tardisadmin:
     aliases: tadmin
-    description: Set TARDIS configuration options.
-    usage: /<command> [config option] [value]
+    description: Set TARDIS configuration options and perform TARDIS administration tasks.
+    usage: /<command> [option] [value]
     permission: tardis.admin
     permission-message: You don't have the permission <permission> to use this command
+    list:
+      description: List all TARDISs and their locations.
+      usage: /<command> list
+    enter:
+      description: Enter a player's TARDIS.
+      usage: /<command> enter [player]
+    delete:
+      description: Delete a player's TARDIS.
+      usage: /<command> delete [player]
+    purge:
+      description: Remove all database entries for the named player.
+      usage: /<command> purge [player]
+    desiege:
+      description: Force a player's TARDIS out of Siege Mode.
+      usage: /<command> desiege [player]
+    include:
+      description: Set whether the specified world is included in time travel destinations.
+      usage: /<command> include [world]
+    exclude:
+      description: Set whether the specified world is excluded from time travel destinations.
+      usage: /<command> exclude [world]
+    arch:
+      description: View an 'arched' player's real name, or with the 'force' argument, toggle arch status.
+      usage: /<command> arch [player] (force)
+    prune:
+      description: Remove TARDISes that haven't been used for an extended period.
+      usage: /<command> prune [number of days]
+    prunelist:
+      description: List TARDISes that haven't been used for an extended period.
+      usage: /<command> prunelist [number of days]
+    playercount:
+      description: Check or set a player's TARDIS count.
+      usage: /<command> playercount [player] [count]
   tardisgive:
     aliases: tgive
     description: Give TARDIS items to a player.
