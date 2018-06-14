@@ -18,6 +18,7 @@ package me.eccentric_nz.TARDIS.handles;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
+import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
 import me.eccentric_nz.TARDIS.database.data.Program;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.entity.Player;
@@ -48,37 +49,20 @@ public class TARDISHandlesProcessor {
 
     public void processDisk() {
         String event = "";
+        int i = 0;
         for (ItemStack is : program.getInventory()) {
             if (is != null) {
                 TARDISHandlesBlock thb = TARDISHandlesBlock.BY_NAME.get(is.getItemMeta().getDisplayName());
-//                TARDISHandlesCategory category = thb.getCategory();
-                switch (thb) {
-                    case FOR:
-                        break;
-                    case IF:
-                        break;
-                    case VARIABLE:
-                        break;
-                    case X:
-                    case Y:
-                    case Z:
-                        break;
-                    case ARTRON:
-                    case DEATH:
-                    case DEMATERIALISE:
-                    case ENTER:
-                    case EXIT:
-                    case HADS:
-                    case LOG_OUT:
-                    case MATERIALISE:
-                    case SIEGE_OFF:
-                    case SIEGE_ON:
-                        event = thb.toString();
-                        break;
-                    default:
-                        break;
+                TARDISHandlesCategory category = thb.getCategory();
+                if (category == TARDISHandlesCategory.EVENT) {
+                    event = thb.toString();
+                    break;
+                } else if (category == TARDISHandlesCategory.COMMAND) {
+                    processCommand(i + 1);
+                    TARDISMessage.handlesSend(player, "HANDLES_EXECUTE");
                 }
             }
+            i++;
         }
         if (!event.isEmpty()) {
             HashMap<String, Object> set = new HashMap<>();
@@ -87,20 +71,94 @@ public class TARDISHandlesProcessor {
             where.put("program_id", pid);
             new QueryFactory(plugin).doUpdate("programs", set, where);
             TARDISMessage.handlesSend(player, "HANDLES_RUNNING");
-        } else {
-            TARDISMessage.handlesSend(player, "HANDLES_EXECUTE");
         }
     }
 
     public void processCommand(int pos) {
-        for (int i = pos; i < 36; i++) {
-            ItemStack is = program.getInventory()[i];
-            if (is != null) {
-                TARDISHandlesBlock thb = TARDISHandlesBlock.BY_NAME.get(is.getItemMeta().getDisplayName());
-                switch (thb) {
-                    case TARDIS:
-                        
+        ResultSetTardisID rs = new ResultSetTardisID(plugin);
+        if (rs.fromUUID(program.getUuid())) {
+            String command = "";
+            int id = rs.getTardis_id();
+            for (int i = pos; i < 36; i++) {
+                ItemStack is = program.getInventory()[i];
+                if (is != null) {
+                    TARDISHandlesBlock thb = TARDISHandlesBlock.BY_NAME.get(is.getItemMeta().getDisplayName());
+                    ItemStack next = program.getInventory()[i + 1];
+                    if (is != null) {
+                        TARDISHandlesBlock arg = TARDISHandlesBlock.BY_NAME.get(next.getItemMeta().getDisplayName());
+                        switch (thb) {
+                            case TARDIS:
+                                switch (arg) {
+                                    case COMEHERE:
+                                        command = "handles call " + program.getUuid() + " " + id;
+                                        break;
+                                    case HIDE:
+                                        command = "tardis hide";
+                                        break;
+                                    case REBUILD:
+                                        command = "tardis rebuild";
+                                        break;
+                                    case TAKE_OFF:
+                                        command = "handles takeoff " + program.getUuid() + " " + id;
+                                        break;
+                                    case LAND:
+                                        command = "handles land " + program.getUuid() + " " + id;
+                                        break;
+                                }
+                                break;
+                            case DOOR:
+                                switch (arg) {
+                                    case OPEN:
+
+                                        break;
+                                    case CLOSE:
+
+                                        break;
+                                    case LOCK:
+
+                                        break;
+                                    case UNLOCK:
+
+                                        break;
+                                }
+                                break;
+                            case LIGHTS:
+                                if (arg == TARDISHandlesBlock.ON) {
+
+                                } else {
+
+                                }
+                                break;
+                            case POWER:
+                                if (arg == TARDISHandlesBlock.ON) {
+
+                                } else {
+
+                                }
+                                break;
+                            case SIEGE:
+                                if (arg == TARDISHandlesBlock.ON) {
+
+                                } else {
+
+                                }
+                                break;
+                            case SCAN:
+                                command = "handles scan " + program.getUuid() + " " + id;
+                                break;
+                            case TRAVEL:
+
+                                break;
+                            default:
+                        }
+                    }
                 }
+            }
+            // execute command
+            if (command.startsWith("handles")) {
+                plugin.getServer().dispatchCommand(plugin.getConsole(), command);
+            } else {
+                player.performCommand(command);
             }
         }
     }
