@@ -16,13 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.travel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitDamager;
@@ -54,10 +47,11 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.*;
+
 /**
- * A control sphere is a device created by the Great Intelligence to control its
- * Robot Yetis. It is a glass sphere that is fitted into the chest of a Yeti and
- * serves as the brain. It emits a beeping noise.
+ * A control sphere is a device created by the Great Intelligence to control its Robot Yetis. It is a glass sphere that
+ * is fitted into the chest of a Yeti and serves as the brain. It emits a beeping noise.
  *
  * @author eccentric_nz
  */
@@ -75,8 +69,8 @@ public class TARDISTerminalListener implements Listener {
     }
 
     /**
-     * Listens for player clicking inside an inventory. If the inventory is a
-     * TARDIS GUI, then the click is processed accordingly.
+     * Listens for player clicking inside an inventory. If the inventory is a TARDIS GUI, then the click is processed
+     * accordingly.
      *
      * @param event a player clicking an inventory slot
      */
@@ -88,7 +82,7 @@ public class TARDISTerminalListener implements Listener {
             event.setCancelled(true);
             int slot = event.getRawSlot();
             if (slot >= 0 && slot < 54) {
-                final Player player = (Player) event.getWhoClicked();
+                Player player = (Player) event.getWhoClicked();
                 UUID uuid = player.getUniqueId();
                 // get the TARDIS the player is in
                 HashMap<String, Object> where = new HashMap<>();
@@ -161,9 +155,7 @@ public class TARDISTerminalListener implements Listener {
                                 wheret.put("tardis_id", terminalIDs.get(uuid));
                                 new QueryFactory(plugin).doSyncUpdate("next", set, wheret);
                                 plugin.getTrackerKeeper().getHasDestination().put(terminalIDs.get(uuid), plugin.getArtronConfig().getInt("travel"));
-                                if (plugin.getTrackerKeeper().getRescue().containsKey(terminalIDs.get(uuid))) {
-                                    plugin.getTrackerKeeper().getRescue().remove(terminalIDs.get(uuid));
-                                }
+                                plugin.getTrackerKeeper().getRescue().remove(terminalIDs.get(uuid));
                                 close(player);
                                 TARDISMessage.send(player, "DEST_SET", !plugin.getTrackerKeeper().getDestinationVortex().containsKey(terminalIDs.get(uuid)));
                                 if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(terminalIDs.get(uuid))) {
@@ -406,7 +398,7 @@ public class TARDISTerminalListener implements Listener {
                     }
                 }
                 // remove the world the Police Box is in
-                if (this_world != null && allowedWorlds.size() > 1 && allowedWorlds.contains(this_world)) {
+                if (this_world != null && allowedWorlds.size() > 1) {
                     allowedWorlds.remove(this_world);
                 }
                 // remove the world if the player doesn't have permission
@@ -550,23 +542,15 @@ public class TARDISTerminalListener implements Listener {
         is.setItemMeta(im);
     }
 
-    private void close(final Player p) {
-        final UUID uuid = p.getUniqueId();
+    private void close(Player p) {
+        UUID uuid = p.getUniqueId();
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             @Override
             public void run() {
-                if (terminalUsers.containsKey(uuid)) {
-                    terminalUsers.remove(uuid);
-                }
-                if (terminalStep.containsKey(uuid)) {
-                    terminalStep.remove(uuid);
-                }
-                if (terminalDestination.containsKey(uuid)) {
-                    terminalDestination.remove(uuid);
-                }
-                if (terminalSub.containsKey(uuid)) {
-                    terminalSub.remove(uuid);
-                }
+                terminalUsers.remove(uuid);
+                terminalStep.remove(uuid);
+                terminalDestination.remove(uuid);
+                terminalSub.remove(uuid);
                 p.closeInventory();
             }
         }, 1L);

@@ -4,17 +4,15 @@
 package me.eccentric_nz.TARDIS.arch.attributes;
 
 /**
- *
  * @author eccentric_nz
  */
 public enum TARDISAttributeOperation {
-
     ADD_NUMBER(0),
     MULTIPLY_PERCENTAGE(1),
     ADD_PERCENTAGE(2);
     private final int id;
 
-    private TARDISAttributeOperation(int id) {
+    TARDISAttributeOperation(int id) {
         this.id = id;
     }
 

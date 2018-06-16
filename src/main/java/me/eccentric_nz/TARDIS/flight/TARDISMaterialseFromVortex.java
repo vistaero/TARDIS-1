@@ -16,18 +16,12 @@
  */
 package me.eccentric_nz.TARDIS.flight;
 
-import java.util.HashMap;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.achievement.TARDISAchievementFactory;
 import me.eccentric_nz.TARDIS.api.event.TARDISMalfunctionEvent;
 import me.eccentric_nz.TARDIS.api.event.TARDISMaterialisationEvent;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetNextLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.ADVANCEMENT;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
@@ -48,8 +42,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISMaterialseFromVortex implements Runnable {
@@ -68,7 +64,7 @@ public class TARDISMaterialseFromVortex implements Runnable {
 
     @Override
     public void run() {
-        final UUID uuid = player.getUniqueId();
+        UUID uuid = player.getUniqueId();
         HashMap<String, Object> wherenl = new HashMap<>();
         wherenl.put("tardis_id", id);
         ResultSetNextLocation rsn = new ResultSetNextLocation(plugin, wherenl);
@@ -77,28 +73,26 @@ public class TARDISMaterialseFromVortex implements Runnable {
             return;
         }
         Location exit = new Location(rsn.getWorld(), rsn.getX(), rsn.getY(), rsn.getZ());
-        final QueryFactory qf = new QueryFactory(plugin);
+        QueryFactory qf = new QueryFactory(plugin);
         boolean is_next_sub = rsn.isSubmarine();
         boolean malfunction = (plugin.getTrackerKeeper().getMalfunction().containsKey(id) && plugin.getTrackerKeeper().getMalfunction().get(id));
         HashMap<String, Object> wherei = new HashMap<>();
         wherei.put("tardis_id", id);
         ResultSetTardis rs = new ResultSetTardis(plugin, wherei, "", false, 2);
         if (rs.resultSet()) {
-            final Tardis tardis = rs.getTardis();
+            Tardis tardis = rs.getTardis();
             // get current location for back
             HashMap<String, Object> wherecu = new HashMap<>();
             wherecu.put("tardis_id", id);
-            final ResultSetCurrentLocation rscl = new ResultSetCurrentLocation(plugin, wherecu);
+            ResultSetCurrentLocation rscl = new ResultSetCurrentLocation(plugin, wherecu);
             if (rscl.resultSet()) {
-                final BukkitScheduler scheduler = plugin.getServer().getScheduler();
+                BukkitScheduler scheduler = plugin.getServer().getScheduler();
                 if (malfunction) {
                     // check for a malfunction
                     TARDISMalfunction m = new TARDISMalfunction(plugin);
                     exit = m.getMalfunction(id, player, rscl.getDirection(), handbrake, tardis.getEps(), tardis.getCreeper());
                     if (exit != null) {
-                        if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                            plugin.getTrackerKeeper().getRescue().remove(id);
-                        }
+                        plugin.getTrackerKeeper().getRescue().remove(id);
                         HashMap<String, Object> wheress = new HashMap<>();
                         wheress.put("tardis_id", id);
                         HashMap<String, Object> setsave = new HashMap<>();
@@ -139,7 +133,7 @@ public class TARDISMaterialseFromVortex implements Runnable {
                     if (!exit.getWorld().isChunkLoaded(exit.getChunk())) {
                         exit.getWorld().loadChunk(exit.getChunk());
                     }
-                    final PRESET preset = tardis.getPreset();
+                    PRESET preset = tardis.getPreset();
                     COMPASS sd = rsn.getDirection();
                     HashMap<String, Object> wherek = new HashMap<>();
                     wherek.put("uuid", uuid.toString());
@@ -155,7 +149,7 @@ public class TARDISMaterialseFromVortex implements Runnable {
                         flight_mode = rsp.getFlightMode();
                     }
                     // set destination flight data
-                    final BuildData bd = new BuildData(plugin, uuid.toString());
+                    BuildData bd = new BuildData(plugin, uuid.toString());
                     bd.setDirection(sd);
                     bd.setLocation(exit);
                     bd.setMalfunction(false);
@@ -165,7 +159,6 @@ public class TARDISMaterialseFromVortex implements Runnable {
                     bd.setSubmarine(is_next_sub);
                     bd.setTardisID(id);
                     bd.setTexture(set_biome);
-
                     // remember flight data
                     plugin.getTrackerKeeper().getFlightData().put(uuid, bd);
                     long flight_mode_delay = ((plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) ? 0L : 518L);
@@ -184,7 +177,7 @@ public class TARDISMaterialseFromVortex implements Runnable {
                         scheduler.scheduleSyncDelayedTask(plugin, runner, flight_mode_delay);
                     }
                     if (bar) {
-                        final long tt = travel_time;
+                        long tt = travel_time;
                         // start travel bar
                         scheduler.scheduleSyncDelayedTask(plugin, () -> {
                             new TARDISTravelBar(plugin).showTravelRemaining(player, tt, false);
@@ -196,14 +189,14 @@ public class TARDISMaterialseFromVortex implements Runnable {
                             scheduler.cancelTask(plugin.getTrackerKeeper().getDestinationVortex().get(id));
                         }
                     }, materialisation_delay - 140L);
-                    final boolean mine_sound = minecart;
-                    final Location sound_loc = (preset.equals(PRESET.JUNK_MODE)) ? exit : handbrake;
-                    final Location external_sound_loc = exit;
-                    final boolean malchk = malfunction;
+                    boolean mine_sound = minecart;
+                    Location sound_loc = (preset.equals(PRESET.JUNK_MODE)) ? exit : handbrake;
+                    Location external_sound_loc = exit;
+                    boolean malchk = malfunction;
                     scheduler.scheduleSyncDelayedTask(plugin, () -> {
                         BuildData b_data = plugin.getTrackerKeeper().getFlightData().get(uuid);
                         Location final_location = b_data.getLocation();
-                        final Location l = new Location(rscl.getWorld(), rscl.getX(), rscl.getY(), rscl.getZ());
+                        Location l = new Location(rscl.getWorld(), rscl.getX(), rscl.getY(), rscl.getZ());
                         plugin.getPM().callEvent(new TARDISMaterialisationEvent(player, tardis, final_location));
                         plugin.getPresetBuilder().buildPreset(b_data);
                         if (!mine_sound) {
@@ -221,12 +214,12 @@ public class TARDISMaterialseFromVortex implements Runnable {
                         } else {
                             handbrake.getWorld().playSound(handbrake, Sound.ENTITY_MINECART_INSIDE, 1.0F, 0.0F);
                         }
-                        final HashMap<String, Object> setcurrent = new HashMap<>();
-                        final HashMap<String, Object> wherecurrent = new HashMap<>();
-                        final HashMap<String, Object> setback = new HashMap<>();
-                        final HashMap<String, Object> whereback = new HashMap<>();
-                        final HashMap<String, Object> setdoor = new HashMap<>();
-                        final HashMap<String, Object> wheredoor = new HashMap<>();
+                        HashMap<String, Object> setcurrent = new HashMap<>();
+                        HashMap<String, Object> wherecurrent = new HashMap<>();
+                        HashMap<String, Object> setback = new HashMap<>();
+                        HashMap<String, Object> whereback = new HashMap<>();
+                        HashMap<String, Object> setdoor = new HashMap<>();
+                        HashMap<String, Object> wheredoor = new HashMap<>();
                         // current
                         setcurrent.put("world", final_location.getWorld().getName());
                         setcurrent.put("x", final_location.getBlockX());
@@ -266,9 +259,7 @@ public class TARDISMaterialseFromVortex implements Runnable {
                             plugin.getTrackerKeeper().getFlightData().remove(uuid);
                         }
                     }, materialisation_delay);
-                    if (plugin.getTrackerKeeper().getDamage().containsKey(id)) {
-                        plugin.getTrackerKeeper().getDamage().remove(id);
-                    }
+                    plugin.getTrackerKeeper().getDamage().remove(id);
                     // set last use
                     long now;
                     if (player.hasPermission("tardis.prune.bypass")) {

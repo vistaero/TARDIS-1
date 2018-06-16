@@ -33,7 +33,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.*;
 import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -167,7 +166,6 @@ public class TARDISSonicListener implements Listener {
                                 TARDISVector3D observerDir = new TARDISVector3D(observerPos.getDirection());
                                 TARDISVector3D observerStart = new TARDISVector3D(observerPos);
                                 TARDISVector3D observerEnd = observerStart.add(observerDir.multiply(16));
-
                                 Player hit = null;
                                 // Get nearby entities
                                 for (Player target : player.getWorld().getPlayers()) {
@@ -868,13 +866,13 @@ public class TARDISSonicListener implements Listener {
             if (b.getType().equals(Material.TNT)) {
                 b.setType(Material.AIR);
                 b.getWorld().spawnEntity(b.getLocation().add(0.5d, 0.5d, 0.5d), EntityType.PRIMED_TNT);
-                plugin.getPM().callEvent(new BlockIgniteEvent(b, IgniteCause.FLINT_AND_STEEL, (Entity) p));
+                plugin.getPM().callEvent(new BlockIgniteEvent(b, IgniteCause.FLINT_AND_STEEL, p));
                 return;
             }
             if (above.getType().equals(Material.AIR)) {
                 above.setType(Material.FIRE);
                 // call a block ignite event
-                plugin.getPM().callEvent(new BlockIgniteEvent(b, IgniteCause.FLINT_AND_STEEL, (Entity) p));
+                plugin.getPM().callEvent(new BlockIgniteEvent(b, IgniteCause.FLINT_AND_STEEL, p));
             }
         }
     }
@@ -897,7 +895,7 @@ public class TARDISSonicListener implements Listener {
         // Lockette
         if (plugin.getPM().isPluginEnabled("Lockette")) {
             Lockette Lockette = (Lockette) plugin.getPM().getPlugin("Lockette");
-            lke = Lockette.isProtected(b);
+            lke = org.yi.acru.bukkit.Lockette.Lockette.isProtected(b);
         }
         if (plugin.getPM().isPluginEnabled("LockettePro")) {
             pro = LocketteProAPI.isProtected(b);

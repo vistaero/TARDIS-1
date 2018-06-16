@@ -16,18 +16,18 @@
  */
 package me.eccentric_nz.TARDIS;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import me.eccentric_nz.TARDIS.chameleon.TARDISStainedGlassLookup;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 /**
- * Keeps track of various building related lookups. these include: Room block
- * counts, Room seed blocks and Stained Glass block colour equivalents for
- * regular blocks.
+ * Keeps track of various building related lookups. these include: Room block counts, Room seed blocks and Stained Glass
+ * block colour equivalents for regular blocks.
  *
  * @author eccentric_nz
  */
@@ -37,7 +37,7 @@ public class TARDISBuilderInstanceKeeper {
     private final TARDISStainedGlassLookup stainedGlassLookup = new TARDISStainedGlassLookup();
     private HashMap<Material, String> seeds;
     private static final HashMap<String, String> BLOCK_CONVERSION = new HashMap<>();
-    private static final List<String> IGNORE_BLOCKS = Arrays.asList(new String[]{"AIR", "BEDROCK", "CAKE_BLOCK", "COMMAND", "GOLD_ORE", "HUGE_MUSHROOM_2", "ICE", "LAVA", "MOB_SPAWNER", "MONSTER_EGGS", "PISTON_EXTENSION", "SPONGE", "STATIONARY_LAVA", "STATIONARY_WATER", "WATER"});
+    private static final List<String> IGNORE_BLOCKS = Arrays.asList("AIR", "BEDROCK", "CAKE_BLOCK", "COMMAND", "GOLD_ORE", "HUGE_MUSHROOM_2", "ICE", "LAVA", "MOB_SPAWNER", "MONSTER_EGGS", "PISTON_EXTENSION", "SPONGE", "STATIONARY_LAVA", "STATIONARY_WATER", "WATER");
     private static final List<Material> PRECIOUS = new ArrayList<>();
     private static final HashMap<String, EntityType> TWA_HEADS = new HashMap<>();
 

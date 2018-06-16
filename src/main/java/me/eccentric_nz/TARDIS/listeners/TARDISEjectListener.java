@@ -16,8 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.listeners;
 
-import java.util.HashMap;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.mobfarming.TARDISLlama;
@@ -25,35 +23,19 @@ import me.eccentric_nz.TARDIS.travel.TARDISDoorLocation;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.ChestedHorse;
-import org.bukkit.entity.Chicken;
-import org.bukkit.entity.Cow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LeashHitch;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Llama;
-import org.bukkit.entity.MushroomCow;
-import org.bukkit.entity.Ocelot;
-import org.bukkit.entity.Pig;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.PolarBear;
-import org.bukkit.entity.Rabbit;
-import org.bukkit.entity.Sheep;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISEjectListener implements Listener {
@@ -66,7 +48,7 @@ public class TARDISEjectListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInteract(PlayerInteractEntityEvent event) {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         if (!plugin.getTrackerKeeper().getEjecting().containsKey(uuid)) {
             return;
@@ -130,7 +112,7 @@ public class TARDISEjectListener implements Listener {
                 if ((!k.isAdult())) {
                     chicken.setBaby();
                 }
-                String chickname = ((LivingEntity) ent).getCustomName();
+                String chickname = ent.getCustomName();
                 if (chickname != null && !chickname.isEmpty()) {
                     chicken.setCustomName(chickname);
                 }
@@ -143,7 +125,7 @@ public class TARDISEjectListener implements Listener {
                 if ((!c.isAdult())) {
                     cow.setBaby();
                 }
-                String cowname = ((LivingEntity) ent).getCustomName();
+                String cowname = ent.getCustomName();
                 if (cowname != null && !cowname.isEmpty()) {
                     cow.setCustomName(cowname);
                 }
@@ -177,7 +159,7 @@ public class TARDISEjectListener implements Listener {
                 if (ll.isCarryingChest()) {
                     tmlla.setHasChest(true);
                 }
-                tmlla.setName(((LivingEntity) ll).getCustomName());
+                tmlla.setName(ll.getCustomName());
                 tmlla.setHorseInventory(ll.getInventory().getContents());
                 tmlla.setDomesticity(ll.getDomestication());
                 tmlla.setJumpStrength(ll.getJumpStrength());
@@ -206,7 +188,7 @@ public class TARDISEjectListener implements Listener {
                 if (name != null && !name.isEmpty()) {
                     llama.setCustomName(name);
                 }
-                Tameable tamed = (Tameable) llama;
+                Tameable tamed = llama;
                 if (tmlla.isTamed()) {
                     tamed.setTamed(true);
                     tamed.setOwner(player);
@@ -214,7 +196,7 @@ public class TARDISEjectListener implements Listener {
                 llama.setDomestication(tmlla.getDomesticity());
                 llama.setJumpStrength(tmlla.getJumpStrength());
                 if (tmlla.hasChest()) {
-                    ChestedHorse ch = (ChestedHorse) llama;
+                    ChestedHorse ch = llama;
                     ch.setCarryingChest(true);
                 }
                 Inventory inv = llama.getInventory();
@@ -242,7 +224,7 @@ public class TARDISEjectListener implements Listener {
                 if ((!m.isAdult())) {
                     mush.setBaby();
                 }
-                String mushname = ((LivingEntity) ent).getCustomName();
+                String mushname = ent.getCustomName();
                 if (mushname != null && !mushname.isEmpty()) {
                     mush.setCustomName(mushname);
                 }
@@ -257,7 +239,7 @@ public class TARDISEjectListener implements Listener {
                 if ((!g.isAdult())) {
                     pig.setBaby();
                 }
-                String pigname = ((LivingEntity) ent).getCustomName();
+                String pigname = ent.getCustomName();
                 if (pigname != null && !pigname.isEmpty()) {
                     pig.setCustomName(pigname);
                 }
@@ -273,7 +255,7 @@ public class TARDISEjectListener implements Listener {
                 if ((!b.isAdult())) {
                     polarbear.setBaby();
                 }
-                String bearname = ((LivingEntity) ent).getCustomName();
+                String bearname = ent.getCustomName();
                 if (bearname != null && !bearname.isEmpty()) {
                     polarbear.setCustomName(bearname);
                 }
@@ -286,7 +268,7 @@ public class TARDISEjectListener implements Listener {
                 if ((!s.isAdult())) {
                     sheep.setBaby();
                 }
-                String sheepname = ((LivingEntity) ent).getCustomName();
+                String sheepname = ent.getCustomName();
                 if (sheepname != null && !sheepname.isEmpty()) {
                     sheep.setCustomName(sheepname);
                 }
@@ -300,7 +282,7 @@ public class TARDISEjectListener implements Listener {
                 if ((!r.isAdult())) {
                     bunny.setBaby();
                 }
-                String rabbitname = ((LivingEntity) ent).getCustomName();
+                String rabbitname = ent.getCustomName();
                 if (rabbitname != null && !rabbitname.isEmpty()) {
                     bunny.setCustomName(rabbitname);
                 }
@@ -309,14 +291,14 @@ public class TARDISEjectListener implements Listener {
                 break;
             case WOLF:
                 Tameable wtamed = (Tameable) ent;
-                if (wtamed.isTamed() && ((OfflinePlayer) wtamed.getOwner()).getUniqueId().equals(player.getUniqueId())) {
+                if (wtamed.isTamed() && wtamed.getOwner().getUniqueId().equals(player.getUniqueId())) {
                     Wolf w = (Wolf) ent;
                     Wolf wolf = (Wolf) l.getWorld().spawnEntity(l, EntityType.WOLF);
                     wolf.setTicksLived(w.getTicksLived());
                     if ((!w.isAdult())) {
                         wolf.setBaby();
                     }
-                    String wolfname = ((LivingEntity) ent).getCustomName();
+                    String wolfname = ent.getCustomName();
                     if (wolfname != null && !wolfname.isEmpty()) {
                         wolf.setCustomName(wolfname);
                     }
@@ -329,14 +311,14 @@ public class TARDISEjectListener implements Listener {
                 break;
             case OCELOT:
                 Tameable otamed = (Tameable) ent;
-                if (otamed.isTamed() && ((OfflinePlayer) otamed.getOwner()).getUniqueId().equals(player.getUniqueId())) {
+                if (otamed.isTamed() && otamed.getOwner().getUniqueId().equals(player.getUniqueId())) {
                     Ocelot o = (Ocelot) ent;
                     Ocelot cat = (Ocelot) l.getWorld().spawnEntity(l, EntityType.OCELOT);
                     cat.setTicksLived(o.getTicksLived());
                     if ((!o.isAdult())) {
                         cat.setBaby();
                     }
-                    String catname = ((LivingEntity) ent).getCustomName();
+                    String catname = ent.getCustomName();
                     if (catname != null && !catname.isEmpty()) {
                         cat.setCustomName(catname);
                     }
@@ -360,7 +342,7 @@ public class TARDISEjectListener implements Listener {
                 if ((!((Villager) ent).isAdult())) {
                     villager.setBaby();
                 }
-                String vilname = ((LivingEntity) ent).getCustomName();
+                String vilname = ent.getCustomName();
                 if (vilname != null && !vilname.isEmpty()) {
                     villager.setCustomName(vilname);
                 }

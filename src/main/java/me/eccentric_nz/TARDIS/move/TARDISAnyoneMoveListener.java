@@ -16,9 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.move;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
@@ -34,8 +31,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISAnyoneMoveListener implements Listener {
@@ -51,7 +51,6 @@ public class TARDISAnyoneMoveListener implements Listener {
         Player p = event.getPlayer();
         Location l = new Location(event.getTo().getWorld(), event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ(), 0.0f, 0.0f);
         Location loc = p.getLocation(); // Grab Location
-
         /**
          * Copyright (c) 2011, The Multiverse Team All rights reserved. Check
          * the Player has actually moved a block to prevent unneeded
@@ -60,7 +59,6 @@ public class TARDISAnyoneMoveListener implements Listener {
          */
         TARDISMoveSession tms = plugin.getTrackerKeeper().getTARDISMoveSession(p);
         tms.setStaleLocation(loc);
-
         // If the location is stale, ie: the player isn't actually moving xyz coords, they're looking around
         if (tms.isStaleLocation()) {
             return;
@@ -91,9 +89,9 @@ public class TARDISAnyoneMoveListener implements Listener {
             wherepp.put("uuid", uuid.toString());
             ResultSetPlayerPrefs rsp = new ResultSetPlayerPrefs(plugin, wherepp);
             boolean hasPrefs = rsp.resultSet();
-            boolean minecart = (hasPrefs) ? rsp.isMinecartOn() : false;
-            boolean userQuotes = (hasPrefs) ? rsp.isQuotesOn() : false;
-            boolean willFarm = (hasPrefs) ? rsp.isFarmOn() : false;
+            boolean minecart = (hasPrefs) && rsp.isMinecartOn();
+            boolean userQuotes = (hasPrefs) && rsp.isQuotesOn();
+            boolean willFarm = (hasPrefs) && rsp.isFarmOn();
             // check for entities near the police box
             List<TARDISParrot> pets = null;
             if (plugin.getConfig().getBoolean("allow.mob_farming") && p.hasPermission("tardis.farm") && !plugin.getTrackerKeeper().getFarming().contains(uuid) && willFarm) {

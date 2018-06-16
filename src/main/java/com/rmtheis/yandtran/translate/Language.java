@@ -94,11 +94,11 @@ public enum Language {
      *
      * @param pLanguage The language identifier.
      */
-    private Language(final String pLanguage) {
+    Language(String pLanguage) {
         language = pLanguage;
     }
 
-    public static Language fromString(final String pLanguage) {
+    public static Language fromString(String pLanguage) {
         for (Language l : values()) {
             if (l.toString().equals(pLanguage)) {
                 return l;

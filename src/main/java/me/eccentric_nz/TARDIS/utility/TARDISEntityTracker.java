@@ -16,23 +16,19 @@
  */
 package me.eccentric_nz.TARDIS.utility;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.listeners.TARDISScannerListener;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
 import org.bukkit.Location;
-import org.bukkit.entity.Ageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Zombie;
+import org.bukkit.entity.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISEntityTracker {
@@ -50,7 +46,7 @@ public class TARDISEntityTracker {
             if (e instanceof LivingEntity) {
                 // create NPC
                 NPCRegistry registry = CitizensAPI.getNPCRegistry();
-                String name = (e instanceof Player) ? ((Player) e).getName() : "";
+                String name = (e instanceof Player) ? e.getName() : "";
                 NPC npc = registry.createNPC(e.getType(), name);
                 // determine relative location
                 double relx = e.getLocation().getX() - exterior.getX();

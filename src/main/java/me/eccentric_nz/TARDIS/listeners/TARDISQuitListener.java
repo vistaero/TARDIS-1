@@ -16,8 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.listeners;
 
-import java.util.HashMap;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.arch.TARDISArchPersister;
 import me.eccentric_nz.TARDIS.artron.TARDISBeaconToggler;
@@ -36,8 +34,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISQuitListener implements Listener {
@@ -64,9 +64,7 @@ public class TARDISQuitListener implements Listener {
                 World w = rsc.getWorld();
                 if (w != null) {
                     Chunk chunk = w.getChunkAt(new Location(w, rsc.getX(), rsc.getY(), rsc.getZ()));
-                    if (plugin.getGeneralKeeper().getTardisChunkList().contains(chunk)) {
-                        plugin.getGeneralKeeper().getTardisChunkList().remove(chunk);
-                    }
+                    plugin.getGeneralKeeper().getTardisChunkList().remove(chunk);
                 }
             }
             // remove player from the TARDIS UUID cache
@@ -77,7 +75,7 @@ public class TARDISQuitListener implements Listener {
                 // check if powered on
                 if (tardis.isPowered_on()) {
                     // not if flying or uninitialised
-                    final int id = tardis.getTardis_id();
+                    int id = tardis.getTardis_id();
                     if (!tardis.isTardis_init() || isTravelling(id) || !tardis.isHandbrake_on()) {
                         return;
                     }
@@ -116,9 +114,7 @@ public class TARDISQuitListener implements Listener {
                 if (plugin.getConfig().getBoolean("arch.enabled") && plugin.getTrackerKeeper().getJohnSmith().containsKey(uuid)) {
                     new TARDISArchPersister(plugin).save(uuid);
                 }
-                if (plugin.getTrackerKeeper().getGeneticallyModified().contains(uuid)) {
-                    plugin.getTrackerKeeper().getGeneticallyModified().remove(uuid);
-                }
+                plugin.getTrackerKeeper().getGeneticallyModified().remove(uuid);
             }
         }
     }

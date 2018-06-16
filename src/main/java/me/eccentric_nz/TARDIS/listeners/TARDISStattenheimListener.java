@@ -16,10 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.listeners;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.crafter.mc.lockettepro.LocketteProAPI;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
@@ -28,11 +24,7 @@ import me.eccentric_nz.TARDIS.artron.TARDISBeaconToggler;
 import me.eccentric_nz.TARDIS.artron.TARDISLampToggler;
 import me.eccentric_nz.TARDIS.artron.TARDISPoliceBoxLampToggler;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
@@ -59,10 +51,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.yi.acru.bukkit.Lockette.Lockette;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
 /**
- * The handheld Recall Button on the TARDIS Stattenheim remote broadcasts a
- * Stattenheim signal through the Vortex, which summons the operator's TARDIS
- * when the operator is in the field.
+ * The handheld Recall Button on the TARDIS Stattenheim remote broadcasts a Stattenheim signal through the Vortex, which
+ * summons the operator's TARDIS when the operator is in the field.
  *
  * @author eccentric_nz
  */
@@ -87,7 +83,6 @@ public class TARDISStattenheimListener implements Listener {
         remote = Material.valueOf(plugin.getRecipesConfig().getString("shaped.Stattenheim Remote.result"));
     }
 
-    @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.MONITOR)
     public void onStattenheimInteract(PlayerInteractEvent event) {
         if (event.getHand() == null || event.getHand().equals(EquipmentSlot.OFF_HAND)) {
@@ -109,7 +104,7 @@ public class TARDISStattenheimListener implements Listener {
                     return;
                 }
                 Tardis tardis = rs.getTardis();
-                final int id = tardis.getTardis_id();
+                int id = tardis.getTardis_id();
                 if (plugin.getTrackerKeeper().getInSiegeMode().contains(id)) {
                     TARDISMessage.send(player, "SIEGE_NO_CONTROL");
                     return;
@@ -119,7 +114,7 @@ public class TARDISStattenheimListener implements Listener {
                     return;
                 }
                 boolean power = tardis.isPowered_on();
-                final QueryFactory qf = new QueryFactory(plugin);
+                QueryFactory qf = new QueryFactory(plugin);
                 if (action.equals(Action.RIGHT_CLICK_BLOCK)) {
                     Block b = event.getClickedBlock();
                     Material m = b.getType();
@@ -202,13 +197,13 @@ public class TARDISStattenheimListener implements Listener {
                                 sub = true;
                             }
                         } else {
-                            int[] start_loc = tt.getStartLocation(remoteLocation, player_d);
+                            int[] start_loc = TARDISTimeTravel.getStartLocation(remoteLocation, player_d);
                             // safeLocation(int startx, int starty, int startz, int resetx, int resetz, World w, COMPASS player_d)
-                            count = tt.safeLocation(start_loc[0], remoteLocation.getBlockY(), start_loc[2], start_loc[1], start_loc[3], remoteLocation.getWorld(), player_d);
+                            count = TARDISTimeTravel.safeLocation(start_loc[0], remoteLocation.getBlockY(), start_loc[2], start_loc[1], start_loc[3], remoteLocation.getWorld(), player_d);
                         }
                         if (plugin.getPM().isPluginEnabled("Lockette")) {
                             Lockette Lockette = (Lockette) plugin.getPM().getPlugin("Lockette");
-                            if (Lockette.isProtected(remoteLocation.getBlock().getRelative(BlockFace.DOWN))) {
+                            if (org.yi.acru.bukkit.Lockette.Lockette.isProtected(remoteLocation.getBlock().getRelative(BlockFace.DOWN))) {
                                 count = 1;
                             }
                         }
@@ -273,9 +268,9 @@ public class TARDISStattenheimListener implements Listener {
                         TARDISMessage.send(player, "TARDIS_COMING");
                         long delay = 10L;
                         plugin.getTrackerKeeper().getInVortex().add(id);
-                        final boolean hid = hidden;
+                        boolean hid = hidden;
                         if (!plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
-                            final DestroyData dd = new DestroyData(plugin, uuid.toString());
+                            DestroyData dd = new DestroyData(plugin, uuid.toString());
                             dd.setDirection(d);
                             dd.setLocation(oldSave);
                             dd.setPlayer(player);
@@ -293,7 +288,7 @@ public class TARDISStattenheimListener implements Listener {
                                 }
                             }, delay);
                         }
-                        final BuildData bd = new BuildData(plugin, uuid.toString());
+                        BuildData bd = new BuildData(plugin, uuid.toString());
                         bd.setDirection(player_d);
                         bd.setLocation(remoteLocation);
                         bd.setMalfunction(false);
@@ -310,9 +305,7 @@ public class TARDISStattenheimListener implements Listener {
                         wheret.put("tardis_id", id);
                         qf.alterEnergyLevel("tardis", -ch, wheret, player);
                         plugin.getTrackerKeeper().getHasDestination().remove(id);
-                        if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                            plugin.getTrackerKeeper().getRescue().remove(id);
-                        }
+                        plugin.getTrackerKeeper().getRescue().remove(id);
                     } else {
                         TARDISMessage.send(player, "NO_PERMS");
                     }

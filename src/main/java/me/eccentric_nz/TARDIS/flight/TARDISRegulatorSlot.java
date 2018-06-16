@@ -16,37 +16,31 @@
  */
 package me.eccentric_nz.TARDIS.flight;
 
-import java.util.Arrays;
-import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * Using data collected from the Interstitial Antenna, the Mean Free Path
- * Tracker shows a TARDIS' planned path through the Space-Time Vortex. It allows
- * the operator to spot approaching turbulence in a TARDIS' flight path.
+ * Using data collected from the Interstitial Antenna, the Mean Free Path Tracker shows a TARDIS' planned path through
+ * the Space-Time Vortex. It allows the operator to spot approaching turbulence in a TARDIS' flight path.
  *
  * @author eccentric_nz
  */
 public class TARDISRegulatorSlot {
 
-    public final List<Integer> bounds = Arrays.asList(new Integer[]{
-        0, 1, 2, 3, 4,
-        9, 10, 11, 12, 13,
-        18, 19, 20, 21, 22,
-        27, 28, 29, 30, 31,
-        36, 37, 38, 39, 40
-    });
+    public final List<Integer> bounds = Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12, 13, 18, 19, 20, 21, 22, 27, 28, 29, 30, 31, 36, 37, 38, 39, 40);
     public final ItemStack box;
     public final ItemStack vortex;
 
     public TARDISRegulatorSlot() {
-        this.box = new ItemStack(Material.WOOL, 1, (byte) 11);
-        ItemMeta ler = this.box.getItemMeta();
+        box = new ItemStack(Material.WOOL, 1, (byte) 11);
+        ItemMeta ler = box.getItemMeta();
         ler.setDisplayName("Regulator");
-        this.box.setItemMeta(ler);
-        this.vortex = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15);
+        box.setItemMeta(ler);
+        vortex = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15);
     }
 
     public int upSlot(int current_slot) {

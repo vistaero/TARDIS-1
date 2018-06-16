@@ -18,20 +18,16 @@ package me.eccentric_nz.TARDIS.utility.recalculators;
 
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 
-;
-
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISTrapdoorRecalculator {
 
     /**
-     * Recalculate the data for directional block (TRAPDOOR) when the TARDIS
-     * preset changes direction.
+     * Recalculate the data for directional block (TRAPDOOR) when the TARDIS preset changes direction.
      *
-     * @param b the byte stored in the preset data
-     * @param d the new direction of the TARDIS
+     * @param b     the byte stored in the preset data
+     * @param d     the new direction of the TARDIS
      * @param torch whether this is the torch preset
      * @return the recalculated byte
      */
@@ -216,5 +212,4 @@ public class TARDISTrapdoorRecalculator {
         }
         return recalc;
     }
-
 }

@@ -16,18 +16,10 @@
  */
 package me.eccentric_nz.TARDIS.advanced;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
 import me.eccentric_nz.TARDIS.builders.TARDISEmergencyRelocation;
-import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.ResultSetAreas;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
 import me.eccentric_nz.TARDIS.enumeration.FLAG;
@@ -51,8 +43,12 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISConsoleCloseListener implements Listener {
@@ -71,7 +67,7 @@ public class TARDISConsoleCloseListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryClose(InventoryCloseEvent event) {
-        final Inventory inv = event.getInventory();
+        Inventory inv = event.getInventory();
         String inv_name = inv.getTitle();
         if (inv_name.equals("§4TARDIS Console")) {
             Player p = ((Player) event.getPlayer());
@@ -287,9 +283,7 @@ public class TARDISConsoleCloseListener implements Listener {
                                         where_tardis.put("tardis_id", id);
                                         qf.doUpdate("tardis", set_tardis, where_tardis);
                                     }
-                                    if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                                        plugin.getTrackerKeeper().getRescue().remove(id);
-                                    }
+                                    plugin.getTrackerKeeper().getRescue().remove(id);
                                     if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                         new TARDISLand(plugin, id, p).exitVortex();
                                     }

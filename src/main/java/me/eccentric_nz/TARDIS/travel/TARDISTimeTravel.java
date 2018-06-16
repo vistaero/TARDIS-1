@@ -39,9 +39,8 @@ import java.util.*;
 /**
  * All things related to time travel.
  * <p>
- * All TARDISes built after a certain point, including the Type 40 the Doctor
- * uses, have a mathematically modelled duplicate of the Eye of harmony with all
- * its attendant features.
+ * All TARDISes built after a certain point, including the Type 40 the Doctor uses, have a mathematically modelled
+ * duplicate of the Eye of harmony with all its attendant features.
  *
  * @author eccentric_nz
  */
@@ -59,19 +58,15 @@ public class TARDISTimeTravel {
     }
 
     /**
-     * Retrieves a random location determined from the TARDIS repeater or
-     * terminal settings.
+     * Retrieves a random location determined from the TARDIS repeater or terminal settings.
      *
      * @param p           a player object used to check permissions against.
-     * @param rx          the data bit setting of the x-repeater, this determines the
-     *                    distance in the x direction.
-     * @param rz          the data bit setting of the z-repeater, this determines the
-     *                    distance in the z direction.
-     * @param ry          the data bit setting of the y-repeater, this determines the
-     *                    multiplier for both the x and z directions.
+     * @param rx          the data bit setting of the x-repeater, this determines the distance in the x direction.
+     * @param rz          the data bit setting of the z-repeater, this determines the distance in the z direction.
+     * @param ry          the data bit setting of the y-repeater, this determines the multiplier for both the x and z
+     *                    directions.
      * @param d           the direction the TARDIS Police Box faces.
-     * @param e           the environment(s) the player has chosen (or is allowed) to
-     *                    travel to.
+     * @param e           the environment(s) the player has chosen (or is allowed) to travel to.
      * @param this_world  the world the Police Box is currently in
      * @param malfunction whether there should be a malfunction
      * @param current
@@ -90,7 +85,6 @@ public class TARDISTimeTravel {
         // get worlds
         Set<String> worldlist = plugin.getConfig().getConfigurationSection("worlds").getKeys(false);
         List<World> allowedWorlds = new ArrayList<>();
-
         if (e.equals("THIS")) {
             allowedWorlds.add(this_world);
         } else {
@@ -116,7 +110,7 @@ public class TARDISTimeTravel {
                         }
                     }
                     // remove the world the Police Box is in
-                    if (allowedWorlds.size() > 1 && allowedWorlds.contains(this_world)) {
+                    if (allowedWorlds.size() > 1) {
                         allowedWorlds.remove(this_world);
                     }
                     // remove the world if the player doesn't have permission
@@ -271,8 +265,8 @@ public class TARDISTimeTravel {
     }
 
     /**
-     * Checks if a random location is safe for the TARDIS Police Box to land at.
-     * The Police Box requires a clear 4 x 3 x 4 (d x w x h) area.
+     * Checks if a random location is safe for the TARDIS Police Box to land at. The Police Box requires a clear 4 x 3 x
+     * 4 (d x w x h) area.
      *
      * @param startx a starting position in the x direction.
      * @param starty a starting position in the y direction.
@@ -320,9 +314,8 @@ public class TARDISTimeTravel {
     }
 
     /**
-     * Checks if a location is safe for the TARDIS Police Box to land at. Used
-     * for debugging purposes only. The Police Box requires a clear 4 x 3 x 4 (d
-     * x w x h) area.
+     * Checks if a location is safe for the TARDIS Police Box to land at. Used for debugging purposes only. The Police
+     * Box requires a clear 4 x 3 x 4 (d x w x h) area.
      *
      * @param loc
      * @param d   the direction the Police Box is facing.

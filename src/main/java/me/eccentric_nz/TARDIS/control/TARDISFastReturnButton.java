@@ -16,7 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.control;
 
-import java.util.HashMap;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.database.ResultSetBackLocation;
@@ -25,8 +24,9 @@ import me.eccentric_nz.TARDIS.flight.TARDISLand;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISFastReturnButton {
@@ -69,9 +69,7 @@ public class TARDISFastReturnButton {
                     wherel.put("tardis_id", id);
                     new QueryFactory(plugin).doSyncUpdate("next", set, wherel);
                     plugin.getTrackerKeeper().getHasDestination().put(id, cost);
-                    if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                        plugin.getTrackerKeeper().getRescue().remove(id);
-                    }
+                    plugin.getTrackerKeeper().getRescue().remove(id);
                     if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                         new TARDISLand(plugin, id, player).exitVortex();
                     }
@@ -86,9 +84,6 @@ public class TARDISFastReturnButton {
     }
 
     private boolean compareCurrentToBack(ResultSetCurrentLocation c, ResultSetBackLocation b) {
-        return (c.getWorld().equals(b.getWorld())
-                && c.getX() == b.getX()
-                && c.getY() == b.getY()
-                && c.getZ() == b.getZ());
+        return (c.getWorld().equals(b.getWorld()) && c.getX() == b.getX() && c.getY() == b.getY() && c.getZ() == b.getZ());
     }
 }

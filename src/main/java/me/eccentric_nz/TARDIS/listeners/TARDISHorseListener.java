@@ -16,7 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.listeners;
 
-import java.util.HashMap;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.database.ResultSetDoors;
@@ -29,23 +28,16 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.AbstractHorse;
-import org.bukkit.entity.ChestedHorse;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Llama;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Tameable;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.inventory.Inventory;
 
+import java.util.HashMap;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISHorseListener implements Listener {
@@ -65,7 +57,7 @@ public class TARDISHorseListener implements Listener {
             Entity passenger = (h.getPassengers().size() > 0) ? h.getPassengers().get(0) : null;
             if (passenger != null && m.equals(Material.WOOD_PLATE)) {
                 if (passenger instanceof Player) {
-                    final Player p = (Player) passenger;
+                    Player p = (Player) passenger;
                     String pworld = p.getLocation().getWorld().getName();
                     HashMap<String, Object> wherep = new HashMap<>();
                     wherep.put("uuid", p.getUniqueId().toString());
@@ -112,7 +104,7 @@ public class TARDISHorseListener implements Listener {
                             tmhor.setHorseStyle(hh.getStyle());
                         }
                         tmhor.setHorseVariant(e.getType());
-                        tmhor.setName(((LivingEntity) h).getCustomName());
+                        tmhor.setName(h.getCustomName());
                         tmhor.setTamed(true);
                         if (h instanceof ChestedHorse) {
                             ChestedHorse ch = (ChestedHorse) h;
@@ -140,7 +132,7 @@ public class TARDISHorseListener implements Listener {
                                 world.getChunkAt(l).load();
                             }
                             Entity ent = world.spawnEntity(l, tmhor.getHorseVariant());
-                            final AbstractHorse equine = (AbstractHorse) ent;
+                            AbstractHorse equine = (AbstractHorse) ent;
                             equine.setAge(tmhor.getAge());
                             equine.setDomestication(tmhor.getDomesticity());
                             equine.setJumpStrength(tmhor.getJumpStrength());
@@ -165,10 +157,9 @@ public class TARDISHorseListener implements Listener {
                             if (plugin.isHelperOnServer()) {
                                 plugin.getTardisHelper().setHorseSpeed(equine, tmhor.getSpeed());
                             }
-                            Tameable tamed = (Tameable) equine;
+                            Tameable tamed = equine;
                             tamed.setTamed(true);
                             tamed.setOwner(p);
-
                             // teleport player and remove from travellers table
                             plugin.getGeneralKeeper().getDoorListener().movePlayer(p, l, true, p.getWorld(), false, 0, true);
                             HashMap<String, Object> where = new HashMap<>();

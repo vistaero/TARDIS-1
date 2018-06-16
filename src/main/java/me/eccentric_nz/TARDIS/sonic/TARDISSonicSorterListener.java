@@ -23,7 +23,6 @@ package me.eccentric_nz.TARDIS.sonic;
 
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.lwc.LWCPlugin;
-import java.util.Arrays;
 import me.crafter.mc.lockettepro.LocketteProAPI;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
@@ -43,9 +42,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.yi.acru.bukkit.Lockette.Lockette;
 
+import java.util.Arrays;
+
 /**
- * Borrowed from the SimpleSort plugin.
- * http://dev.bukkit.org/bukkit-plugins/simplesort/
+ * Borrowed from the SimpleSort plugin. http://dev.bukkit.org/bukkit-plugins/simplesort/
  *
  * @author Shadow1013GL
  * @author Pyr0Byt3
@@ -77,7 +77,7 @@ public class TARDISSonicSorterListener implements Listener {
                         // is Lockette or LWC on the server?
                         if (plugin.getPM().isPluginEnabled("Lockette")) {
                             Lockette Lockette = (Lockette) plugin.getPM().getPlugin("Lockette");
-                            if (Lockette.isProtected(block)) {
+                            if (org.yi.acru.bukkit.Lockette.Lockette.isProtected(block)) {
                                 allow = false;
                             }
                         }
@@ -124,10 +124,7 @@ public class TARDISSonicSorterListener implements Listener {
                     if (item2 == null || item2.getAmount() <= 0 || maxStackSize == 1) {
                         continue;
                     }
-                    if (item2.getType() == item1.getType()
-                            && item1.getDurability() == item2.getDurability()
-                            && item1.getEnchantments().equals(item2.getEnchantments())
-                            && item1.getItemMeta().equals(item2.getItemMeta())) {
+                    if (item2.getType() == item1.getType() && item1.getDurability() == item2.getDurability() && item1.getEnchantments().equals(item2.getEnchantments()) && item1.getItemMeta().equals(item2.getItemMeta())) {
                         if (item2.getAmount() > needed) {
                             item1.setAmount(maxStackSize);
                             item2.setAmount(item2.getAmount() - needed);

@@ -19,14 +19,12 @@ package me.eccentric_nz.TARDIS.info;
 import java.util.TreeMap;
 
 /**
- * Articles in the TARDIS Information System were accessed by typing in an
- * initialism for the subject. Entering IF, for example, brought up the
- * database's index file.
+ * Articles in the TARDIS Information System were accessed by typing in an initialism for the subject. Entering IF, for
+ * example, brought up the database's index file.
  *
  * @author bootthanoo, eccentric_nz
  */
 public enum TARDISInfoMenu {
-
     TIS("TARDIS Information System", "TIS|Commands|TARDIS Commands|add", "TARDIS"),
     ITEMS("TIS|Items", "TIS", "I"),
     KEY("TIS|Items|TARDIS Key", "ITEMS", "K"),
@@ -275,34 +273,62 @@ public enum TARDISInfoMenu {
     TIME_TRAVEL("TIS|Manual|Time Travel", "MANUAL", "T"),
     CONSOLE_BLOCKS("TIS|Manual|Console Blocks", "MANUAL", "C"),
     CONSOLE_BLOCKS_2("TIS|Manual|Console Blocks 2", "MANUAL", "o"),
-    CONSOLE_ARS("TIS|Manual|Console Blocks|ARS", "CONSOLE_BLOCKS", "A"), //A
-    ADVANCED("TIS|Manual|Console Blocks|Advanced Console", "CONSOLE_BLOCKS", "v"), //v
-    STORAGE("TIS|Manual|Console Blocks|Disk Storage", "CONSOLE_BLOCKS", "S"), //S
-    ARTRON("TIS|Manual|Console Blocks|Artron Energy Capacitor", "CONSOLE_BLOCKS", "r"), //r
-    BACKDOOR("TIS|Manual|Console Blocks|Backdoor", "CONSOLE_BLOCKS", "B"), //B
-    BUTTON("TIS|Manual|Console Blocks|Button", "CONSOLE_BLOCKS", "u"), //u
-    CHAMELEON("TIS|Manual|Console Blocks|Chameleon", "CONSOLE_BLOCKS", "C"), //C
-    CONDENSER("TIS|Manual|Console Blocks|Condenser", "CONSOLE_BLOCKS", "o"), //o
-    CREEPER("TIS|Manual|Console Blocks|Creeper", "CONSOLE_BLOCKS", "p"), //p
-    DOOR("TIS|Manual|Console Blocks|Door", "CONSOLE_BLOCKS", "D"), //D
-    EPS("TIS|Manual|Console Blocks|EPS", "CONSOLE_BLOCKS", "P"), //P
-    CONSOLE_FARM("TIS|Manual|Console Blocks|Farm", "CONSOLE_BLOCKS", "m"), //m
-    HANDBRAKE("TIS|Manual|Console Blocks|Handbrake", "CONSOLE_BLOCKS", "k"), //k
-    INFO("TIS|Manual|Console Blocks|Information System", "CONSOLE_BLOCKS_2", "I"), //I
-    KEYBOARD("TIS|Manual|Console Blocks|Keyboard", "CONSOLE_BLOCKS_2", "K"), //K
-    TOGGLE("TIS|Manual|Console Blocks 2|Wool toggle", "CONSOLE_BLOCKS_2", "o"), //o
-    LIGHT("TIS|Manual|Console Blocks 2|Light", "CONSOLE_BLOCKS_2", "L"), //L
-    CONSOLE_RAIL("TIS|Manual|Console Blocks 2|Rails", "CONSOLE_BLOCKS_2", "R"), //R
-    SAVE_SIGN("TIS|Manual|Console Blocks 2|Save Sign", "CONSOLE_BLOCKS_2", "S"), //S
-    SCANNER("TIS|Manual|Console Blocks 2|Scanner", "CONSOLE_BLOCKS_2", "c"), //c
-    CONSOLE_STABLE("TIS|Manual|Console Blocks 2|Stable", "CONSOLE_BLOCKS_2", "b"), //t
-    CONSOLE_STALL("TIS|Manual|Console Blocks 2|Stall", "CONSOLE_BLOCKS_2", "a"), //a
-    TERMINAL("TIS|Manual|Console Blocks 2|Terminal", "CONSOLE_BLOCKS_2", "T"), //T
-    TEMPORAL("TIS|Manual|Console Blocks 2|Temporal Locator", "CONSOLE_BLOCKS_2", "m"), //m
-    WORLD_REPEATER("TIS|Manual|Console Blocks 2|World Repeater", "CONSOLE_BLOCKS_2", "W"), //W
-    X_REPEATER("TIS|Manual|Console Blocks 2|X Repeater", "CONSOLE_BLOCKS_2", "X"), //X
-    Y_REPEATER("TIS|Manual|Console Blocks 2|Y Repeater", "CONSOLE_BLOCKS_2", "Y"), //Y
-    Z_REPEATER("TIS|Manual|Console Blocks 2|Z Repeater", "CONSOLE_BLOCKS_2", "Z"), //Z
+    CONSOLE_ARS("TIS|Manual|Console Blocks|ARS", "CONSOLE_BLOCKS", "A"),
+    //A
+    ADVANCED("TIS|Manual|Console Blocks|Advanced Console", "CONSOLE_BLOCKS", "v"),
+    //v
+    STORAGE("TIS|Manual|Console Blocks|Disk Storage", "CONSOLE_BLOCKS", "S"),
+    //S
+    ARTRON("TIS|Manual|Console Blocks|Artron Energy Capacitor", "CONSOLE_BLOCKS", "r"),
+    //r
+    BACKDOOR("TIS|Manual|Console Blocks|Backdoor", "CONSOLE_BLOCKS", "B"),
+    //B
+    BUTTON("TIS|Manual|Console Blocks|Button", "CONSOLE_BLOCKS", "u"),
+    //u
+    CHAMELEON("TIS|Manual|Console Blocks|Chameleon", "CONSOLE_BLOCKS", "C"),
+    //C
+    CONDENSER("TIS|Manual|Console Blocks|Condenser", "CONSOLE_BLOCKS", "o"),
+    //o
+    CREEPER("TIS|Manual|Console Blocks|Creeper", "CONSOLE_BLOCKS", "p"),
+    //p
+    DOOR("TIS|Manual|Console Blocks|Door", "CONSOLE_BLOCKS", "D"),
+    //D
+    EPS("TIS|Manual|Console Blocks|EPS", "CONSOLE_BLOCKS", "P"),
+    //P
+    CONSOLE_FARM("TIS|Manual|Console Blocks|Farm", "CONSOLE_BLOCKS", "m"),
+    //m
+    HANDBRAKE("TIS|Manual|Console Blocks|Handbrake", "CONSOLE_BLOCKS", "k"),
+    //k
+    INFO("TIS|Manual|Console Blocks|Information System", "CONSOLE_BLOCKS_2", "I"),
+    //I
+    KEYBOARD("TIS|Manual|Console Blocks|Keyboard", "CONSOLE_BLOCKS_2", "K"),
+    //K
+    TOGGLE("TIS|Manual|Console Blocks 2|Wool toggle", "CONSOLE_BLOCKS_2", "o"),
+    //o
+    LIGHT("TIS|Manual|Console Blocks 2|Light", "CONSOLE_BLOCKS_2", "L"),
+    //L
+    CONSOLE_RAIL("TIS|Manual|Console Blocks 2|Rails", "CONSOLE_BLOCKS_2", "R"),
+    //R
+    SAVE_SIGN("TIS|Manual|Console Blocks 2|Save Sign", "CONSOLE_BLOCKS_2", "S"),
+    //S
+    SCANNER("TIS|Manual|Console Blocks 2|Scanner", "CONSOLE_BLOCKS_2", "c"),
+    //c
+    CONSOLE_STABLE("TIS|Manual|Console Blocks 2|Stable", "CONSOLE_BLOCKS_2", "b"),
+    //t
+    CONSOLE_STALL("TIS|Manual|Console Blocks 2|Stall", "CONSOLE_BLOCKS_2", "a"),
+    //a
+    TERMINAL("TIS|Manual|Console Blocks 2|Terminal", "CONSOLE_BLOCKS_2", "T"),
+    //T
+    TEMPORAL("TIS|Manual|Console Blocks 2|Temporal Locator", "CONSOLE_BLOCKS_2", "m"),
+    //m
+    WORLD_REPEATER("TIS|Manual|Console Blocks 2|World Repeater", "CONSOLE_BLOCKS_2", "W"),
+    //W
+    X_REPEATER("TIS|Manual|Console Blocks 2|X Repeater", "CONSOLE_BLOCKS_2", "X"),
+    //X
+    Y_REPEATER("TIS|Manual|Console Blocks 2|Y Repeater", "CONSOLE_BLOCKS_2", "Y"),
+    //Y
+    Z_REPEATER("TIS|Manual|Console Blocks 2|Z Repeater", "CONSOLE_BLOCKS_2", "Z"),
+    //Z
     TARDIS_CONTROLS("TIS|Manual|TARDIS Controls", "MANUAL", "S"),
     MALFUNCTIONS("TIS|Manual|TARDIS Controls|Malfunctions", "TARDIS_CONTROLS", "M"),
     ALT_CONTROLS("TIS|Manual|TARDIS Controls|Alternative Controls", "TARDIS_CONTROLS", "l"),
@@ -355,7 +381,7 @@ public enum TARDISInfoMenu {
     private final String parent;
     private final String key;
 
-    private TARDISInfoMenu(String name, String parent, String key) {
+    TARDISInfoMenu(String name, String parent, String key) {
         this.name = name;
         this.parent = parent;
         this.key = key;
@@ -367,7 +393,7 @@ public enum TARDISInfoMenu {
      * @return name of this TARDISInfoMenu
      */
     public String getName() {
-        return this.name;
+        return name;
     }
 
     /**
@@ -376,7 +402,7 @@ public enum TARDISInfoMenu {
      * @return parent of this TARDISInfoMenu
      */
     public String getParent() {
-        return this.parent;
+        return parent;
     }
 
     /**
@@ -385,7 +411,7 @@ public enum TARDISInfoMenu {
      * @return key of this TARDISInfoMenu
      */
     public String getKey() {
-        return this.key;
+        return key;
     }
 
     /**

@@ -16,11 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.rooms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import me.eccentric_nz.TARDIS.JSON.JSONArray;
 import me.eccentric_nz.TARDIS.JSON.JSONObject;
 import me.eccentric_nz.TARDIS.TARDIS;
@@ -28,7 +23,6 @@ import me.eccentric_nz.TARDIS.TARDISConstants;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.enumeration.ROOM;
 import me.eccentric_nz.TARDIS.enumeration.USE_CLAY;
-import static me.eccentric_nz.TARDIS.schematic.TARDISBannerSetter.setBanners;
 import me.eccentric_nz.TARDIS.utility.TARDISBlockSetters;
 import me.eccentric_nz.TARDIS.utility.TARDISLocationGetters;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
@@ -42,11 +36,14 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import java.util.*;
+
+import static me.eccentric_nz.TARDIS.schematic.TARDISBannerSetter.setBanners;
+
 /**
- * The TARDIS had a swimming pool. After the TARDIS' crash following the
- * Doctor's tenth regeneration, the pool's water - or perhaps the pool itself -
- * fell into the library. After the TARDIS had fixed itself, the swimming pool
- * was restored but the Doctor did not know where it was.
+ * The TARDIS had a swimming pool. After the TARDIS' crash following the Doctor's tenth regeneration, the pool's water -
+ * or perhaps the pool itself - fell into the library. After the TARDIS had fixed itself, the swimming pool was restored
+ * but the Doctor did not know where it was.
  *
  * @author eccentric_nz
  */
@@ -89,44 +86,43 @@ public class TARDISRoomRunnable implements Runnable {
 
     public TARDISRoomRunnable(TARDIS plugin, TARDISRoomData roomData, Player p) {
         this.plugin = plugin;
-        this.l = roomData.getLocation();
-        this.s = roomData.getSchematic();
-        this.wall_type = roomData.getMiddleType();
-        this.wall_data = roomData.getMiddleData();
-        this.floor_type = roomData.getFloorType();
-        this.floor_data = roomData.getFloorData();
-        this.room = roomData.getRoom();
-        this.tardis_id = roomData.getTardis_id();
-        this.running = false;
+        l = roomData.getLocation();
+        s = roomData.getSchematic();
+        wall_type = roomData.getMiddleType();
+        wall_data = roomData.getMiddleData();
+        floor_type = roomData.getFloorType();
+        floor_data = roomData.getFloorData();
+        room = roomData.getRoom();
+        tardis_id = roomData.getTardis_id();
+        running = false;
         this.p = p;
-        this.repeaterData[0] = (byte) 0;
-        this.repeaterData[1] = (byte) 0;
-        this.repeaterData[2] = (byte) 1;
-        this.repeaterData[3] = (byte) 2;
-        this.repeaterData[4] = (byte) 0;
-        this.repeaterData[5] = (byte) 3;
-        this.repeaterOrder.put(2, 3);
-        this.repeaterOrder.put(3, 2);
-        this.repeaterOrder.put(4, 5);
-        this.repeaterOrder.put(5, 4);
-        this.notThese.add(Material.CARROT);
-        this.notThese.add(Material.COCOA);
-        this.notThese.add(Material.CROPS);
-        this.notThese.add(Material.LEVER);
-        this.notThese.add(Material.MELON_STEM);
-        this.notThese.add(Material.PISTON_EXTENSION);
-        this.notThese.add(Material.POTATO);
-        this.notThese.add(Material.PUMPKIN_STEM);
-        this.notThese.add(Material.REDSTONE_TORCH_ON);
-        this.notThese.add(Material.SUGAR_CANE_BLOCK);
-        this.notThese.add(Material.TORCH);
-        this.notThese.add(Material.WOODEN_DOOR);
+        repeaterData[0] = (byte) 0;
+        repeaterData[1] = (byte) 0;
+        repeaterData[2] = (byte) 1;
+        repeaterData[3] = (byte) 2;
+        repeaterData[4] = (byte) 0;
+        repeaterData[5] = (byte) 3;
+        repeaterOrder.put(2, 3);
+        repeaterOrder.put(3, 2);
+        repeaterOrder.put(4, 5);
+        repeaterOrder.put(5, 4);
+        notThese.add(Material.CARROT);
+        notThese.add(Material.COCOA);
+        notThese.add(Material.CROPS);
+        notThese.add(Material.LEVER);
+        notThese.add(Material.MELON_STEM);
+        notThese.add(Material.PISTON_EXTENSION);
+        notThese.add(Material.POTATO);
+        notThese.add(Material.PUMPKIN_STEM);
+        notThese.add(Material.REDSTONE_TORCH_ON);
+        notThese.add(Material.SUGAR_CANE_BLOCK);
+        notThese.add(Material.TORCH);
+        notThese.add(Material.WOODEN_DOOR);
     }
 
     /**
      * A runnable task that builds TARDIS rooms block by block.
      */
-    @SuppressWarnings("deprecation")
     @Override
     public void run() {
         // initialise
@@ -568,7 +564,6 @@ public class TARDISRoomRunnable implements Runnable {
                     }
                 }
             }
-
             Chunk thisChunk = world.getChunkAt(world.getBlockAt(startx, starty, startz));
             if (!plugin.getGeneralKeeper().getRoomChunkList().contains(thisChunk)) {
                 plugin.getGeneralKeeper().getRoomChunkList().add(thisChunk);
@@ -630,8 +625,8 @@ public class TARDISRoomRunnable implements Runnable {
                 int ctype;
                 String loc_str;
                 List<Material> controls = Arrays.asList(Material.CAKE_BLOCK, Material.STONE_BUTTON, Material.HUGE_MUSHROOM_2, Material.WOOD_BUTTON);
-                if (controls.contains(this.type)) {
-                    switch (this.type) {
+                if (controls.contains(type)) {
+                    switch (type) {
                         case STONE_BUTTON: // stone button - random
                             ctype = 1;
                             loc_str = TARDISLocationGetters.makeLocationStr(world, startx, starty, startz);
@@ -698,10 +693,9 @@ public class TARDISRoomRunnable implements Runnable {
     private boolean checkRoomNextDoor(Block b) {
         if (b.getLocation().getBlockZ() < (resetz + 10) && !b.getRelative(BlockFace.EAST).getType().equals(Material.AIR)) {
             return true;
-        } else if (!b.getRelative(BlockFace.SOUTH).getType().equals(Material.AIR)) {
-            return true;
+        } else {
+            return !b.getRelative(BlockFace.SOUTH).getType().equals(Material.AIR);
         }
-        return false;
     }
 
     public void setTask(int task) {

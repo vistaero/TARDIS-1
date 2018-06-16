@@ -18,7 +18,6 @@
 package me.eccentric_nz.TARDIS.noteblock;
 
 public enum NotePitch {
-
     NOTE_0(0, 0.5F),
     NOTE_1(1, 0.53F),
     NOTE_2(2, 0.56F),
@@ -48,7 +47,7 @@ public enum NotePitch {
     public int note;
     public float pitch;
 
-    private NotePitch(int note, float pitch) {
+    NotePitch(int note, float pitch) {
         this.note = note;
         this.pitch = pitch;
     }

@@ -16,9 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.achievement;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.database.ResultSetAchievements;
@@ -33,10 +30,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 /**
- * Rassilon was the founder of Time Lord civilisation and perhaps the single
- * greatest figure of Gallifreyan history. He was generally considered the first
- * Time Lord. Rassilon brought the Eye of Harmony, actually the singularity of a
+ * Rassilon was the founder of Time Lord civilisation and perhaps the single greatest figure of Gallifreyan history. He
+ * was generally considered the first Time Lord. Rassilon brought the Eye of Harmony, actually the singularity of a
  * black hole, to Gallifrey. He invented TARDISes.
  *
  * @author eccentric_nz
@@ -106,7 +106,7 @@ public class TARDISAchievementFactory {
                 qf.doUpdate("achievements", seta, wherem);
             } else {
                 if (obj.getClass().equals(String.class)) {
-                    if (data != null && !data.contains((String) obj)) {
+                    if (data != null && !data.contains(obj)) {
                         seta.put("amount", amount + ":" + obj);
                         qf.doUpdate("achievements", seta, wherem);
                     }

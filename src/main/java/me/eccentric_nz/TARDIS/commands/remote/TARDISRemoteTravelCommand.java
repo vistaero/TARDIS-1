@@ -16,7 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.commands.remote;
 
-import java.util.HashMap;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.builders.BuildData;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
@@ -34,8 +33,9 @@ import org.bukkit.block.Biome;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 
+import java.util.HashMap;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISRemoteTravelCommand {
@@ -84,7 +84,7 @@ public class TARDISRemoteTravelCommand {
             HashMap<String, Object> set = new HashMap<>();
             if (!plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                 plugin.getTrackerKeeper().getInVortex().add(id);
-                final DestroyData dd = new DestroyData(plugin, player.getUniqueId().toString());
+                DestroyData dd = new DestroyData(plugin, player.getUniqueId().toString());
                 dd.setDirection(cd);
                 dd.setLocation(l);
                 dd.setPlayer(player);
@@ -105,7 +105,7 @@ public class TARDISRemoteTravelCommand {
                 }
             }
             long delay = (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) ? 1L : 500L;
-            final BuildData bd = new BuildData(plugin, player.getUniqueId().toString());
+            BuildData bd = new BuildData(plugin, player.getUniqueId().toString());
             bd.setDirection(sd);
             bd.setLocation(exit);
             bd.setMalfunction(false);
@@ -118,9 +118,7 @@ public class TARDISRemoteTravelCommand {
                 plugin.getPresetBuilder().buildPreset(bd);
                 TARDISSounds.playTARDISSound(bd.getLocation(), "tardis_land");
             }, delay);
-            if (plugin.getTrackerKeeper().getDamage().containsKey(id)) {
-                plugin.getTrackerKeeper().getDamage().remove(id);
-            }
+            plugin.getTrackerKeeper().getDamage().remove(id);
             // current
             HashMap<String, Object> setcurrent = new HashMap<>();
             setcurrent.put("world", exit.getWorld().getName());

@@ -16,11 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.lazarus;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.event.TARDISGeneticManipulatorDisguiseEvent;
 import me.eccentric_nz.TARDIS.api.event.TARDISGeneticManipulatorUndisguiseEvent;
@@ -29,30 +24,8 @@ import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import me.eccentric_nz.TARDIS.utility.TARDISSounds;
 import me.libraryaddict.disguise.DisguiseAPI;
-import me.libraryaddict.disguise.disguisetypes.AnimalColor;
-import me.libraryaddict.disguise.disguisetypes.DisguiseType;
-import me.libraryaddict.disguise.disguisetypes.MobDisguise;
-import me.libraryaddict.disguise.disguisetypes.PlayerDisguise;
-import me.libraryaddict.disguise.disguisetypes.RabbitType;
-import me.libraryaddict.disguise.disguisetypes.watchers.AgeableWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.BatWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.BlazeWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.ChestedHorseWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.CreeperWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.EndermanWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.HorseWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.LivingWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.LlamaWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.OcelotWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.ParrotWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.PigWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.RabbitWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.SheepWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.SlimeWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.SnowmanWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.VillagerWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.WolfWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.ZombieVillagerWatcher;
+import me.libraryaddict.disguise.disguisetypes.*;
+import me.libraryaddict.disguise.disguisetypes.watchers.*;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -71,8 +44,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.*;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISLazarusGUIListener extends TARDISMenuListener implements Listener {
@@ -99,14 +73,14 @@ public class TARDISLazarusGUIListener extends TARDISMenuListener implements List
     }
 
     /**
-     * Listens for player clicking inside an inventory. If the inventory is a
-     * TARDIS GUI, then the click is processed accordingly.
+     * Listens for player clicking inside an inventory. If the inventory is a TARDIS GUI, then the click is processed
+     * accordingly.
      *
      * @param event a player clicking an inventory slot
      */
     @EventHandler(ignoreCancelled = true)
     public void onLazarusClick(InventoryClickEvent event) {
-        final Inventory inv = event.getInventory();
+        Inventory inv = event.getInventory();
         String name = inv.getTitle();
         if (name.equals("§4Genetic Manipulator")) {
             event.setCancelled(true);
@@ -114,9 +88,9 @@ public class TARDISLazarusGUIListener extends TARDISMenuListener implements List
                 max_slot = 43;
             }
             int slot = event.getRawSlot();
-            final Player player = (Player) event.getWhoClicked();
-            final UUID uuid = player.getUniqueId();
-            final Block b = plugin.getTrackerKeeper().getLazarus().get(uuid);
+            Player player = (Player) event.getWhoClicked();
+            UUID uuid = player.getUniqueId();
+            Block b = plugin.getTrackerKeeper().getLazarus().get(uuid);
             if (b == null) {
                 return;
             }
@@ -414,30 +388,14 @@ public class TARDISLazarusGUIListener extends TARDISMenuListener implements List
 
     private void untrack(UUID uuid) {
         // stop tracking player
-        if (plugin.getTrackerKeeper().getLazarus().containsKey(uuid)) {
-            plugin.getTrackerKeeper().getLazarus().remove(uuid);
-        }
-        if (disguises.containsKey(uuid)) {
-            disguises.remove(uuid);
-        }
-        if (sheep.containsKey(uuid)) {
-            sheep.remove(uuid);
-        }
-        if (horses.containsKey(uuid)) {
-            horses.remove(uuid);
-        }
-        if (cats.containsKey(uuid)) {
-            cats.remove(uuid);
-        }
-        if (professions.containsKey(uuid)) {
-            professions.remove(uuid);
-        }
-        if (slimes.containsKey(uuid)) {
-            slimes.remove(uuid);
-        }
-        if (plugin.getTrackerKeeper().getGeneticManipulation().contains(uuid)) {
-            plugin.getTrackerKeeper().getGeneticManipulation().remove(uuid);
-        }
+        plugin.getTrackerKeeper().getLazarus().remove(uuid);
+        disguises.remove(uuid);
+        sheep.remove(uuid);
+        horses.remove(uuid);
+        cats.remove(uuid);
+        professions.remove(uuid);
+        slimes.remove(uuid);
+        plugin.getTrackerKeeper().getGeneticManipulation().remove(uuid);
     }
 
     private void openDoor(Block b) {

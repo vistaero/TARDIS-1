@@ -16,9 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.flight;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
 import me.eccentric_nz.TARDIS.builders.BuildData;
@@ -28,12 +25,14 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * The Helmic Orientators are slide controls (some consoles have a keyboard)
- * used by the operator for setting the Space-Time Coordinates. The coordinates
- * must take into account the motion of objects relative to a TARDIS' current
- * location, gravity's distortion of the Space-Time Vortex, and the exact time
- * the operator wishes to travel to.
+ * The Helmic Orientators are slide controls (some consoles have a keyboard) used by the operator for setting the
+ * Space-Time Coordinates. The coordinates must take into account the motion of objects relative to a TARDIS' current
+ * location, gravity's distortion of the Space-Time Vortex, and the exact time the operator wishes to travel to.
  *
  * @author eccentric_nz
  */
@@ -44,7 +43,7 @@ public class TARDISFlightAdjustment {
 
     public TARDISFlightAdjustment(TARDIS plugin) {
         this.plugin = plugin;
-        this.angles = Arrays.asList(0, 45, 90, 135, 180, 225, 270, 315);
+        angles = Arrays.asList(0, 45, 90, 135, 180, 225, 270, 315);
     }
 
     public Location getLocation(BuildData bd, int r) {
@@ -76,8 +75,8 @@ public class TARDISFlightAdjustment {
                     sub = tt.submarine(adjusted_location.getBlock(), bd.getDirection());
                     safe = (sub != null);
                 } else {
-                    int[] start = tt.getStartLocation(adjusted_location, bd.getDirection());
-                    safe = (tt.safeLocation(start[0], y, start[2], start[1], start[3], adjusted_location.getWorld(), bd.getDirection()) < 1);
+                    int[] start = TARDISTimeTravel.getStartLocation(adjusted_location, bd.getDirection());
+                    safe = (TARDISTimeTravel.safeLocation(start[0], y, start[2], start[1], start[3], adjusted_location.getWorld(), bd.getDirection()) < 1);
                 }
                 if (safe) {
                     final_location = (bd.isSubmarine()) ? sub : adjusted_location;

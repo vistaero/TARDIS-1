@@ -16,22 +16,11 @@
  */
 package me.eccentric_nz.TARDIS.move;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
 import me.eccentric_nz.TARDIS.ARS.TARDISARSMethods;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.builders.TARDISInteriorPostioning;
 import me.eccentric_nz.TARDIS.builders.TARDISTIPSData;
-import me.eccentric_nz.TARDIS.database.ResultSetARS;
-import me.eccentric_nz.TARDIS.database.ResultSetCompanions;
-import me.eccentric_nz.TARDIS.database.ResultSetControls;
-import me.eccentric_nz.TARDIS.database.ResultSetHidden;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.planets.TARDISAngelsAPI;
 import me.eccentric_nz.TARDIS.utility.TARDISDalekDisguiser;
 import me.eccentric_nz.TARDIS.utility.TARDISLocationGetters;
@@ -42,24 +31,13 @@ import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Enderman;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import static org.bukkit.entity.EntityType.STRAY;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.PigZombie;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Skeleton;
-import org.bukkit.entity.Slime;
+import org.bukkit.entity.*;
 import org.bukkit.entity.Villager.Profession;
-import org.bukkit.entity.Vindicator;
-import org.bukkit.entity.Zombie;
-import org.bukkit.entity.ZombieVillager;
 import org.bukkit.inventory.EntityEquipment;
 
+import java.util.*;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISMonsterRunnable implements Runnable {
@@ -202,7 +180,7 @@ public class TARDISMonsterRunnable implements Runnable {
                                     tm.setType(type);
                                     tm.setAge(e.getTicksLived());
                                     tm.setHealth(((LivingEntity) e).getHealth());
-                                    tm.setName(((LivingEntity) e).getCustomName());
+                                    tm.setName(e.getCustomName());
                                     if (e.getPassengers().size() > 0) {
                                         tm.setPassenger(e.getPassengers().get(0).getType());
                                     }
@@ -416,13 +394,13 @@ public class TARDISMonsterRunnable implements Runnable {
                     break;
             }
             if (m.getAge() > 0) {
-                ((LivingEntity) ent).setTicksLived(m.getAge());
+                ent.setTicksLived(m.getAge());
             }
             if (m.getHealth() > 0 && m.getHealth() <= 20.0d) {
                 ((LivingEntity) ent).setHealth(m.getHealth());
             }
             if (m.getName() != null && !m.getName().isEmpty()) {
-                ((LivingEntity) ent).setCustomName(m.getName());
+                ent.setCustomName(m.getName());
             }
             if (m.getPassenger() != null) {
                 if (plugin.getPM().isPluginEnabled("TARDISWeepingAngels") && m.getPassenger().equals(EntityType.GUARDIAN)) {
@@ -437,6 +415,6 @@ public class TARDISMonsterRunnable implements Runnable {
 
     private boolean isTimelord(TARDISTeleportLocation tpl, Entity e) {
         ResultSetCompanions rsc = new ResultSetCompanions(plugin, tpl.getTardisId());
-        return (rsc.getCompanions().contains(((Player) e).getUniqueId()));
+        return (rsc.getCompanions().contains(e.getUniqueId()));
     }
 }

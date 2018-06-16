@@ -19,11 +19,9 @@ package me.eccentric_nz.TARDIS.ARS;
 import java.util.HashMap;
 
 /**
- *
  * @author eccentric_nz
  */
 public enum TARDISARS implements ARS {
-
     // add offsets
     ANTIGRAVITY(24, "ANTIGRAVITY", "Anti-gravity Well", 1),
     ARBORETUM(18, "ARBORETUM", "Arboretum", 1),
@@ -63,7 +61,7 @@ public enum TARDISARS implements ARS {
     private final static HashMap<Integer, ARS> EXTENDED_ID = new HashMap<>();
     private final static HashMap<String, ARS> EXTENDED_NAME = new HashMap<>();
 
-    private TARDISARS(int id, String name, String descriptiveName, int offset) {
+    TARDISARS(int id, String name, String descriptiveName, int offset) {
         this.id = id;
         this.name = name;
         this.descriptiveName = descriptiveName;

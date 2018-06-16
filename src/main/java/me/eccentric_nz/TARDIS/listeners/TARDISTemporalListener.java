@@ -16,8 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.listeners;
 
-import java.util.Arrays;
-import java.util.List;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.Material;
@@ -29,8 +27,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISTemporalListener implements Listener {
@@ -54,9 +54,7 @@ public class TARDISTemporalListener implements Listener {
                 return;
             }
             p.resetPlayerTime();
-            if (plugin.getTrackerKeeper().getSetTime().containsKey(p.getUniqueId())) {
-                plugin.getTrackerKeeper().getSetTime().remove(p.getUniqueId());
-            }
+            plugin.getTrackerKeeper().getSetTime().remove(p.getUniqueId());
             TARDISMessage.send(p, "TEMPORAL_RESET");
         }
     }

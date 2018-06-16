@@ -16,11 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.hads;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
 import me.eccentric_nz.TARDIS.api.event.TARDISHADSEvent;
@@ -40,12 +35,13 @@ import org.bukkit.World.Environment;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import java.util.*;
+
 /**
- * The Hostile Action Displacement System, or HADS, was one of the defence
- * mechanisms of the Doctor's TARDIS. When the outer shell of the vessel came
- * under attack, the unit dematerialised the TARDIS and re-materialised it a
- * short distance away after the attacker had gone, in a safer locale. The HADS
- * had to be manually set, and the Doctor often forgot to do so.
+ * The Hostile Action Displacement System, or HADS, was one of the defence mechanisms of the Doctor's TARDIS. When the
+ * outer shell of the vessel came under attack, the unit dematerialised the TARDIS and re-materialised it a short
+ * distance away after the attacker had gone, in a safer locale. The HADS had to be manually set, and the Doctor often
+ * forgot to do so.
  *
  * @author eccentric_nz
  */
@@ -56,12 +52,11 @@ public class TARDISHostileDisplacement {
     private int count = 0;
 
     public TARDISHostileDisplacement(TARDIS plugin) {
-        this.angles = Arrays.asList(0, 45, 90, 135, 180, 225, 270, 315);
+        angles = Arrays.asList(0, 45, 90, 135, 180, 225, 270, 315);
         this.plugin = plugin;
     }
 
-    public void moveTARDIS(final int id, UUID uuid, Player hostile, PRESET preset) {
-
+    public void moveTARDIS(int id, UUID uuid, Player hostile, PRESET preset) {
         TARDISTimeTravel tt = new TARDISTimeTravel(plugin);
         int r = plugin.getConfig().getInt("preferences.hads_distance");
         HashMap<String, Object> wherecl = new HashMap<>();
@@ -101,8 +96,8 @@ public class TARDISHostileDisplacement {
                     sub = tt.submarine(l.getBlock(), d);
                     safe = (sub != null);
                 } else {
-                    int[] start = tt.getStartLocation(l, d);
-                    safe = (tt.safeLocation(start[0], y, start[2], start[1], start[3], l.getWorld(), d) < 1);
+                    int[] start = TARDISTimeTravel.getStartLocation(l, d);
+                    safe = (TARDISTimeTravel.safeLocation(start[0], y, start[2], start[1], start[3], l.getWorld(), d) < 1);
                 }
                 if (safe) {
                     Location fl = (rsc.isSubmarine()) ? sub : l;
@@ -122,7 +117,7 @@ public class TARDISHostileDisplacement {
                         long delay = 1L;
                         // move TARDIS
                         plugin.getTrackerKeeper().getInVortex().add(id);
-                        final DestroyData dd = new DestroyData(plugin, uuid.toString());
+                        DestroyData dd = new DestroyData(plugin, uuid.toString());
                         dd.setDirection(d);
                         dd.setLocation(loc);
                         dd.setPlayer(player);
@@ -135,7 +130,7 @@ public class TARDISHostileDisplacement {
                             plugin.getTrackerKeeper().getDematerialising().add(id);
                             plugin.getPresetDestroyer().destroyPreset(dd);
                         }, delay);
-                        final BuildData bd = new BuildData(plugin, uuid.toString());
+                        BuildData bd = new BuildData(plugin, uuid.toString());
                         bd.setDirection(d);
                         bd.setLocation(fl);
                         bd.setMalfunction(false);

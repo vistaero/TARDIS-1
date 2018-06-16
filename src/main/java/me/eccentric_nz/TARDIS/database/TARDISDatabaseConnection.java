@@ -16,18 +16,18 @@
  */
 package me.eccentric_nz.TARDIS.database;
 
+import me.eccentric_nz.TARDIS.TARDIS;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import me.eccentric_nz.TARDIS.TARDIS;
 
 /**
  * Singleton class to get the database connection.
- *
- * Many facts, figures, and formulas are contained within the Matrix - a
- * supercomputer and micro-universe used by the High Council of the Time Lords
- * as a storehouse of knowledge to predict future events.
+ * <p>
+ * Many facts, figures, and formulas are contained within the Matrix - a supercomputer and micro-universe used by the
+ * High Council of the Time Lords as a storehouse of knowledge to predict future events.
  *
  * @author eccentric_nz
  */
@@ -39,6 +39,7 @@ public class TARDISDatabaseConnection {
     public static synchronized TARDISDatabaseConnection getINSTANCE() {
         return INSTANCE;
     }
+
     public Connection connection = null;
     public Statement statement = null;
 
@@ -52,7 +53,7 @@ public class TARDISDatabaseConnection {
         this.isMySQL = isMySQL;
     }
 
-    public void setConnection() throws Exception {
+    public void setConnection() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -74,7 +75,6 @@ public class TARDISDatabaseConnection {
     }
 
     /**
-     *
      * @return an exception
      * @throws CloneNotSupportedException
      */
@@ -87,16 +87,15 @@ public class TARDISDatabaseConnection {
      * Test the database connection
      *
      * @param connection
-     * @throws java.sql.SQLException
      */
-    public void testConnection(Connection connection) throws SQLException {
+    public void testConnection(Connection connection) {
         if (isMySQL) {
             try {
                 statement = connection.createStatement();
                 statement.executeQuery("SELECT 1");
             } catch (SQLException e) {
                 try {
-                    this.setConnection();
+                    setConnection();
                 } catch (Exception ex) {
                     TARDIS.plugin.debug("Could not re-connect to database!");
                 }

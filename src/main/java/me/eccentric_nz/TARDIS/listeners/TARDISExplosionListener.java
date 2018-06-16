@@ -31,8 +31,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
 /**
- * Distronic explosives are powerful but unstable weapons, used on many worlds
- * as components of explosive warheads attached to missiles.
+ * Distronic explosives are powerful but unstable weapons, used on many worlds as components of explosive warheads
+ * attached to missiles.
  *
  * @author eccentric_nz
  */
@@ -45,10 +45,8 @@ public class TARDISExplosionListener implements Listener {
     }
 
     /**
-     * Listens for explosions around the TARDIS Police Box. If the explosion
-     * affects any of the Police Box blocks, then those blocks are removed from
-     * the effect of the explosion, there by protecting the Police box from
-     * damage.
+     * Listens for explosions around the TARDIS Police Box. If the explosion affects any of the Police Box blocks, then
+     * those blocks are removed from the effect of the explosion, there by protecting the Police box from damage.
      *
      * @param e an entity exploding
      */
@@ -77,9 +75,7 @@ public class TARDISExplosionListener implements Listener {
                 if (loc != null) {
                     Block block = loc.getBlock();
                     // if the block is a TARDIS block then remove it
-                    if (e.blockList().contains(block)) {
-                        e.blockList().remove(block);
-                    }
+                    e.blockList().remove(block);
                 }
             }
         }

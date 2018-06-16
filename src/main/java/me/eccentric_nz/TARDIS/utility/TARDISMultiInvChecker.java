@@ -16,13 +16,14 @@
  */
 package me.eccentric_nz.TARDIS.utility;
 
-import java.util.HashMap;
 import uk.co.tggl.pluckerpluck.multiinv.MIYamlFiles;
+
+import java.util.HashMap;
 
 public class TARDISMultiInvChecker {
 
     public static boolean checkWorldsCanShare(String from, String to) {
         HashMap<String, String> migroups = MIYamlFiles.getGroups();
-        return (migroups.containsKey(from) && migroups.containsKey(to)) ? migroups.get(from).equals(migroups.get(to)) : false;
+        return (migroups.containsKey(from) && migroups.containsKey(to)) && migroups.get(from).equals(migroups.get(to));
     }
 }

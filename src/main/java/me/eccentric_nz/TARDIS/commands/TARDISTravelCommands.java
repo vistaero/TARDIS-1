@@ -16,39 +16,16 @@
  */
 package me.eccentric_nz.TARDIS.commands;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISSerializeInventory;
 import me.eccentric_nz.TARDIS.api.Parameters;
-import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.ResultSetAreas;
-import me.eccentric_nz.TARDIS.database.ResultSetBackLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetDestinations;
-import me.eccentric_nz.TARDIS.database.ResultSetDiskStorage;
-import me.eccentric_nz.TARDIS.database.ResultSetHomeLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.enumeration.FLAG;
 import me.eccentric_nz.TARDIS.flight.TARDISLand;
 import me.eccentric_nz.TARDIS.listeners.TARDISBiomeReaderListener;
-import me.eccentric_nz.TARDIS.travel.TARDISCaveFinder;
-import me.eccentric_nz.TARDIS.travel.TARDISRescue;
-import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
-import me.eccentric_nz.TARDIS.travel.TARDISTravelRequest;
-import me.eccentric_nz.TARDIS.travel.TARDISVillageTravel;
+import me.eccentric_nz.TARDIS.travel.*;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import me.eccentric_nz.TARDIS.utility.TARDISWorldBorderChecker;
@@ -64,11 +41,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Command /tardistravel [arguments].
- *
- * Time travel is the process of travelling through time, even in a non-linear
- * direction.
+ * <p>
+ * Time travel is the process of travelling through time, even in a non-linear direction.
  *
  * @author eccentric_nz
  */
@@ -89,7 +70,6 @@ public class TARDISTravelCommands implements CommandExecutor {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Player player = null;
         if (sender instanceof Player) {
@@ -170,9 +150,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                     qf.doSyncUpdate("next", set, tid);
                     TARDISMessage.send(player, "TRAVEL_APPROVED", permArea);
                     plugin.getTrackerKeeper().getHasDestination().put(id, travel);
-                    if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                        plugin.getTrackerKeeper().getRescue().remove(id);
-                    }
+                    plugin.getTrackerKeeper().getRescue().remove(id);
                     if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                         new TARDISLand(plugin, id, player).exitVortex();
                     }
@@ -289,9 +267,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                             qf.doSyncUpdate("next", set, tid);
                             TARDISMessage.send(player, "TRAVEL_LOADED", which, !plugin.getTrackerKeeper().getDestinationVortex().containsKey(id));
                             plugin.getTrackerKeeper().getHasDestination().put(id, travel);
-                            if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                                plugin.getTrackerKeeper().getRescue().remove(id);
-                            }
+                            plugin.getTrackerKeeper().getRescue().remove(id);
                             if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                 new TARDISLand(plugin, id, player).exitVortex();
                             }
@@ -357,11 +333,11 @@ public class TARDISTravelCommands implements CommandExecutor {
                             return true;
                         }
                         // ask if we can travel to this player
-                        final UUID requestedUUID = requested.getUniqueId();
+                        UUID requestedUUID = requested.getUniqueId();
                         TARDISMessage.send(requested, "REQUEST_TRAVEL", player.getName(), ChatColor.AQUA + "tardis request accept" + ChatColor.RESET);
                         plugin.getTrackerKeeper().getChat().put(requestedUUID, player.getUniqueId());
-                        final Player p = player;
-                        final String to = args[0];
+                        Player p = player;
+                        String to = args[0];
                         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                             if (plugin.getTrackerKeeper().getChat().containsKey(requestedUUID)) {
                                 plugin.getTrackerKeeper().getChat().remove(requestedUUID);
@@ -420,7 +396,6 @@ public class TARDISTravelCommands implements CommandExecutor {
                             try {
                                 Biome biome = Biome.valueOf(upper);
                                 TARDISMessage.send(player, "BIOME_SEARCH");
-
                                 HashMap<String, Object> wherecl = new HashMap<>();
                                 wherecl.put("tardis_id", tardis.getTardis_id());
                                 ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, wherecl);
@@ -449,10 +424,10 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     while (!bw.getChunkAt(tb).isLoaded()) {
                                         bw.getChunkAt(tb).load();
                                     }
-                                    int[] start_loc = tt.getStartLocation(tb, rsc.getDirection());
+                                    int[] start_loc = TARDISTimeTravel.getStartLocation(tb, rsc.getDirection());
                                     int tmp_y = tb.getBlockY();
                                     for (int up = 0; up < 10; up++) {
-                                        int count = tt.safeLocation(start_loc[0], tmp_y + up, start_loc[2], start_loc[1], start_loc[3], tb.getWorld(), rsc.getDirection());
+                                        int count = TARDISTimeTravel.safeLocation(start_loc[0], tmp_y + up, start_loc[2], start_loc[1], start_loc[3], tb.getWorld(), rsc.getDirection());
                                         if (count == 0) {
                                             tb.setY(tmp_y + up);
                                             break;
@@ -467,9 +442,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     qf.doSyncUpdate("next", set, tid);
                                     TARDISMessage.send(player, "BIOME_SET", !plugin.getTrackerKeeper().getDestinationVortex().containsKey(id));
                                     plugin.getTrackerKeeper().getHasDestination().put(id, travel);
-                                    if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                                        plugin.getTrackerKeeper().getRescue().remove(id);
-                                    }
+                                    plugin.getTrackerKeeper().getRescue().remove(id);
                                     if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                         new TARDISLand(plugin, id, player).exitVortex();
                                     }
@@ -540,9 +513,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                 qf.doSyncUpdate("next", set, tid);
                                 TARDISMessage.send(player, "LOC_SET", !plugin.getTrackerKeeper().getDestinationVortex().containsKey(id));
                                 plugin.getTrackerKeeper().getHasDestination().put(id, travel);
-                                if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                                    plugin.getTrackerKeeper().getRescue().remove(id);
-                                }
+                                plugin.getTrackerKeeper().getRescue().remove(id);
                                 if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                     new TARDISLand(plugin, id, player).exitVortex();
                                 }
@@ -586,9 +557,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                         qf.doSyncUpdate("next", set, tid);
                         TARDISMessage.send(player, "TRAVEL_APPROVED", args[1]);
                         plugin.getTrackerKeeper().getHasDestination().put(id, travel);
-                        if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                            plugin.getTrackerKeeper().getRescue().remove(id);
-                        }
+                        plugin.getTrackerKeeper().getRescue().remove(id);
                         if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                             new TARDISLand(plugin, id, player).exitVortex();
                         }
@@ -629,7 +598,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     // make location
                                     Location location = new Location(rsc.getWorld(), x, y, z);
                                     // check location
-                                    int count = this.checkLocation(location, player, id, tt);
+                                    int count = checkLocation(location, player, id, tt);
                                     if (count > 0) {
                                         TARDISMessage.send(player, "NOT_SAFE");
                                         return true;
@@ -642,9 +611,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                         qf.doSyncUpdate("next", set, tid);
                                         TARDISMessage.send(player, "LOC_SAVED", true);
                                         plugin.getTrackerKeeper().getHasDestination().put(id, travel);
-                                        if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                                            plugin.getTrackerKeeper().getRescue().remove(id);
-                                        }
+                                        plugin.getTrackerKeeper().getRescue().remove(id);
                                         if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                             new TARDISLand(plugin, id, player).exitVortex();
                                         }
@@ -654,7 +621,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     // automatically get highest block Y coord
                                     Location determiney = getCoordinateLocation(args, player, id);
                                     if (determiney != null) {
-                                        int count = this.checkLocation(determiney, player, id, tt);
+                                        int count = checkLocation(determiney, player, id, tt);
                                         if (count > 0) {
                                             TARDISMessage.send(player, "NOT_SAFE");
                                             return true;
@@ -667,9 +634,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                             qf.doSyncUpdate("next", set, tid);
                                             TARDISMessage.send(player, "LOC_SAVED", true);
                                             plugin.getTrackerKeeper().getHasDestination().put(id, travel);
-                                            if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                                                plugin.getTrackerKeeper().getRescue().remove(id);
-                                            }
+                                            plugin.getTrackerKeeper().getRescue().remove(id);
                                             if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                                 new TARDISLand(plugin, id, player).exitVortex();
                                             }
@@ -683,7 +648,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                 Location giveny = getCoordinateLocation(args, player, id);
                                 if (giveny != null) {
                                     // check location
-                                    int count = this.checkLocation(giveny, player, id, tt);
+                                    int count = checkLocation(giveny, player, id, tt);
                                     if (count > 0) {
                                         TARDISMessage.send(player, "NOT_SAFE");
                                         return true;
@@ -696,9 +661,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                         qf.doSyncUpdate("next", set, tid);
                                         TARDISMessage.send(player, "LOC_SAVED", true);
                                         plugin.getTrackerKeeper().getHasDestination().put(id, travel);
-                                        if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-                                            plugin.getTrackerKeeper().getRescue().remove(id);
-                                        }
+                                        plugin.getTrackerKeeper().getRescue().remove(id);
                                         if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                             new TARDISLand(plugin, id, player).exitVortex();
                                         }
@@ -929,8 +892,8 @@ public class TARDISTravelCommands implements CommandExecutor {
             return 1;
         }
         // check location
-        int[] start_loc = tt.getStartLocation(location, rsc.getDirection());
-        return tt.safeLocation(start_loc[0], location.getBlockY(), start_loc[2], start_loc[1], start_loc[3], location.getWorld(), rsc.getDirection());
+        int[] start_loc = TARDISTimeTravel.getStartLocation(location, rsc.getDirection());
+        return TARDISTimeTravel.safeLocation(start_loc[0], location.getBlockY(), start_loc[2], start_loc[1], start_loc[3], location.getWorld(), rsc.getDirection());
     }
 
     private int getRelativeCoordinate(String arg) {

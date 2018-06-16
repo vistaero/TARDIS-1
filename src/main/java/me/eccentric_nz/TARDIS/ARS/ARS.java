@@ -17,18 +17,17 @@
 package me.eccentric_nz.TARDIS.ARS;
 
 /**
- * Used to dynamically add custom rooms to the TARDIS' Architectural
- * Reconfiguration System.
+ * Used to dynamically add custom rooms to the TARDIS' Architectural Reconfiguration System.
  *
  * @author eccentric_nz
  */
 public interface ARS {
 
-    public int getId();
+    int getId();
 
-    public String getActualName();
+    String getActualName();
 
-    public String getDescriptiveName();
+    String getDescriptiveName();
 
-    public int getOffset();
+    int getOffset();
 }

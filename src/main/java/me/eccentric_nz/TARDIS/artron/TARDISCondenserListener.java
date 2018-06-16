@@ -16,9 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.artron;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.achievement.TARDISAchievementFactory;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
@@ -46,10 +43,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 /**
- * Following his disrupted resurrection, the Master was able to offensively use
- * energy - presumably his own artron energy - to strike his enemies with
- * debilitating energy blasts, at the cost of reducing his own life force.
+ * Following his disrupted resurrection, the Master was able to offensively use energy - presumably his own artron
+ * energy - to strike his enemies with debilitating energy blasts, at the cost of reducing his own life force.
  *
  * @author eccentric_nz
  */
@@ -64,13 +64,11 @@ public class TARDISCondenserListener implements Listener {
     }
 
     /**
-     * Listens for player interaction with the TARDIS condenser chest. When the
-     * chest is closed, any DIRT, SAND, GRAVEL, COBBLESTONE or ROTTEN FLESH is
-     * converted to Artron Energy at a ratio of 1:1.
+     * Listens for player interaction with the TARDIS condenser chest. When the chest is closed, any DIRT, SAND, GRAVEL,
+     * COBBLESTONE or ROTTEN FLESH is converted to Artron Energy at a ratio of 1:1.
      *
      * @param event a chest closing
      */
-    @SuppressWarnings("deprecation")
     @EventHandler(ignoreCancelled = true)
     public void onChestClose(InventoryCloseEvent event) {
         Inventory inv = event.getInventory();
@@ -78,7 +76,7 @@ public class TARDISCondenserListener implements Listener {
         String title = inv.getName();
         if (holder instanceof Chest) {
             if (title.equals("§4Artron Condenser") || title.equals("§4Server Condenser")) {
-                final Player player = (Player) event.getPlayer();
+                Player player = (Player) event.getPlayer();
                 Chest chest = (Chest) holder;
                 Location loc = chest.getLocation();
                 String chest_loc;
@@ -154,7 +152,7 @@ public class TARDISCondenserListener implements Listener {
                             ResultSetCondenser rsc = new ResultSetCondenser(plugin, wherec);
                             HashMap<String, Object> setc = new HashMap<>();
                             if (rsc.resultSet()) {
-                                int new_stack_size = (int) map.getValue() + rsc.getBlock_count();
+                                int new_stack_size = map.getValue() + rsc.getBlock_count();
                                 qf.updateCondensedBlockCount(new_stack_size, tardis.getTardis_id(), map.getKey());
                             } else {
                                 setc.put("tardis_id", tardis.getTardis_id());

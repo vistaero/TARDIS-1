@@ -16,8 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.commands.remote;
 
-import java.util.HashMap;
-import java.util.UUID;
 import me.crafter.mc.lockettepro.LocketteProAPI;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
@@ -42,8 +40,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.yi.acru.bukkit.Lockette.Lockette;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISRemoteComehereCommand {
@@ -54,7 +54,6 @@ public class TARDISRemoteComehereCommand {
         this.plugin = plugin;
     }
 
-    @SuppressWarnings("deprecation")
     public boolean doRemoteComeHere(Player player, UUID uuid) {
         Location eyeLocation = player.getTargetBlock(plugin.getGeneralKeeper().getTransparent(), 50).getLocation();
         if (!plugin.getConfig().getBoolean("travel.include_default_world") && plugin.getConfig().getBoolean("creation.default_world") && eyeLocation.getWorld().getName().equals(plugin.getConfig().getString("creation.default_world_name"))) {
@@ -88,7 +87,7 @@ public class TARDISRemoteComehereCommand {
             return true;
         }
         Tardis tardis = rs.getTardis();
-        final int id = tardis.getTardis_id();
+        int id = tardis.getTardis_id();
         // check they are not in the tardis
         HashMap<String, Object> wherettrav = new HashMap<>();
         wherettrav.put("uuid", player.getUniqueId().toString());
@@ -123,13 +122,13 @@ public class TARDISRemoteComehereCommand {
                 sub = true;
             }
         } else {
-            int[] start_loc = tt.getStartLocation(eyeLocation, player_d);
+            int[] start_loc = TARDISTimeTravel.getStartLocation(eyeLocation, player_d);
             // safeLocation(int startx, int starty, int startz, int resetx, int resetz, World w, COMPASS player_d)
-            count = tt.safeLocation(start_loc[0], eyeLocation.getBlockY(), start_loc[2], start_loc[1], start_loc[3], eyeLocation.getWorld(), player_d);
+            count = TARDISTimeTravel.safeLocation(start_loc[0], eyeLocation.getBlockY(), start_loc[2], start_loc[1], start_loc[3], eyeLocation.getWorld(), player_d);
         }
         if (plugin.getPM().isPluginEnabled("Lockette")) {
             Lockette Lockette = (Lockette) plugin.getPM().getPlugin("Lockette");
-            if (Lockette.isProtected(eyeLocation.getBlock())) {
+            if (org.yi.acru.bukkit.Lockette.Lockette.isProtected(eyeLocation.getBlock())) {
                 count = 1;
             }
         }
@@ -143,7 +142,7 @@ public class TARDISRemoteComehereCommand {
             TARDISMessage.send(player, "WOULD_GRIEF_BLOCKS");
             return true;
         }
-        final QueryFactory qf = new QueryFactory(plugin);
+        QueryFactory qf = new QueryFactory(plugin);
         Location oldSave = null;
         HashMap<String, Object> bid = new HashMap<>();
         bid.put("tardis_id", id);
@@ -188,9 +187,9 @@ public class TARDISRemoteComehereCommand {
         TARDISMessage.send(player, "TARDIS_COMING");
         long delay = 1L;
         plugin.getTrackerKeeper().getInVortex().add(id);
-        final boolean hid = hidden;
+        boolean hid = hidden;
         if (!plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
-            final DestroyData dd = new DestroyData(plugin, player.getUniqueId().toString());
+            DestroyData dd = new DestroyData(plugin, player.getUniqueId().toString());
             dd.setDirection(d);
             dd.setLocation(oldSave);
             dd.setPlayer(player);
@@ -208,7 +207,7 @@ public class TARDISRemoteComehereCommand {
                 }
             }, delay);
         }
-        final BuildData bd = new BuildData(plugin, player.getUniqueId().toString());
+        BuildData bd = new BuildData(plugin, player.getUniqueId().toString());
         bd.setDirection(player_d);
         bd.setLocation(eyeLocation);
         bd.setMalfunction(false);
@@ -221,9 +220,7 @@ public class TARDISRemoteComehereCommand {
             plugin.getPresetBuilder().buildPreset(bd);
         }, delay * 2);
         plugin.getTrackerKeeper().getHasDestination().remove(id);
-        if (plugin.getTrackerKeeper().getRescue().containsKey(id)) {
-            plugin.getTrackerKeeper().getRescue().remove(id);
-        }
+        plugin.getTrackerKeeper().getRescue().remove(id);
         return true;
     }
 }

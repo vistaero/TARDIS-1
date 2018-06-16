@@ -16,16 +16,9 @@
  */
 package me.eccentric_nz.TARDIS.move;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.control.TARDISPowerButton;
-import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.ResultSetCompanions;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetVoid;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.mobfarming.TARDISFarmer;
@@ -40,8 +33,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISMoveListener implements Listener {
@@ -54,13 +50,12 @@ public class TARDISMoveListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerMoveToFromTARDIS(PlayerMoveEvent event) {
-        final Player p = event.getPlayer();
+        Player p = event.getPlayer();
         if (!plugin.getTrackerKeeper().getMover().contains(p.getUniqueId())) {
             return;
         }
         Location l = new Location(event.getTo().getWorld(), event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ(), 0.0f, 0.0f);
         Location loc = p.getLocation(); // Grab Location
-
         /**
          * Copyright (c) 2011, The Multiverse Team All rights reserved. Check
          * the Player has actually moved a block to prevent unneeded
@@ -69,7 +64,6 @@ public class TARDISMoveListener implements Listener {
          */
         TARDISMoveSession tms = plugin.getTrackerKeeper().getTARDISMoveSession(p);
         tms.setStaleLocation(loc);
-
         // If the location is stale, ie: the player isn't actually moving xyz coords, they're looking around
         if (tms.isStaleLocation()) {
             return;
@@ -78,7 +72,7 @@ public class TARDISMoveListener implements Listener {
         if (plugin.getTrackerKeeper().getPortals().containsKey(l)) {
             TARDISTeleportLocation tpl = plugin.getTrackerKeeper().getPortals().get(l);
             UUID uuid = p.getUniqueId();
-            final int id = tpl.getTardisId();
+            int id = tpl.getTardisId();
             // are they a companion of this TARDIS?
             List<UUID> companions = new ResultSetCompanions(plugin, id).getCompanions();
             if (tpl.isAbandoned() || companions.contains(uuid)) {
@@ -103,10 +97,10 @@ public class TARDISMoveListener implements Listener {
                 wherepp.put("uuid", uuid.toString());
                 ResultSetPlayerPrefs rsp = new ResultSetPlayerPrefs(plugin, wherepp);
                 boolean hasPrefs = rsp.resultSet();
-                boolean minecart = (hasPrefs) ? rsp.isMinecartOn() : false;
-                boolean userQuotes = (hasPrefs) ? rsp.isQuotesOn() : false;
-                boolean willFarm = (hasPrefs) ? rsp.isFarmOn() : false;
-                boolean canPowerUp = (hasPrefs) ? rsp.isAutoPowerUp() && !tpl.isAbandoned() : false;
+                boolean minecart = (hasPrefs) && rsp.isMinecartOn();
+                boolean userQuotes = (hasPrefs) && rsp.isQuotesOn();
+                boolean willFarm = (hasPrefs) && rsp.isFarmOn();
+                boolean canPowerUp = (hasPrefs) && (rsp.isAutoPowerUp() && !tpl.isAbandoned());
                 // check for entities near the police box
                 List<TARDISParrot> pets = null;
                 if (plugin.getConfig().getBoolean("allow.mob_farming") && p.hasPermission("tardis.farm") && !plugin.getTrackerKeeper().getFarming().contains(uuid) && willFarm) {

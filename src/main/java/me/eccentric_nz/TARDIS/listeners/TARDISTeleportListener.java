@@ -16,9 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.listeners;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.QueryFactory;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
@@ -29,9 +26,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 /**
- * Teleportation is a form of matter transmission and can be either a process of
- * physical/psychological will or a technological one.
+ * Teleportation is a form of matter transmission and can be either a process of physical/psychological will or a
+ * technological one.
  *
  * @author eccentric_nz
  */
@@ -62,9 +63,7 @@ public class TARDISTeleportListener implements Listener {
                     TARDISMessage.send(p, "OCCUPY_AUTO");
                 }
                 // stop tracking telepaths
-                if (plugin.getTrackerKeeper().getTelepaths().containsKey(p.getUniqueId())) {
-                    plugin.getTrackerKeeper().getTelepaths().remove(p.getUniqueId());
-                }
+                plugin.getTrackerKeeper().getTelepaths().remove(p.getUniqueId());
             }
         }
     }

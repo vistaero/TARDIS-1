@@ -24,9 +24,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 /**
- * The Chameleon Circuit controls the exterior shell's Cloaking Device. The
- * Cloaking Device allows the shape, color, mass and texture of the shell to be
- * altered to blend in with its surroundings. This feature is designed to help
+ * The Chameleon Circuit controls the exterior shell's Cloaking Device. The Cloaking Device allows the shape, color,
+ * mass and texture of the shell to be altered to blend in with its surroundings. This feature is designed to help
  * prevent changes to history.
  *
  * @author eccentric_nz
@@ -39,21 +38,20 @@ public class TARDISChameleonCircuit {
         this.plugin = plugin;
     }
 
-    @SuppressWarnings("deprecation")
     public int[] getChameleonBlock(Block b, OfflinePlayer p) {
         int[] data = new int[2];
         int chameleonType = b.getTypeId();
         int wall_block = 159;
         byte chameleonData = 8;
         // determine wall_block
-        if (plugin.getBlocksConfig().getIntegerList("chameleon_blocks").contains((Integer) chameleonType)) {
+        if (plugin.getBlocksConfig().getIntegerList("chameleon_blocks").contains(chameleonType)) {
             wall_block = chameleonType;
             chameleonData = b.getData();
         }
-        if (TARDISConstants.CHAMELEON_BLOCKS_BAD.contains((Integer) chameleonType)) {
+        if (TARDISConstants.CHAMELEON_BLOCKS_BAD.contains(chameleonType)) {
             TARDISMessage.send(p.getPlayer(), "CHAM_NOT_ENGAGE");
         }
-        if (TARDISConstants.CHAMELEON_BLOCKS_CHANGE.contains((Integer) chameleonType)) {
+        if (TARDISConstants.CHAMELEON_BLOCKS_CHANGE.contains(chameleonType)) {
             wall_block = swapId(chameleonType);
             switch (chameleonType) {
                 case 12:
@@ -91,17 +89,17 @@ public class TARDISChameleonCircuit {
                     break;
             }
         }
-        if (TARDISConstants.CHAMELEON_BLOCKS_NEXT.contains((Integer) chameleonType)) {
+        if (TARDISConstants.CHAMELEON_BLOCKS_NEXT.contains(chameleonType)) {
             // try the surrounding blocks
             for (BlockFace bf : plugin.getGeneralKeeper().getSurrounding()) {
                 Block surroundblock = b.getRelative(bf);
                 int eid = surroundblock.getTypeId();
-                if (TARDISConstants.CHAMELEON_BLOCKS_VALID.contains((Integer) eid)) {
+                if (TARDISConstants.CHAMELEON_BLOCKS_VALID.contains(eid)) {
                     wall_block = eid;
                     chameleonData = surroundblock.getData();
                     break;
                 }
-                if (TARDISConstants.CHAMELEON_BLOCKS_CHANGE.contains((Integer) eid)) {
+                if (TARDISConstants.CHAMELEON_BLOCKS_CHANGE.contains(eid)) {
                     wall_block = swapId(eid);
                     switch (eid) {
                         case 134:
@@ -122,7 +120,7 @@ public class TARDISChameleonCircuit {
             }
         }
         // if it's a precious block or TNT and all_blocks is false, then switch it to wool of similar colour
-        if (TARDISConstants.CHAMELEON_BLOCKS_PRECIOUS.contains((Integer) chameleonType) && !plugin.getConfig().getBoolean("allow.all_blocks")) {
+        if (TARDISConstants.CHAMELEON_BLOCKS_PRECIOUS.contains(chameleonType) && !plugin.getConfig().getBoolean("allow.all_blocks")) {
             wall_block = 35;
             switch (chameleonType) {
                 case 41:

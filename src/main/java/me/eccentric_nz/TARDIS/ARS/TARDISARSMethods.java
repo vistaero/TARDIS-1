@@ -16,23 +16,11 @@
  */
 package me.eccentric_nz.TARDIS.ARS;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.JSON.JSONArray;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitDamager;
-import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.ResultSetARS;
-import me.eccentric_nz.TARDIS.database.ResultSetCondenser;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
@@ -44,13 +32,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.*;
+
 /**
- * The architectural reconfiguration system is a component of the Doctor's
- * TARDIS in the shape of a tree that, according to the Eleventh Doctor,
- * "reconstructs the particles according to your needs." It is basically "a
- * machine that makes machines," perhaps somewhat like a 3D printer. It is,
- * according to Gregor Van Baalen's scanner, "more valuable than the total sum
- * of any currency.
+ * The architectural reconfiguration system is a component of the Doctor's TARDIS in the shape of a tree that, according
+ * to the Eleventh Doctor, "reconstructs the particles according to your needs." It is basically "a machine that makes
+ * machines," perhaps somewhat like a 3D printer. It is, according to Gregor Van Baalen's scanner, "more valuable than
+ * the total sum of any currency.
  *
  * @author eccentric_nz
  */
@@ -96,9 +84,9 @@ public class TARDISARSMethods {
     public void revert(UUID uuid) {
         TARDISARSSaveData sd = save_map_data.get(uuid);
         JSONArray json = new JSONArray(sd.getData());
-        final HashMap<String, Object> set = new HashMap<>();
+        HashMap<String, Object> set = new HashMap<>();
         set.put("json", json.toString());
-        final HashMap<String, Object> wherea = new HashMap<>();
+        HashMap<String, Object> wherea = new HashMap<>();
         wherea.put("ars_id", sd.getId());
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             new QueryFactory(plugin).doUpdate("ars", set, wherea);
@@ -134,8 +122,8 @@ public class TARDISARSMethods {
      * Gets a 5x5 2D slice from a 3D array
      *
      * @param layer the level to to get
-     * @param x the x position of the slice
-     * @param z the z position of the slice
+     * @param x     the x position of the slice
+     * @param z     the z position of the slice
      * @return a slice of the larger array
      */
     public int[][] sliceGrid(int[][] layer, int x, int z) {
@@ -153,17 +141,15 @@ public class TARDISARSMethods {
     }
 
     /**
-     * Sets an ItemStack to the specified inventory slot updating the display
-     * name and removing any lore.
+     * Sets an ItemStack to the specified inventory slot updating the display name and removing any lore.
      *
-     * @param inv the inventory to update
-     * @param slot the slot number to update
-     * @param id the item id to set the item stack to
-     * @param room the room type associated with the id
-     * @param uuid the player using the GUI
+     * @param inv    the inventory to update
+     * @param slot   the slot number to update
+     * @param id     the item id to set the item stack to
+     * @param room   the room type associated with the id
+     * @param uuid   the player using the GUI
      * @param update whether to update the grid display
      */
-    @SuppressWarnings("deprecation")
     public void setSlot(Inventory inv, int slot, int id, String room, UUID uuid, boolean update) {
         ItemStack is = new ItemStack(id, 1);
         ItemMeta im = is.getItemMeta();
@@ -185,13 +171,12 @@ public class TARDISARSMethods {
     /**
      * Sets an ItemStack to the specified inventory slot.
      *
-     * @param inv the inventory to update
-     * @param slot the slot number to update
-     * @param is the item stack to set
-     * @param uuid the player using the GUI
+     * @param inv    the inventory to update
+     * @param slot   the slot number to update
+     * @param is     the item stack to set
+     * @param uuid   the player using the GUI
      * @param update whether to update the grid display
      */
-    @SuppressWarnings("deprecation")
     public void setSlot(Inventory inv, int slot, ItemStack is, UUID uuid, boolean update) {
         inv.setItem(slot, is);
         int id = is.getTypeId();
@@ -204,8 +189,7 @@ public class TARDISARSMethods {
      * Get the coordinates of the clicked slot in relation to the ARS map.
      *
      * @param slot the slot that was clicked
-     * @param md an instance of the TARDISARSMapData class from which to
-     * retrieve the map offset
+     * @param md   an instance of the TARDISARSMapData class from which to retrieve the map offset
      * @return an array of ints
      */
     public int[] getCoords(int slot, TARDISARSMapData md) {
@@ -234,12 +218,11 @@ public class TARDISARSMethods {
     }
 
     /**
-     * Saves the current map to the TARDISARSMapData instance associated with
-     * the player using the GUI.
+     * Saves the current map to the TARDISARSMapData instance associated with the player using the GUI.
      *
      * @param uuid the UUID of the player using the GUI
      * @param slot the slot that was clicked
-     * @param id the type id of the block in the slot
+     * @param id   the type id of the block in the slot
      */
     public void updateGrid(UUID uuid, int slot, int id) {
         TARDISARSMapData md = map_data.get(uuid);
@@ -265,9 +248,9 @@ public class TARDISARSMethods {
     /**
      * Sets the lore of the ItemStack in the specified slot.
      *
-     * @param inv the inventory to update
+     * @param inv  the inventory to update
      * @param slot the slot to update
-     * @param str the lore to set
+     * @param str  the lore to set
      */
     public void setLore(Inventory inv, int slot, String str) {
         List<String> lore = (str != null) ? Arrays.asList(str) : null;
@@ -280,7 +263,7 @@ public class TARDISARSMethods {
     /**
      * Switches the indicator block for the map level.
      *
-     * @param inv the inventory to update
+     * @param inv  the inventory to update
      * @param slot the slot to update
      * @param uuid the UUID of the player using the GUI
      */
@@ -306,18 +289,12 @@ public class TARDISARSMethods {
      *
      * @param p the player using the GUI
      */
-    public void close(final Player p) {
-        final UUID uuid = p.getUniqueId();
+    public void close(Player p) {
+        UUID uuid = p.getUniqueId();
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-            if (scroll_start.containsKey(uuid)) {
-                scroll_start.remove(uuid);
-            }
-            if (selected_slot.containsKey(uuid)) {
-                selected_slot.remove(uuid);
-            }
-            if (hasLoadedMap.contains(uuid)) {
-                hasLoadedMap.remove(uuid);
-            }
+            scroll_start.remove(uuid);
+            selected_slot.remove(uuid);
+            hasLoadedMap.remove(uuid);
             if (map_data.containsKey(uuid)) {
                 if (playerIsOwner(p.getUniqueId().toString(), ids.get(uuid))) {
                     saveAll(uuid);
@@ -386,7 +363,7 @@ public class TARDISARSMethods {
     /**
      * Loads the map from the database ready for use in the GUI.
      *
-     * @param inv the inventory to load the map into
+     * @param inv  the inventory to load the map into
      * @param uuid the UUID of the player using the GUI
      */
     public void loadMap(Inventory inv, UUID uuid) {
@@ -443,7 +420,7 @@ public class TARDISARSMethods {
      * Move the map to a new position.
      *
      * @param uuid the UUID of the player using the GUI
-     * @param inv the inventory to update
+     * @param inv  the inventory to update
      * @param slot the slot number to update
      */
     public void moveMap(UUID uuid, Inventory inv, int slot) {
@@ -479,13 +456,11 @@ public class TARDISARSMethods {
     }
 
     /**
-     * Checks whether a player has condensed the required blocks to grow the
-     * room (s).
+     * Checks whether a player has condensed the required blocks to grow the room (s).
      *
      * @param uuid the UUID of the player to check for
-     * @param map a HashMap where the key is the changed room slot and the value
-     * is the ARS room type
-     * @param id the TARDIS id
+     * @param map  a HashMap where the key is the changed room slot and the value is the ARS room type
+     * @param id   the TARDIS id
      * @return true or false
      */
     public boolean hasCondensables(String uuid, HashMap<TARDISARSSlot, ARS> map, int id) {

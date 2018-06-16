@@ -16,10 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.move;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
 import me.eccentric_nz.TARDIS.database.ResultSetDoorBlocks;
@@ -29,8 +25,12 @@ import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISDoorCloser {
@@ -47,7 +47,7 @@ public class TARDISDoorCloser {
 
     public void closeDoors() {
         // get door locations
-        final ResultSetDoorBlocks rs = new ResultSetDoorBlocks(plugin, id);
+        ResultSetDoorBlocks rs = new ResultSetDoorBlocks(plugin, id);
         if (rs.resultSet()) {
             close(rs.getOuterBlock(), rs.getInnerBlock().getLocation(), rs.getOuterDirection());
             // inner
@@ -63,11 +63,10 @@ public class TARDISDoorCloser {
     /**
      * Close the door.
      *
-     * @param block the bottom door block
+     * @param block  the bottom door block
      * @param remove whether to clear the
-     * @param dd the door direction
+     * @param dd     the door direction
      */
-    @SuppressWarnings("deprecation")
     private void close(Block block, Location inportal, COMPASS dd) {
         if (block != null && plugin.getGeneralKeeper().getDoors().contains(block.getType())) {
             byte door_data = block.getData();
@@ -125,9 +124,7 @@ public class TARDISDoorCloser {
             if (!plugin.getConfig().getBoolean("preferences.open_door_policy")) {
                 // players
                 uuids.forEach((u) -> {
-                    if (plugin.getTrackerKeeper().getMover().contains(u)) {
-                        plugin.getTrackerKeeper().getMover().remove(u);
-                    }
+                    plugin.getTrackerKeeper().getMover().remove(u);
                 });
             }
             // locations
