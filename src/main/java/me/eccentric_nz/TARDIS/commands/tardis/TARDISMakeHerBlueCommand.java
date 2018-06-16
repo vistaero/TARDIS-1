@@ -16,8 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.commands.tardis;
 
-import java.util.HashMap;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.builders.BuildData;
@@ -31,8 +29,10 @@ import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISMakeHerBlueCommand {
@@ -59,7 +59,6 @@ public class TARDISMakeHerBlueCommand {
                 return true;
             }
         }
-        plugin.getTrackerKeeper().getRebuildCooldown().put(uuid, System.currentTimeMillis());
         HashMap<String, Object> where = new HashMap<>();
         where.put("uuid", uuid.toString());
         ResultSetTardis rs = new ResultSetTardis(plugin, where, "", false, 0);
@@ -116,13 +115,14 @@ public class TARDISMakeHerBlueCommand {
             TARDISMessage.send(player.getPlayer(), "ENERGY_NO_REBUILD");
             return false;
         }
+        plugin.getTrackerKeeper().getRebuildCooldown().put(uuid, System.currentTimeMillis());
         // set the preset to NEW
         HashMap<String, Object> wherep = new HashMap<>();
         wherep.put("tardis_id", id);
         HashMap<String, Object> set = new HashMap<>();
         set.put("chameleon_preset", "NEW");
         qf.doUpdate("tardis", set, wherep);
-        final BuildData bd = new BuildData(plugin, uuid.toString());
+        BuildData bd = new BuildData(plugin, uuid.toString());
         bd.setDirection(rsc.getDirection());
         bd.setLocation(l);
         bd.setMalfunction(false);

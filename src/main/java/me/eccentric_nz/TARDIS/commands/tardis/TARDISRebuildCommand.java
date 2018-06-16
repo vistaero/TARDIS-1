@@ -16,8 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.commands.tardis;
 
-import java.util.HashMap;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.builders.BuildData;
@@ -32,8 +30,10 @@ import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISRebuildCommand {
@@ -44,7 +44,7 @@ public class TARDISRebuildCommand {
         this.plugin = plugin;
     }
 
-    public boolean rebuildPreset(final OfflinePlayer player) {
+    public boolean rebuildPreset(OfflinePlayer player) {
         if (player.getPlayer().hasPermission("tardis.rebuild")) {
             UUID uuid = player.getUniqueId();
             if (plugin.getTrackerKeeper().getRebuildCooldown().containsKey(uuid)) {
@@ -56,7 +56,6 @@ public class TARDISRebuildCommand {
                     return true;
                 }
             }
-            plugin.getTrackerKeeper().getRebuildCooldown().put(uuid, System.currentTimeMillis());
             HashMap<String, Object> where = new HashMap<>();
             where.put("uuid", uuid.toString());
             ResultSetTardis rs = new ResultSetTardis(plugin, where, "", false, 0);
@@ -73,7 +72,7 @@ public class TARDISRebuildCommand {
                 TARDISMessage.send(player.getPlayer(), "INVISIBILITY_ENGAGED");
                 return true;
             }
-            final int id = tardis.getTardis_id();
+            int id = tardis.getTardis_id();
             TARDISCircuitChecker tcc = null;
             if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(player.getPlayer(), true)) {
                 tcc = new TARDISCircuitChecker(plugin, id);
@@ -117,7 +116,8 @@ public class TARDISRebuildCommand {
                 TARDISMessage.send(player.getPlayer(), "ENERGY_NO_REBUILD");
                 return false;
             }
-            final BuildData bd = new BuildData(plugin, uuid.toString());
+            plugin.getTrackerKeeper().getRebuildCooldown().put(uuid, System.currentTimeMillis());
+            BuildData bd = new BuildData(plugin, uuid.toString());
             bd.setDirection(rsc.getDirection());
             bd.setLocation(l);
             bd.setMalfunction(false);
