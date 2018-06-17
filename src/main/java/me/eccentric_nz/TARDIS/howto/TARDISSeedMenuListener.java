@@ -27,9 +27,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * A control room's look could be changed over time. The process by which an
- * operator could transform a control room was fairly simple, once compared by
- * the Fifth Doctor to changing a "desktop theme".
+ * A control room's look could be changed over time. The process by which an operator could transform a control room was
+ * fairly simple, once compared by the Fifth Doctor to changing a "desktop theme".
  *
  * @author eccentric_nz
  */
@@ -47,15 +46,15 @@ public class TARDISSeedMenuListener extends TARDISMenuListener implements Listen
         Inventory inv = event.getInventory();
         String name = inv.getTitle();
         if (name.equals("§4TARDIS Seeds Menu")) {
-            final Player p = (Player) event.getWhoClicked();
+            Player p = (Player) event.getWhoClicked();
             int slot = event.getRawSlot();
-            if (slot >= 0 && slot < 18) {
-                final ItemStack is = inv.getItem(slot);
+            if (slot >= 0 && slot < 27) {
+                ItemStack is = inv.getItem(slot);
                 if (is != null) {
                     // close
                     event.setCancelled(true);
                     close(p);
-                    if (slot != 17) {
+                    if (slot != 26) {
                         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                             ItemStack[] recipe = new TARDISSeedRecipeInventory(is.getType()).getMenu();
                             Inventory gui = plugin.getServer().createInventory(p, 27, "§4TARDIS Seed Recipe");
@@ -79,7 +78,7 @@ public class TARDISSeedMenuListener extends TARDISMenuListener implements Listen
      * @param p the player using the GUI
      */
     @Override
-    public void close(final Player p) {
+    public void close(Player p) {
         plugin.getTrackerKeeper().getHowTo().remove(p.getUniqueId());
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             p.closeInventory();

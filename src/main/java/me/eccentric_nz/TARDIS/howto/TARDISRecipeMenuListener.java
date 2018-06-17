@@ -27,9 +27,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * A control room's look could be changed over time. The process by which an
- * operator could transform a control room was fairly simple, once compared by
- * the Fifth Doctor to changing a "desktop theme".
+ * A control room's look could be changed over time. The process by which an operator could transform a control room was
+ * fairly simple, once compared by the Fifth Doctor to changing a "desktop theme".
  *
  * @author eccentric_nz
  */
@@ -47,10 +46,10 @@ public class TARDISRecipeMenuListener extends TARDISMenuListener implements List
         Inventory inv = event.getInventory();
         String name = inv.getTitle();
         if (name.equals("§4TARDIS Seed Recipe")) {
-            final Player p = (Player) event.getWhoClicked();
+            Player p = (Player) event.getWhoClicked();
             int slot = event.getRawSlot();
             if (slot >= 0 && slot < 27) {
-                final ItemStack is = inv.getItem(slot);
+                ItemStack is = inv.getItem(slot);
                 if (is != null) {
                     event.setCancelled(true);
                     switch (slot) {
@@ -59,7 +58,7 @@ public class TARDISRecipeMenuListener extends TARDISMenuListener implements List
                             close(p);
                             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                                 ItemStack[] seeds = new TARDISSeedsInventory(p).getMenu();
-                                Inventory gui = plugin.getServer().createInventory(p, 18, "§4TARDIS Seeds Menu");
+                                Inventory gui = plugin.getServer().createInventory(p, 27, "§4TARDIS Seeds Menu");
                                 gui.setContents(seeds);
                                 p.openInventory(gui);
                             }, 2L);
@@ -98,7 +97,7 @@ public class TARDISRecipeMenuListener extends TARDISMenuListener implements List
      * @param p the player using the GUI
      */
     @Override
-    public void close(final Player p) {
+    public void close(Player p) {
         plugin.getTrackerKeeper().getHowTo().remove(p.getUniqueId());
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             p.closeInventory();

@@ -16,8 +16,6 @@
  */
 package me.eccentric_nz.TARDIS.howto;
 
-import java.util.ArrayList;
-import java.util.List;
 import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
 import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
 import org.bukkit.Material;
@@ -25,12 +23,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * By the time of his eleventh incarnation, the Doctor's console room had gone
- * through at least twelve redesigns, though the TARDIS revealed that she had
- * archived 30 versions. Once a control room was reconfigured, the TARDIS
- * archived the old design "for neatness". The TARDIS effectively "curated" a
- * museum of control rooms — both those in the Doctor's personal past and future
+ * By the time of his eleventh incarnation, the Doctor's console room had gone through at least twelve redesigns, though
+ * the TARDIS revealed that she had archived 30 versions. Once a control room was reconfigured, the TARDIS archived the
+ * old design "for neatness". The TARDIS effectively "curated" a museum of control rooms — both those in the Doctor's
+ * personal past and future
  *
  * @author eccentric_nz
  */
@@ -41,7 +41,7 @@ public class TARDISSeedsInventory {
 
     public TARDISSeedsInventory(Player player) {
         this.player = player;
-        this.menu = getItemStack();
+        menu = getItemStack();
     }
 
     /**
@@ -50,11 +50,11 @@ public class TARDISSeedsInventory {
      * @return an Array of itemStacks (an inventory)
      */
     private ItemStack[] getItemStack() {
-        ItemStack[] stack = new ItemStack[18];
+        ItemStack[] stack = new ItemStack[27];
         int i = 0;
         // get consoles
         for (SCHEMATIC a : CONSOLES.getBY_NAMES().values()) {
-            if (player.hasPermission("tardis." + a.getPermission())) {
+            if (player.hasPermission("tardis." + a.getPermission()) && !a.getSeedMaterial().equals(Material.COBBLESTONE)) {
                 Material m = Material.getMaterial(a.getSeed());
                 ItemStack is = new ItemStack(m, 1);
                 ItemMeta im = is.getItemMeta();
@@ -72,8 +72,7 @@ public class TARDISSeedsInventory {
         ItemMeta close_im = close.getItemMeta();
         close_im.setDisplayName("Close");
         close.setItemMeta(close_im);
-        stack[17] = close;
-
+        stack[26] = close;
         return stack;
     }
 
