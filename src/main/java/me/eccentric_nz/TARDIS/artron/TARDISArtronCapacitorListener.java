@@ -16,18 +16,10 @@
  */
 package me.eccentric_nz.TARDIS.artron;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.event.TARDISClaimEvent;
-import static me.eccentric_nz.TARDIS.commands.tardis.TARDISAbandonCommand.getSign;
 import me.eccentric_nz.TARDIS.control.TARDISPowerButton;
-import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.ResultSetControls;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.move.TARDISDoorCloser;
@@ -54,9 +46,14 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static me.eccentric_nz.TARDIS.commands.tardis.TARDISAbandonCommand.getSign;
+
 /**
- * The Ninth Doctor used the Cardiff rift to "re-charge" his TARDIS. The process
- * took 2 days.
+ * The Ninth Doctor used the Cardiff rift to "re-charge" his TARDIS. The process took 2 days.
  *
  * @author eccentric_nz
  */
@@ -75,15 +72,12 @@ public class TARDISArtronCapacitorListener implements Listener {
     }
 
     /**
-     * Listens for player interaction with the button on the Artron Energy
-     * Capacitor. If the button is right-clicked, then the Artron levels are
-     * updated. Clicking with a Nether Star puts the capacitor to maximum,
-     * clicking with the TARDIS key initialises the capacitor by spawning a
-     * charged creeper inside it and sets the level to 50%. Clicking while
-     * sneaking transfers player Artron Energy into the capacitor.
-     *
-     * If the button is just right-clicked, it displays the current capacitor
-     * level as percentage of full.
+     * Listens for player interaction with the button on the Artron Energy Capacitor. If the button is right-clicked,
+     * then the Artron levels are updated. Clicking with a Nether Star puts the capacitor to maximum, clicking with the
+     * TARDIS key initialises the capacitor by spawning a charged creeper inside it and sets the level to 50%. Clicking
+     * while sneaking transfers player Artron Energy into the capacitor.
+     * <p>
+     * If the button is just right-clicked, it displays the current capacitor level as percentage of full.
      *
      * @param event the player clicking a block
      */
@@ -92,7 +86,7 @@ public class TARDISArtronCapacitorListener implements Listener {
         if (event.getHand() == null || event.getHand().equals(EquipmentSlot.OFF_HAND)) {
             return;
         }
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         Block block = event.getClickedBlock();
         if (block != null) {
             Material blockType = block.getType();
@@ -108,7 +102,7 @@ public class TARDISArtronCapacitorListener implements Listener {
                     ResultSetControls rsc = new ResultSetControls(plugin, where, false);
                     if (rsc.resultSet()) {
                         // get tardis data
-                        final int id = rsc.getTardis_id();
+                        int id = rsc.getTardis_id();
                         HashMap<String, Object> wheret = new HashMap<>();
                         wheret.put("tardis_id", id);
                         ResultSetTardis rs = new ResultSetTardis(plugin, wheret, "", false, 2);
@@ -117,7 +111,7 @@ public class TARDISArtronCapacitorListener implements Listener {
                             if (tardis.getPreset().equals(PRESET.JUNK)) {
                                 return;
                             }
-                            final boolean abandoned = tardis.isAbandoned();
+                            boolean abandoned = tardis.isAbandoned();
                             HashMap<String, Object> whereid = new HashMap<>();
                             whereid.put("tardis_id", id);
                             int current_level = tardis.getArtron_level();
@@ -245,8 +239,7 @@ public class TARDISArtronCapacitorListener implements Listener {
                                     set.put("powered_on", 1);
                                     qf.doUpdate("tardis", set, whereid);
                                     TARDISMessage.send(player, "ENERGY_INIT");
-                                } else // toggle power
-                                {
+                                } else { // toggle power
                                     if (plugin.getConfig().getBoolean("allow.power_down")) {
                                         boolean pu = true;
                                         if (abandoned) {
