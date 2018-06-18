@@ -16,20 +16,10 @@
  */
 package me.eccentric_nz.TARDIS.move;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.builders.TARDISEmergencyRelocation;
 import me.eccentric_nz.TARDIS.control.TARDISPowerButton;
-import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.ResultSetCompanions;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetDoors;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
@@ -57,11 +47,15 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Door;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
 /**
- * During TARDIS operation, a distinctive grinding and whirring sound is usually
- * heard. River Song once demonstrated a TARDIS was capable of materialising
- * silently, teasing the Doctor that the noise was actually caused by him
- * leaving the brakes on.
+ * During TARDIS operation, a distinctive grinding and whirring sound is usually heard. River Song once demonstrated a
+ * TARDIS was capable of materialising silently, teasing the Doctor that the noise was actually caused by him leaving
+ * the brakes on.
  *
  * @author eccentric_nz
  */
@@ -72,13 +66,11 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
     }
 
     /**
-     * Listens for player interaction with TARDIS doors. If the door is
-     * right-clicked with the TARDIS key (configurable) it will teleport the
-     * player either into or out of the TARDIS.
+     * Listens for player interaction with TARDIS doors. If the door is right-clicked with the TARDIS key (configurable)
+     * it will teleport the player either into or out of the TARDIS.
      *
      * @param event a player clicking a block
      */
-    @SuppressWarnings("deprecation")
     @EventHandler(ignoreCancelled = true)
     public void onDoorInteract(PlayerInteractEvent event) {
         if (event.getHand() == null || event.getHand().equals(EquipmentSlot.OFF_HAND)) {
@@ -89,10 +81,10 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
             Material blockType = block.getType();
             // only proceed if they are clicking a door!
             if (plugin.getGeneralKeeper().getDoors().contains(blockType) || blockType.equals(Material.TRAP_DOOR)) {
-                final Player player = event.getPlayer();
+                Player player = event.getPlayer();
                 if (player.hasPermission("tardis.enter")) {
                     Action action = event.getAction();
-                    final UUID playerUUID = player.getUniqueId();
+                    UUID playerUUID = player.getUniqueId();
                     World playerWorld = player.getLocation().getWorld();
                     Location block_loc = block.getLocation();
                     byte doorData = block.getData();
@@ -112,7 +104,7 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                         event.setUseInteractedBlock(Event.Result.DENY);
                         event.setUseItemInHand(Event.Result.DENY);
                         event.setCancelled(true);
-                        final int id = rsd.getTardis_id();
+                        int id = rsd.getTardis_id();
                         if (plugin.getTrackerKeeper().getMaterialising().contains(id) || plugin.getTrackerKeeper().getDematerialising().contains(id)) {
                             TARDISMessage.send(player, "NOT_WHILE_MAT");
                             return;
@@ -165,7 +157,7 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                         } else {
                             key = plugin.getConfig().getString("preferences.key");
                         }
-                        final boolean minecart = rsp.isMinecartOn();
+                        boolean minecart = rsp.isMinecartOn();
                         Material m = Material.getMaterial(key);
                         if (action == Action.LEFT_CLICK_BLOCK) {
                             // must be the owner
@@ -311,8 +303,8 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                             tid.put("tardis_id", id);
                             ResultSetTardis rs = new ResultSetTardis(plugin, tid, "", false, 2);
                             if (rs.resultSet()) {
-                                final Tardis tardis = rs.getTardis();
-                                final int artron = tardis.getArtron_level();
+                                Tardis tardis = rs.getTardis();
+                                int artron = tardis.getArtron_level();
                                 int required = plugin.getArtronConfig().getInt("backdoor");
                                 UUID tlUUID = tardis.getUuid();
                                 PRESET preset = tardis.getPreset();
@@ -340,7 +332,7 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                 // get players direction
                                 COMPASS pd = COMPASS.valueOf(TARDISStaticUtils.getPlayersDirection(player, false));
                                 // get the other door direction
-                                final COMPASS d;
+                                COMPASS d;
                                 HashMap<String, Object> other = new HashMap<>();
                                 other.put("tardis_id", id);
                                 other.put("door_type", end_doortype);
@@ -356,6 +348,11 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                         // is the TARDIS materialising?
                                         if (plugin.getTrackerKeeper().getInVortex().contains(id) || plugin.getTrackerKeeper().getMaterialising().contains(id) || plugin.getTrackerKeeper().getDematerialising().contains(id)) {
                                             TARDISMessage.send(player, "LOST_IN_VORTEX");
+                                            return;
+                                        }
+                                        // Can't SHIFT-click if INVISIBLE preset
+                                        if (preset.equals(PRESET.INVISIBLE)) {
+                                            TARDISMessage.send(player, "INVISIBILITY_SNEAK");
                                             return;
                                         }
                                         Location exitLoc;
@@ -376,7 +373,7 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                             }
                                             exitLoc.setYaw(yaw);
                                             // get location from database
-                                            final Location exitTardis = exitLoc;
+                                            Location exitTardis = exitLoc;
                                             // make location safe ie. outside of the bluebox
                                             double ex = exitTardis.getX();
                                             double ez = exitTardis.getZ();
@@ -407,7 +404,7 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                             movePlayer(player, exitTardis, true, playerWorld, userQuotes, 2, minecart);
                                             if (plugin.getConfig().getBoolean("allow.mob_farming") && player.hasPermission("tardis.farm")) {
                                                 TARDISFarmer tf = new TARDISFarmer(plugin);
-                                                final List<TARDISParrot> pets = tf.exitPets(player);
+                                                List<TARDISParrot> pets = tf.exitPets(player);
                                                 if (pets != null && pets.size() > 0) {
                                                     plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                                                         movePets(pets, exitTardis, player, d, false);
@@ -467,7 +464,7 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                                 yaw += adjustYaw(pd, innerD);
                                             }
                                             tmp_loc.setYaw(yaw);
-                                            final Location tardis_loc = tmp_loc;
+                                            Location tardis_loc = tmp_loc;
                                             movePlayer(player, tardis_loc, false, playerWorld, userQuotes, 1, minecart);
                                             if (pets != null && pets.size() > 0) {
                                                 movePets(pets, tardis_loc, player, d, true);
@@ -519,7 +516,7 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                         }
                                         ibd_loc.setYaw(yaw);
                                         ibd_loc.setPitch(pitch);
-                                        final Location inner_loc = ibd_loc;
+                                        Location inner_loc = ibd_loc;
                                         movePlayer(player, inner_loc, false, playerWorld, userQuotes, 1, minecart);
                                         if (plugin.getConfig().getBoolean("allow.tp_switch") && userTP) {
                                             if (!rsp.getTextureIn().isEmpty()) {
@@ -568,7 +565,7 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                         }
                                         obd_loc.setYaw(yaw);
                                         obd_loc.setPitch(pitch);
-                                        final Location outer_loc = obd_loc;
+                                        Location outer_loc = obd_loc;
                                         movePlayer(player, outer_loc, true, playerWorld, userQuotes, 2, minecart);
                                         if (plugin.getConfig().getBoolean("allow.tp_switch") && userTP) {
                                             new TARDISResourcePackChanger(plugin).changeRP(player, rsp.getTextureOut());
