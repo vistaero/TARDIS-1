@@ -16,17 +16,9 @@
  */
 package me.eccentric_nz.TARDIS.listeners;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
-import me.eccentric_nz.TARDIS.database.ResultSetAreas;
-import me.eccentric_nz.TARDIS.database.ResultSetControls;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetDestinations;
-import me.eccentric_nz.TARDIS.database.ResultSetHomeLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import org.bukkit.GameMode;
@@ -36,16 +28,19 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+
 /**
- * Now, if the trachoid crystal contrafibulations are in synchronic resonance
- * with the referential difference index, then this should take us right to the
- * heart of the trouble. And they don't make sentences like that anymore.
+ * Now, if the trachoid crystal contrafibulations are in synchronic resonance with the referential difference index,
+ * then this should take us right to the heart of the trouble. And they don't make sentences like that anymore.
  *
  * @author eccentric_nz
  */
@@ -57,35 +52,33 @@ public class TARDISKeyboardListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBlockPlace(BlockPlaceEvent event) {
-        Block block = event.getBlockPlaced();
-        if (block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
+    @EventHandler(ignoreCancelled = true)
+    public void onKeyboardInteract(PlayerInteractEvent event) {
+        if (event.getHand() == null || event.getHand().equals(EquipmentSlot.OFF_HAND)) {
             return;
         }
-        Block against = event.getBlockAgainst();
-        // is it a TARDIS keyboard sign
-        String loc_str = against.getLocation().toString();
-        HashMap<String, Object> where = new HashMap<>();
-        where.put("type", 7);
-        where.put("location", loc_str);
-        ResultSetControls rsc = new ResultSetControls(plugin, where, false);
-        if (rsc.resultSet()) {
-            if (plugin.getPM().isPluginEnabled("ProtocolLib")) {
-                event.setCancelled(true);
+        Block b = event.getClickedBlock();
+        if (b != null && (b.getType().equals(Material.SIGN_POST) || b.getType().equals(Material.WALL_SIGN))) {
+            Player player = event.getPlayer();
+            String loc = event.getClickedBlock().getLocation().toString();
+            HashMap<String, Object> where = new HashMap<>();
+            where.put("type", 7);
+            where.put("location", loc);
+            ResultSetControls rs = new ResultSetControls(plugin, where, false);
+            if (rs.resultSet()) {
+                TARDISCircuitChecker tcc = null;
+                if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(player, false)) {
+                    tcc = new TARDISCircuitChecker(plugin, rs.getTardis_id());
+                    tcc.getCircuits();
+                }
+                if (tcc != null && !tcc.hasInput()) {
+                    TARDISMessage.send(player, "INPUT_MISSING");
+                    return;
+                }
+                Sign sign = (Sign) b.getState();
+                plugin.getTrackerKeeper().getSign().put(loc, sign);
+                plugin.getTardisHelper().openSignGUI(player, b);
             }
-            TARDISCircuitChecker tcc = null;
-            if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(event.getPlayer(), false)) {
-                tcc = new TARDISCircuitChecker(plugin, rsc.getTardis_id());
-                tcc.getCircuits();
-            }
-            if (tcc != null && !tcc.hasInput()) {
-                TARDISMessage.send(event.getPlayer(), "INPUT_MISSING");
-                return;
-            }
-            Sign keyboard = (Sign) against.getState();
-            // track this sign
-            plugin.getTrackerKeeper().getSign().put(block.getLocation().toString(), keyboard);
         }
     }
 

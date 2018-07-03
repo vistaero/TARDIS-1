@@ -165,7 +165,7 @@ public class TARDIS extends JavaPlugin {
         versions.put("My Worlds", "1.67");
         versions.put("PerWorldInventory", "2.0.0");
         versions.put("ProtocolLib", "4.3.0");
-        versions.put("TARDISChunkGenerator", "2.5.5");
+        versions.put("TARDISChunkGenerator", "2.5.6");
         versions.put("TerrainControl", "2.9.0");
         versions.put("Towny", "0.91");
         versions.put("WorldBorder", "1.8.1");
@@ -184,8 +184,13 @@ public class TARDIS extends JavaPlugin {
         Version minversion = new Version("1.12.2");
         // check CraftBukkit version
         if (bukkitversion.compareTo(minversion) >= 0) {
-            // check for WorldBorder class
             hasVersion = true;
+            if (!loadHelper()) {
+                console.sendMessage(pluginName + ChatColor.RED + "This plugin requires TARDISChunkGenerator to function, disabling...");
+                hasVersion = false;
+                pm.disablePlugin(this);
+                return;
+            }
             for (Map.Entry<String, String> plg : versions.entrySet()) {
                 if (!checkPluginVersion(plg.getKey(), plg.getValue())) {
                     console.sendMessage(pluginName + ChatColor.RED + "This plugin requires " + plg.getKey() + " to be v" + plg.getValue() + " or higher, disabling...");
@@ -227,7 +232,6 @@ public class TARDIS extends JavaPlugin {
             disguisesOnServer = pm.isPluginEnabled("LibsDisguises");
             generalKeeper = new TARDISGeneralInstanceKeeper(this);
             generalKeeper.setQuotes(quotes());
-            loadHelper();
             try {
                 difficulty = DIFFICULTY.valueOf(getConfig().getString("preferences.difficulty").toUpperCase(Locale.ENGLISH));
             } catch (IllegalArgumentException e) {
@@ -239,7 +243,6 @@ public class TARDIS extends JavaPlugin {
             figura.addShapedRecipes();
             incomposita = new TARDISShapelessRecipe(this);
             incomposita.addShapelessRecipes();
-
             new TARDISListenerRegisterer(this).registerListeners();
             new TARDISCommandSetter(this).loadCommands();
             startSound();
@@ -697,12 +700,14 @@ public class TARDIS extends JavaPlugin {
     /**
      * Checks if the TARDISChunkGenerator plugin is available, and loads support if it is.
      */
-    private void loadHelper() {
+    private boolean loadHelper() {
         if (pm.getPlugin("TARDISChunkGenerator") != null) {
             debug("Hooking into TARDISChunkGenerator!");
             helperOnServer = true;
             tardisHelper = (TARDISHelper) plugin.getPM().getPlugin("TARDISChunkGenerator");
+            return true;
         }
+        return false;
     }
 
     public TARDISHelper getTardisHelper() {
