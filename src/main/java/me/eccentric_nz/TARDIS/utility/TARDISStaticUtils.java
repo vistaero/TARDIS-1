@@ -26,7 +26,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISStaticUtils {
@@ -34,7 +33,7 @@ public class TARDISStaticUtils {
     /**
      * Get the direction a player is facing.
      *
-     * @param p the player
+     * @param p    the player
      * @param swap whether to swap the direction E &lt;-&gt; W, S &lt;-&gt; N
      * @return the direction the player is facing
      */
@@ -61,102 +60,6 @@ public class TARDISStaticUtils {
             d = (swap) ? "EAST" : "WEST";
         }
         return d;
-    }
-
-    /**
-     * Get the stone type from the data value.
-     *
-     * @param d the block's data value
-     * @return the block type
-     */
-    public static String getStoneType(byte d) {
-        String type;
-        switch (d) {
-            case 1:
-                type = "GRANITE";
-                break;
-            case 2:
-                type = "POLISHED GRANITE";
-                break;
-            case 3:
-                type = "DIORITE";
-                break;
-            case 4:
-                type = "POLISHED DIORITE";
-                break;
-            case 5:
-                type = "ANDESITE";
-                break;
-            case 6:
-                type = "POLISHED ANDESITE";
-                break;
-            default:
-                type = "STONE";
-                break;
-        }
-        return type;
-    }
-
-    /**
-     * Get the wood type from the material and data type.
-     *
-     * @param m the block's material
-     * @param d the block's data value
-     * @return the wood type
-     */
-    public static String getWoodType(Material m, byte d) {
-        String type;
-        switch (m) {
-            case WOOD:
-                switch (d) {
-                    case 0:
-                        type = "OAK";
-                        break;
-                    case 1:
-                        type = "SPRUCE";
-                        break;
-                    case 2:
-                        type = "BIRCH";
-                        break;
-                    case 3:
-                        type = "JUNGLE";
-                        break;
-                    case 4:
-                        type = "ACACIA";
-                        break;
-                    default:
-                        type = "DARK_OAK";
-                        break;
-                }
-                break;
-            case LOG:
-                switch (d) {
-                    case 0:
-                        type = "OAK";
-                        break;
-                    case 1:
-                        type = "SPRUCE";
-                        break;
-                    case 2:
-                        type = "BIRCH";
-                        break;
-                    default:
-                        type = "JUNGLE";
-                        break;
-                }
-                break;
-            default: // LOG_2
-                switch (d) {
-                    case 0:
-                        type = "ACACIA";
-                        break;
-                    default:
-                        type = "DARK_OAK";
-                        break;
-                }
-                break;
-        }
-        return type;
     }
 
     /**
@@ -223,10 +126,9 @@ public class TARDISStaticUtils {
      * Checks whether a door is open.
      *
      * @param door_bottom the bottom door block
-     * @param dd the direction the door is facing
+     * @param dd          the direction the door is facing
      * @return true or false
      */
-    @SuppressWarnings("deprecation")
     public static boolean isOpen(Block door_bottom, COMPASS dd) {
         byte door_data = door_bottom.getData();
         switch (dd) {
@@ -255,8 +157,7 @@ public class TARDISStaticUtils {
     }
 
     /**
-     * Gets the column to set the Police box sign in if CTM is on in the
-     * player's preferences.
+     * Gets the column to set the Police box sign in if CTM is on in the player's preferences.
      *
      * @param d the direction of the Police Box
      * @return the column
@@ -275,26 +176,12 @@ public class TARDISStaticUtils {
     }
 
     /**
-     * Get a shortened name for a sign.
-     *
-     * @param name the name to shorten
-     * @param useDots whether to add dots after the shortened name
-     * @return the shortened name
-     */
-    public static String getShortenedName(String name, boolean useDots) {
-        if (name.length() > 16) {
-            name = useDots ? name.substring(0, 14) + ".." : name.substring(0, 16);
-        }
-        return name;
-    }
-
-    /**
      * Sets the Chameleon Sign text or messages the player.
      *
-     * @param loc the location string retrieved from the database
+     * @param loc  the location string retrieved from the database
      * @param line the line number to set
      * @param text the text to write
-     * @param p the player to message (if the Chameleon control is not a sign)
+     * @param p    the player to message (if the Chameleon control is not a sign)
      */
     public static void setSign(String loc, int line, String text, Player p) {
         // get sign block so we can update it

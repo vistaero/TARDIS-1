@@ -16,22 +16,11 @@
  */
 package me.eccentric_nz.TARDIS.destroyers;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.event.TARDISDestructionEvent;
 import me.eccentric_nz.TARDIS.builders.TARDISInteriorPostioning;
 import me.eccentric_nz.TARDIS.builders.TARDISTIPSData;
-import me.eccentric_nz.TARDIS.database.QueryFactory;
-import me.eccentric_nz.TARDIS.database.ResultSetBlocks;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetGravity;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
@@ -45,10 +34,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.util.*;
+
 /**
- * The Daleks were a warlike race who waged war across whole civilisations and
- * races all over the universe. Advance and Attack! Attack and Destroy! Destroy
- * and Rejoice!
+ * The Daleks were a warlike race who waged war across whole civilisations and races all over the universe. Advance and
+ * Attack! Attack and Destroy! Destroy and Rejoice!
  *
  * @author eccentric_nz
  */
@@ -81,7 +72,7 @@ public class TARDISExterminator {
                     return false;
                 }
                 Location bb_loc = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
-                final DestroyData dd = new DestroyData(plugin, uuid.toString());
+                DestroyData dd = new DestroyData(plugin, uuid.toString());
                 dd.setDirection(rsc.getDirection());
                 dd.setLocation(bb_loc);
                 dd.setPlayer(plugin.getServer().getOfflinePlayer(uuid));
@@ -120,11 +111,10 @@ public class TARDISExterminator {
      * Deletes a TARDIS.
      *
      * @param player running the command.
-     * @param block the block that represents the Police Box sign
+     * @param block  the block that represents the Police Box sign
      * @return true or false depending on whether the TARIS could be deleted
      */
-    @SuppressWarnings("deprecation")
-    public boolean exterminate(final Player player, Block block) {
+    public boolean exterminate(Player player, Block block) {
         int signx = 0, signz = 0;
         Location sign_loc = block.getLocation();
         HashMap<String, Object> where = new HashMap<>();
@@ -169,7 +159,7 @@ public class TARDISExterminator {
         }
         if (rs.resultSet()) {
             Tardis tardis = rs.getTardis();
-            final int id = tardis.getTardis_id();
+            int id = tardis.getTardis_id();
             String owner = tardis.getOwner();
             String chunkLoc = tardis.getChunk();
             int tips = tardis.getTIPS();
@@ -215,18 +205,18 @@ public class TARDISExterminator {
                     break;
             }
             int signy = -2;
-            // if the sign was on the TARDIS destroy the TARDIS!
-            final DestroyData dd = new DestroyData(plugin, player.getUniqueId().toString());
-            dd.setDirection(d);
-            dd.setLocation(bb_loc);
-            dd.setPlayer(player);
-            dd.setHide(true);
-            dd.setOutside(false);
-            dd.setSubmarine(rsc.isSubmarine());
-            dd.setTardisID(id);
-            dd.setBiome(rsc.getBiome());
-            plugin.getPM().callEvent(new TARDISDestructionEvent(player, bb_loc, owner));
             if (sign_loc.getBlockX() == bb_loc.getBlockX() + signx && sign_loc.getBlockY() + signy == bb_loc.getBlockY() && sign_loc.getBlockZ() == bb_loc.getBlockZ() + signz) {
+                // if the sign was on the TARDIS destroy the TARDIS!
+                DestroyData dd = new DestroyData(plugin, player.getUniqueId().toString());
+                dd.setDirection(d);
+                dd.setLocation(bb_loc);
+                dd.setPlayer(player);
+                dd.setHide(true);
+                dd.setOutside(false);
+                dd.setSubmarine(rsc.isSubmarine());
+                dd.setTardisID(id);
+                dd.setBiome(rsc.getBiome());
+                plugin.getPM().callEvent(new TARDISDestructionEvent(player, bb_loc, owner));
                 if (!tardis.isHidden()) {
                     // remove Police Box
                     plugin.getPresetDestroyer().destroyPreset(dd);
