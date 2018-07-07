@@ -507,7 +507,6 @@ public class TARDISNbtFactory {
     /**
      * Convert wrapped List and Map objects into their respective NBT counterparts.
      *
-     * @param name  - the name of the NBT element to create.
      * @param value - the value of the element to create. Can be a List or a Map.
      * @return The NBT element.
      */

@@ -266,7 +266,7 @@ public class TARDISArtronCapacitorListener implements Listener {
                                                     PRESET preset = rs.getTardis().getPreset();
                                                     Sign sign = getSign(current, rscl.getDirection(), preset);
                                                     if (sign != null) {
-                                                        String player_name = player.getName();
+                                                        String player_name = player.getDisplayName();
                                                         if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null) {
                                                             Essentials essentials = (Essentials) plugin.getServer().getPluginManager().getPlugin("Essentials");
                                                             User user = essentials.getUser(tardis.getUuid());

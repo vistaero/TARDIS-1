@@ -20,7 +20,6 @@ import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
 import org.bukkit.Material;
 
 /**
- *
  * @author eccentric_nz
  */
 public class TARDISBuildData {
@@ -30,8 +29,6 @@ public class TARDISBuildData {
     private byte wallData;
     private Material floorType;
     private byte floorData;
-    private int box_id;
-    private byte box_data;
     private int lamp;
 
     public TARDISBuildData() {
@@ -75,22 +72,6 @@ public class TARDISBuildData {
 
     public void setFloorData(byte floorData) {
         this.floorData = floorData;
-    }
-
-    public int getBox_id() {
-        return box_id;
-    }
-
-    public void setBox_id(int box_id) {
-        this.box_id = box_id;
-    }
-
-    public byte getBox_data() {
-        return box_data;
-    }
-
-    public void setBox_data(byte box_data) {
-        this.box_data = box_data;
     }
 
     public int getLamp() {
