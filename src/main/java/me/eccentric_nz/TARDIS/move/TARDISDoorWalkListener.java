@@ -233,7 +233,7 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                         if (Tag.DOORS.isTagged(blockType)) {
                                             if (doortype == 0 || doortype == 1) {
                                                 boolean open = TARDISStaticUtils.isDoorOpen(block);
-                                                if (!material.equals(m) && doortype == 0 && !open) {
+                                                /*if (!material.equals(m) && doortype == 0 && !open) {
                                                     // must use key to open the outer door
                                                     String[] split = plugin.getRecipesConfig().getString("shaped.Sonic Screwdriver.result").split(":");
                                                     Material sonic = Material.valueOf(split[0]);
@@ -241,7 +241,7 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                                         TARDISMessage.send(player, "NOT_KEY", key);
                                                     }
                                                     return;
-                                                }
+                                                }*/
                                                 if (open && rs.getTardis().isAbandoned()) {
                                                     TARDISMessage.send(player, "ABANDONED_DOOR");
                                                     return;
@@ -266,11 +266,11 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                 }
                             }
                         } else if (action == Action.RIGHT_CLICK_BLOCK && player.isSneaking()) {
-                            if (!material.equals(m) && doortype == 0) {
+                            /*if (!material.equals(m) && doortype == 0) {
                                 // must use key to open and close the outer door
                                 TARDISMessage.send(player, "NOT_KEY", key);
                                 return;
-                            }
+                            }*/
                             if (rsd.isLocked()) {
                                 TARDISMessage.send(player, "DOOR_DEADLOCKED");
                                 return;

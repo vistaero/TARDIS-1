@@ -232,10 +232,10 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                                                     Material sonic = Material.valueOf(split[0]);
                                                     if (material.equals(sonic) && player.hasPermission("tardis.sonic.admin")) {
                                                         toggle = true;
-                                                    } else {
+                                                    }/* else {
                                                         TARDISMessage.send(player, "NOT_KEY", key);
                                                         toggle = false;
-                                                    }
+                                                    }*/
                                                 }
                                             }
                                             if (open && rs.getTardis().isAbandoned()) {
@@ -263,11 +263,11 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                                 }
                             }
                         } else if (action == Action.RIGHT_CLICK_BLOCK && player.isSneaking()) {
-                            if (!material.equals(m) && doortype == 0) {
+                            /*if (!material.equals(m) && doortype == 0) {
                                 // must use key to open and close the outer door
                                 TARDISMessage.send(player, "NOT_KEY", key);
                                 return;
-                            }
+                            }*/
                             if (rsd.isLocked()) {
                                 TARDISMessage.send(player, "DOOR_DEADLOCKED");
                                 return;
