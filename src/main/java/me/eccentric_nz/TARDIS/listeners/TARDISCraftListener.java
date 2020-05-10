@@ -40,6 +40,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.*;
 import java.util.logging.Level;
+import org.bukkit.entity.HumanEntity;
 
 /**
  * @author eccentric_nz
@@ -159,6 +160,18 @@ public class TARDISCraftListener implements Listener {
                     lam.setColor(Color.WHITE);
                     is.setItemMeta(lam);
                     ci.setResult(is);
+                } else if (is.hasItemMeta() && is.getItemMeta().hasDisplayName() && is.getItemMeta().getDisplayName().contains("Key")) {
+                    HumanEntity human = event.getView().getPlayer();
+                    if (human instanceof Player) {
+                        Player player = (Player) human;
+                        ItemMeta meta = is.getItemMeta();
+                        List<String> loreList = meta.getLore();
+                        loreList.add(player.getUniqueId().toString());
+                        meta.setLore(loreList);
+                        is.setItemMeta(meta);
+                        ci.setResult(is);
+
+                    }
                 }
             }
         }

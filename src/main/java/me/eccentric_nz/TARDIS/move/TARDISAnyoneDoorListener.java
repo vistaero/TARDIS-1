@@ -149,47 +149,42 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                         boolean minecart = rsp.isMinecartOn();
                         Material m = Material.getMaterial(key);
                         if (action == Action.LEFT_CLICK_BLOCK) {
-                            // must be the owner
-                            ResultSetTardisID rs = new ResultSetTardisID(plugin);
-                            if (rs.fromUUID(player.getUniqueId().toString())) {
-                                if (rs.getTardis_id() != id) {
-                                    TARDISMessage.send(player, "DOOR_LOCK_UNLOCK");
-                                    return;
-                                }
-                                // must use key to lock / unlock door
-                                if (material.equals(m)) {
-                                    if (stack.hasItemMeta() && stack.getItemMeta().hasDisplayName() && stack.getItemMeta().getDisplayName().equals("TARDIS Remote Key")) {
-                                        return;
-                                    }
-                                    int locked = (rsd.isLocked()) ? 0 : 1;
-                                    String message = (rsd.isLocked()) ? plugin.getLanguage().getString("DOOR_UNLOCK") : plugin.getLanguage().getString("DOOR_DEADLOCK");
-                                    HashMap<String, Object> setl = new HashMap<>();
-                                    setl.put("locked", locked);
-                                    HashMap<String, Object> wherel = new HashMap<>();
-                                    wherel.put("tardis_id", rsd.getTardis_id());
-                                    // always lock / unlock both doors
-                                    plugin.getQueryFactory().doUpdate("doors", setl, wherel);
-                                    TARDISMessage.send(player, "DOOR_LOCK", message);
-                                } else if (material.isAir()) { // knock with hand
-                                    // only outside the TARDIS
-                                    if (doortype == 0) {
-                                        // only if companion
-                                        ResultSetCompanions rsc = new ResultSetCompanions(plugin, id);
-                                        if (rsc.getCompanions().contains(playerUUID)) {
-                                            // get Time Lord
-                                            HashMap<String, Object> wherett = new HashMap<>();
-                                            ResultSetTardis rstt = new ResultSetTardis(plugin, wherett, "", false, 2);
-                                            if (rstt.resultSet()) {
-                                                UUID tluuid = rstt.getTardis().getUuid();
-                                                // only if Time Lord is inside
-                                                HashMap<String, Object> wherev = new HashMap<>();
-                                                wherev.put("uuid", tluuid.toString());
-                                                ResultSetTravellers rsv = new ResultSetTravellers(plugin, wherev, false);
-                                                if (rsv.resultSet()) {
-                                                    Player tl = plugin.getServer().getPlayer(tluuid);
-                                                    Sound knock = (blockType.equals(Material.IRON_DOOR)) ? Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR : Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR;
-                                                    tl.getWorld().playSound(tl.getLocation(), knock, 3.0F, 3.0F);
-                                                }
+                            UUID ownerUUID = null;
+                            HashMap<String, Object> wherett = new HashMap<>();
+                            wherett.put("tardis_id", id);
+                            ResultSetTardis rstt = new ResultSetTardis(plugin, wherett, "", false, 2);
+                            if (rstt.resultSet()) {
+                                ownerUUID = rstt.getTardis().getUuid();
+                            }
+                                
+                            // Only the key with the UUID of the owner on the lore can lock/unlock
+                            if (material.equals(m) && (stack.hasItemMeta() && stack.getItemMeta().hasLore() && 
+                                    stack.getItemMeta().getLore().get(stack.getItemMeta().getLore().size() - 1).contains(ownerUUID.toString()))) {
+                                //ResultSetTardisID rs = new ResultSetTardisID(plugin);
+                                int locked = (rsd.isLocked()) ? 0 : 1;
+                                String message = (rsd.isLocked()) ? plugin.getLanguage().getString("DOOR_UNLOCK") : plugin.getLanguage().getString("DOOR_DEADLOCK");
+                                HashMap<String, Object> setl = new HashMap<>();
+                                setl.put("locked", locked);
+                                HashMap<String, Object> wherel = new HashMap<>();
+                                wherel.put("tardis_id", rsd.getTardis_id());
+                                // always lock / unlock both doors
+                                plugin.getQueryFactory().doUpdate("doors", setl, wherel);
+                                TARDISMessage.send(player, "DOOR_LOCK", message);
+                            } else if (material.isAir()) { // knock with hand
+                                // only outside the TARDIS
+                                if (doortype == 0) {
+                                    // only if companion
+                                    ResultSetCompanions rsc = new ResultSetCompanions(plugin, id);
+                                    if (rsc.getCompanions().contains(playerUUID)) {
+                                        if (ownerUUID != null) {
+                                            // only if Time Lord is inside
+                                            HashMap<String, Object> wherev = new HashMap<>();
+                                            wherev.put("uuid", ownerUUID.toString());
+                                            ResultSetTravellers rsv = new ResultSetTravellers(plugin, wherev, false);
+                                            if (rsv.resultSet()) {
+                                                Player tl = plugin.getServer().getPlayer(ownerUUID);
+                                                Sound knock = (blockType.equals(Material.IRON_DOOR)) ? Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR : Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR;
+                                                tl.getWorld().playSound(tl.getLocation(), knock, 3.0F, 3.0F);
                                             }
                                         }
                                     }
