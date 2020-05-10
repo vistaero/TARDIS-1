@@ -176,11 +176,6 @@ public class TARDISHandbrakeListener implements Listener {
                                     }
                                     new TARDISTakeoff(plugin).run(id, block, handbrake_loc, player, beac_on, beacon, bar);
                                 } else {
-                                    TARDISMessage.send(player, "HANDBRAKE_OFF_ERR");
-                                }
-                            }
-                            if (action == Action.LEFT_CLICK_BLOCK) {
-                                if (!tardis.isHandbrake_on()) {
                                     TARDISSounds.playTARDISSound(handbrake_loc, "tardis_handbrake_engage");
                                     // Changes the lever to on
                                     TARDISHandbrake.setLevers(block, true, inside, handbrake_loc.toString(), id, plugin);
@@ -219,8 +214,6 @@ public class TARDISHandbrakeListener implements Listener {
                                     HashMap<String, Object> whereh = new HashMap<>();
                                     whereh.put("tardis_id", id);
                                     plugin.getQueryFactory().doUpdate("tardis", set, whereh);
-                                } else {
-                                    TARDISMessage.send(player, "HANDBRAKE_ON_ERR");
                                 }
                             }
                         }
