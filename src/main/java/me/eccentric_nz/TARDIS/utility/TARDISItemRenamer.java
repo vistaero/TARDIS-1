@@ -53,6 +53,7 @@ public class TARDISItemRenamer {
                 ArrayList<String> lore = new ArrayList<>();
                 lore.add("Enter and exit your TARDIS");
                 im.setLore(lore);
+                im.setCustomModelData(1);
             }
             try {
                 RECIPE_ITEM recipeItem = RECIPE_ITEM.valueOf(TARDISStringUtils.toScoredUppercase(name));
