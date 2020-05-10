@@ -76,7 +76,7 @@ public class TARDISKeyMenuListener extends TARDISMenuListener implements Listene
                         ItemMeta choice_im = choice.getItemMeta();
                         String choice_name = choice_im.getDisplayName();
                         ItemMeta sonic_im = key.getItemMeta();
-                        sonic_im.setDisplayName(choice_name);
+                        //sonic_im.setDisplayName(choice_name);
                         sonic_im.setCustomModelData(choice_im.getCustomModelData());
                         key.setItemMeta(sonic_im);
                         break;
