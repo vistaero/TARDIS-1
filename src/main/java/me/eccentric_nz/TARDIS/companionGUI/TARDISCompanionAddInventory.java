@@ -36,12 +36,14 @@ import java.util.UUID;
 public class TARDISCompanionAddInventory {
 
     private final TARDIS plugin;
+    Player player;
     private final UUID uuid;
     private final ItemStack[] players;
 
-    public TARDISCompanionAddInventory(TARDIS plugin, UUID uuid) {
+    public TARDISCompanionAddInventory(TARDIS plugin, Player player) {
         this.plugin = plugin;
-        this.uuid = uuid;
+        this.player = player;
+        uuid = this.player.getUniqueId();
         players = getItemStack();
     }
 
@@ -60,7 +62,7 @@ public class TARDISCompanionAddInventory {
             for (Player p : plugin.getServer().getOnlinePlayers()) {
                 if (i < 45) {
                     UUID puid = p.getUniqueId();
-                    if (puid != uuid && !comps.contains(puid.toString())) {
+                    if (puid != uuid && !comps.contains(puid.toString()) && VanishChecker.canSee(player, p)) {
                         ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
                         SkullMeta skull = (SkullMeta) head.getItemMeta();
                         skull.setOwningPlayer(p);
