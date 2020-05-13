@@ -152,9 +152,9 @@ public class TARDISDoorClickListener extends TARDISDoorListener implements Liste
                                     break;
                             }
                             if (action == Action.LEFT_CLICK_BLOCK) {
-                                //if (stack.hasItemMeta() && stack.getItemMeta().hasDisplayName() && stack.getItemMeta().getDisplayName().equals("TARDIS Remote Key")) {
-                                  //  return;
-                                //}
+                                if (stack.hasItemMeta() && stack.getItemMeta().hasDisplayName() && stack.getItemMeta().getDisplayName().equals("TARDIS Remote Key")) {
+                                    return;
+                                }
                                 // must be the owner
                                 ResultSetTardisID rs = new ResultSetTardisID(plugin);
                                 if (rs.fromUUID(player.getUniqueId().toString())) {
@@ -552,9 +552,9 @@ public class TARDISDoorClickListener extends TARDISDoorListener implements Liste
                         } else {
                             String[] split = plugin.getRecipesConfig().getString("shaped.Sonic Screwdriver.result").split(":");
                             Material sonic = Material.valueOf(split[0]);
-                            /*if (!material.equals(sonic) || !player.hasPermission("tardis.sonic.admin")) {
+                            if (!material.equals(sonic) || !player.hasPermission("tardis.sonic.admin")) {
                                 TARDISMessage.send(player, "NOT_KEY", key);
-                            }*/
+                            }
                             // knock with hand
                             if (material.isAir()) {
                                 // only outside the TARDIS
