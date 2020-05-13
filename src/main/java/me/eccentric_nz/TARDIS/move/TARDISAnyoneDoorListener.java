@@ -226,7 +226,7 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                                             boolean open = TARDISStaticUtils.isDoorOpen(block);
                                             boolean toggle = true;
                                             // must use key to open the outer door
-                                            if (doortype == 0 && !open) {
+                                            /*if (doortype == 0 && !open) {
                                                 if (material.equals(m)) {
                                                     // must be Time Lord or companion
                                                     ResultSetCompanions rsc = new ResultSetCompanions(plugin, id);
@@ -242,7 +242,7 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                                                         toggle = false;
                                                     }
                                                 }
-                                            }
+                                            }*/
                                             if (open && rs.getTardis().isAbandoned()) {
                                                 TARDISMessage.send(player, "ABANDONED_DOOR");
                                                 return;
@@ -264,7 +264,13 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                                 } else if (rs.getTardis().getUuid() != playerUUID) {
                                     TARDISMessage.send(player, "DOOR_DEADLOCKED");
                                 } else {
-                                    TARDISMessage.send(player, "DOOR_UNLOCK");
+                                    // must be admin sonic
+                                    String[] split = plugin.getRecipesConfig().getString("shaped.Sonic Screwdriver.result").split(":");
+                                    Material sonic = Material.valueOf(split[0]);
+                                    if (material.equals(sonic) && player.hasPermission("tardis.sonic.admin"))
+                                        new TARDISDoorToggler(plugin, block, player, minecart, TARDISStaticUtils.isDoorOpen(block), id).toggleDoors();
+                                    else
+                                        TARDISMessage.send(player, "DOOR_UNLOCK");
                                 }
                             }
                         } else if (action == Action.RIGHT_CLICK_BLOCK && player.isSneaking()) {
