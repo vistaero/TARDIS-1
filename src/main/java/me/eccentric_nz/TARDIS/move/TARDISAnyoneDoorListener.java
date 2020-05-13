@@ -168,10 +168,11 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                             }
                             
                             // Only the key with the UUID of the owner can lock/unlock
-                            if (adminSonic || (stack.hasItemMeta() && stack.getItemMeta().hasLore()
-                                    && stack.getItemMeta().getLore().get(stack.getItemMeta().getLore().size() - 1).contains("TARDIS Key"))) {
-
+                            if (adminSonic || (stack.hasItemMeta() && stack.getItemMeta().hasLore())) {
                                 UUID keyUUID = stack.getItemMeta().getPersistentDataContainer().get(plugin.getTimeLordUuidKey(), plugin.getPersistentDataTypeUUID());
+                                if (keyUUID == null)
+                                    return;
+                                
                                 if (adminSonic || keyUUID.equals(ownerUUID)) {
                                     //ResultSetTardisID rs = new ResultSetTardisID(plugin);
                                     int locked = (rsd.isLocked()) ? 0 : 1;
