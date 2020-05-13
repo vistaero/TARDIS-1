@@ -163,21 +163,18 @@ public class TARDISCraftListener implements Listener {
                     ci.setResult(is);
                 } else if (is.hasItemMeta() && is.getItemMeta().hasDisplayName() && is.getItemMeta().getDisplayName().contains("Key")) {
                     HumanEntity human = event.getView().getPlayer();
-                    if (human instanceof Player) {
-                        Player player = (Player) human;
-                        ItemMeta meta = is.getItemMeta();
-                        // set whose key it is
-                        List<String> loreList = meta.getLore();
-                        loreList.add(player.getName() + "'s TARDIS Key");
-                        meta.setLore(loreList);
-                        // set the uuid of the tardis owner
-                        NamespacedKey key = new NamespacedKey(plugin, "tardis-owner-uuid");
-                        meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, player.getUniqueId().toString());
-                        // save meta
-                        is.setItemMeta(meta);
-                        ci.setResult(is);
-                        
-                    }
+                    ItemMeta meta = is.getItemMeta();
+                    // set whose key it is
+                    List<String> loreList = meta.getLore();
+                    loreList.add(human.getName() + "'s TARDIS Key");
+                    meta.setLore(loreList);
+                    // set the uuid of the tardis owner
+                    NamespacedKey key = new NamespacedKey(plugin, "tardis-owner-uuid");
+                    meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, human.getUniqueId().toString());
+                    // save meta
+                    is.setItemMeta(meta);
+                    ci.setResult(is);
+
                 }
             }
         }
