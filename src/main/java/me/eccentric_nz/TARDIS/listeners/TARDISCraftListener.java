@@ -40,7 +40,9 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.*;
 import java.util.logging.Level;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.persistence.PersistentDataType;
 
 /**
  * @author eccentric_nz
@@ -164,12 +166,17 @@ public class TARDISCraftListener implements Listener {
                     if (human instanceof Player) {
                         Player player = (Player) human;
                         ItemMeta meta = is.getItemMeta();
+                        // set whose key it is
                         List<String> loreList = meta.getLore();
-                        loreList.add(player.getUniqueId().toString());
+                        loreList.add(player.getName() + "'s TARDIS Key");
                         meta.setLore(loreList);
+                        // set the uuid of the tardis owner
+                        NamespacedKey key = new NamespacedKey(plugin, "tardis-owner-uuid");
+                        meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, player.getUniqueId().toString());
+                        // save meta
                         is.setItemMeta(meta);
                         ci.setResult(is);
-
+                        
                     }
                 }
             }
