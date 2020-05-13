@@ -150,7 +150,15 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                         }
                         boolean minecart = rsp.isMinecartOn();
                         Material m = Material.getMaterial(key);
-                        if (action == Action.LEFT_CLICK_BLOCK && material.equals(m)) {
+                        
+                        // using admin sonic?
+                        boolean adminSonic = false;
+                        String[] split = plugin.getRecipesConfig().getString("shaped.Sonic Screwdriver.result").split(":");
+                        Material sonic = Material.valueOf(split[0]);
+                        if (material.equals(sonic) && player.hasPermission("tardis.sonic.admin"))
+                            adminSonic = true;
+                        
+                        if (action == Action.LEFT_CLICK_BLOCK && (material.equals(m) || adminSonic)) {
                             UUID ownerUUID = null;
                             HashMap<String, Object> wherett = new HashMap<>();
                             wherett.put("tardis_id", id);
@@ -158,15 +166,16 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                             if (rstt.resultSet()) {
                                 ownerUUID = rstt.getTardis().getUuid();
                             }
+                            
                             // Only the key with the UUID of the owner can lock/unlock
-                            if ((stack.hasItemMeta() && stack.getItemMeta().hasLore() && 
-                                    stack.getItemMeta().getLore().get(stack.getItemMeta().getLore().size() - 1).contains("TARDIS Key"))) {
+                            if (adminSonic || (stack.hasItemMeta() && stack.getItemMeta().hasLore()
+                                    && stack.getItemMeta().getLore().get(stack.getItemMeta().getLore().size() - 1).contains("TARDIS Key"))) {
                                 NamespacedKey nmKey = new NamespacedKey(plugin, "tardis-owner-uuid");
                                 PersistentDataContainer container = stack.getItemMeta().getPersistentDataContainer();
 
-                                if (container.has(nmKey, PersistentDataType.STRING)) {
+                                if (adminSonic || container.has(nmKey, PersistentDataType.STRING)) {
                                     String foundValue = container.get(nmKey, PersistentDataType.STRING);
-                                    if (foundValue.contentEquals(ownerUUID.toString()))
+                                    if (adminSonic || foundValue.contentEquals(ownerUUID.toString()))
                                     {
                                         //ResultSetTardisID rs = new ResultSetTardisID(plugin);
                                         int locked = (rsd.isLocked()) ? 0 : 1;
@@ -225,24 +234,7 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                                         if (doortype == 0 || doortype == 1) {
                                             boolean open = TARDISStaticUtils.isDoorOpen(block);
                                             boolean toggle = true;
-                                            // must use key to open the outer door
-                                            /*if (doortype == 0 && !open) {
-                                                if (material.equals(m)) {
-                                                    // must be Time Lord or companion
-                                                    ResultSetCompanions rsc = new ResultSetCompanions(plugin, id);
-                                                    toggle = rsc.getCompanions().contains(playerUUID);
-                                                } else {
-                                                    // must be admin sonic
-                                                    String[] split = plugin.getRecipesConfig().getString("shaped.Sonic Screwdriver.result").split(":");
-                                                    Material sonic = Material.valueOf(split[0]);
-                                                    if (material.equals(sonic) && player.hasPermission("tardis.sonic.admin")) {
-                                                        toggle = true;
-                                                    }else {
-                                                        TARDISMessage.send(player, "NOT_KEY", key);
-                                                        toggle = false;
-                                                    }
-                                                }
-                                            }*/
+                                            
                                             if (open && rs.getTardis().isAbandoned()) {
                                                 TARDISMessage.send(player, "ABANDONED_DOOR");
                                                 return;
@@ -264,21 +256,10 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                                 } else if (rs.getTardis().getUuid() != playerUUID) {
                                     TARDISMessage.send(player, "DOOR_DEADLOCKED");
                                 } else {
-                                    // must be admin sonic
-                                    String[] split = plugin.getRecipesConfig().getString("shaped.Sonic Screwdriver.result").split(":");
-                                    Material sonic = Material.valueOf(split[0]);
-                                    if (material.equals(sonic) && player.hasPermission("tardis.sonic.admin"))
-                                        new TARDISDoorToggler(plugin, block, player, minecart, TARDISStaticUtils.isDoorOpen(block), id).toggleDoors();
-                                    else
-                                        TARDISMessage.send(player, "DOOR_UNLOCK");
+                                    TARDISMessage.send(player, "DOOR_UNLOCK");
                                 }
                             }
                         } else if (action == Action.RIGHT_CLICK_BLOCK && player.isSneaking()) {
-                            /*if (!material.equals(m) && doortype == 0) {
-                                // must use key to open and close the outer door
-                                TARDISMessage.send(player, "NOT_KEY", key);
-                                return;
-                            }*/
                             if (rsd.isLocked()) {
                                 TARDISMessage.send(player, "DOOR_DEADLOCKED");
                                 return;
