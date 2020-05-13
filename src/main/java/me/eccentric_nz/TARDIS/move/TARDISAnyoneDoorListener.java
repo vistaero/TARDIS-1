@@ -50,6 +50,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -169,25 +170,21 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                             // Only the key with the UUID of the owner can lock/unlock
                             if (adminSonic || (stack.hasItemMeta() && stack.getItemMeta().hasLore()
                                     && stack.getItemMeta().getLore().get(stack.getItemMeta().getLore().size() - 1).contains("TARDIS Key"))) {
-                                NamespacedKey nmKey = new NamespacedKey(plugin, "tardis-owner-uuid");
-                                PersistentDataContainer container = stack.getItemMeta().getPersistentDataContainer();
 
-                                if (adminSonic || container.has(nmKey, PersistentDataType.STRING)) {
-                                    String foundValue = container.get(nmKey, PersistentDataType.STRING);
-                                    if (adminSonic || foundValue.contentEquals(ownerUUID.toString()))
-                                    {
-                                        //ResultSetTardisID rs = new ResultSetTardisID(plugin);
-                                        int locked = (rsd.isLocked()) ? 0 : 1;
-                                        String message = (rsd.isLocked()) ? plugin.getLanguage().getString("DOOR_UNLOCK") : plugin.getLanguage().getString("DOOR_DEADLOCK");
-                                        HashMap<String, Object> setl = new HashMap<>();
-                                        setl.put("locked", locked);
-                                        HashMap<String, Object> wherel = new HashMap<>();
-                                        wherel.put("tardis_id", rsd.getTardis_id());
-                                        // always lock / unlock both doors
-                                        plugin.getQueryFactory().doUpdate("doors", setl, wherel);
-                                        TARDISMessage.send(player, "DOOR_LOCK", message);
-                                    }
+                                UUID keyUUID = stack.getItemMeta().getPersistentDataContainer().get(plugin.getTimeLordUuidKey(), plugin.getPersistentDataTypeUUID());
+                                if (adminSonic || keyUUID.equals(ownerUUID)) {
+                                    //ResultSetTardisID rs = new ResultSetTardisID(plugin);
+                                    int locked = (rsd.isLocked()) ? 0 : 1;
+                                    String message = (rsd.isLocked()) ? plugin.getLanguage().getString("DOOR_UNLOCK") : plugin.getLanguage().getString("DOOR_DEADLOCK");
+                                    HashMap<String, Object> setl = new HashMap<>();
+                                    setl.put("locked", locked);
+                                    HashMap<String, Object> wherel = new HashMap<>();
+                                    wherel.put("tardis_id", rsd.getTardis_id());
+                                    // always lock / unlock both doors
+                                    plugin.getQueryFactory().doUpdate("doors", setl, wherel);
+                                    TARDISMessage.send(player, "DOOR_LOCK", message);
                                 }
+
                             } else if (material.isAir()) { // knock with hand
                                 // only outside the TARDIS
                                 if (doortype == 0) {
