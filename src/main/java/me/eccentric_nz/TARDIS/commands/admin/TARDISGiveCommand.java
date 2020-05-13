@@ -304,7 +304,7 @@ public class TARDISGiveCommand implements CommandExecutor {
         if (result.hasItemMeta() && result.getItemMeta().hasDisplayName() && result.getItemMeta().getDisplayName().contains("Key")) {
             ItemMeta meta = result.getItemMeta();
             List<String> loreList = meta.getLore();
-            loreList.add(player.getName().toString());
+            loreList.add(player.getName().toString() + "'s TARDIS Key");
             NamespacedKey key = new NamespacedKey(plugin, "tardis-owner-uuid");
             meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, player.getUniqueId().toString());
             meta.setLore(loreList);
