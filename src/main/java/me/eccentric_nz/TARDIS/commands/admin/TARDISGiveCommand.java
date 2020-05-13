@@ -300,6 +300,16 @@ public class TARDISGiveCommand implements CommandExecutor {
             im.addItemFlags(ItemFlag.values());
             result.setItemMeta(im);
         }
+        if (item.equals("key")) {
+            ItemMeta im = result.getItemMeta();
+            im.getPersistentDataContainer().set(plugin.getTimeLordUuidKey(), plugin.getPersistentDataTypeUUID(), player.getUniqueId());
+            List<String> lore = im.getLore();
+            String format = ChatColor.AQUA + "" + ChatColor.ITALIC;
+            lore.add(format + "This key belongs to");
+            lore.add(format + player.getName());
+            im.setLore(lore);
+            result.setItemMeta(im);
+        }
         result.setAmount(amount);
         if (result.hasItemMeta() && result.getItemMeta().hasDisplayName() && result.getItemMeta().getDisplayName().contains("Key")) {
             ItemMeta meta = result.getItemMeta();
@@ -325,6 +335,20 @@ public class TARDISGiveCommand implements CommandExecutor {
         } else {
             ShapedRecipe recipe = plugin.getFigura().getShapedRecipes().get(item);
             result = recipe.getResult();
+            if (result.hasItemMeta()) {
+                ItemMeta im = result.getItemMeta();
+                if (im.hasDisplayName() && im.getDisplayName().contains("Key")) {
+                    im.getPersistentDataContainer().set(plugin.getTimeLordUuidKey(), plugin.getPersistentDataTypeUUID(), player.getUniqueId());
+                    if (im.hasLore()) {
+                        List<String> lore = im.getLore();
+                        String format = ChatColor.AQUA + "" + ChatColor.ITALIC;
+                        lore.add(format + "This key belongs to");
+                        lore.add(format + player.getName());
+                        im.setLore(lore);
+                    }
+                    result.setItemMeta(im);
+                }
+            }
         }
         result.setAmount(1);
         player.getInventory().addItem(result);
@@ -364,11 +388,10 @@ public class TARDISGiveCommand implements CommandExecutor {
                 plugin.getQueryFactory().doUpdate("tardis", set, wheret);
                 sender.sendMessage(plugin.getPluginName() + player + "'s Artron Energy Level was set to " + set_level);
             }
-            return true;
         } else {
             TARDISMessage.send(sender, "UUID_NOT_FOUND", player);
-            return true;
         }
+        return true;
     }
 
     private boolean giveSeed(CommandSender sender, String[] args) {
@@ -436,11 +459,10 @@ public class TARDISGiveCommand implements CommandExecutor {
         UUID uuid = plugin.getServer().getOfflinePlayer(player).getUniqueId();
         if (uuid != null) {
             plugin.getServer().dispatchCommand(sender, "vmg " + uuid.toString() + " " + amount);
-            return true;
         } else {
             TARDISMessage.send(sender, "UUID_NOT_FOUND", player);
-            return true;
         }
+        return true;
     }
 
     private boolean giveFullCell(CommandSender sender, int amount, Player player) {

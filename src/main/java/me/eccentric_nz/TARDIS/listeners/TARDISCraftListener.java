@@ -24,6 +24,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -161,20 +162,19 @@ public class TARDISCraftListener implements Listener {
                     lam.setColor(Color.WHITE);
                     is.setItemMeta(lam);
                     ci.setResult(is);
-                } else if (is.hasItemMeta() && is.getItemMeta().hasDisplayName() && is.getItemMeta().getDisplayName().contains("Key")) {
+                } else if (dn.contains("Key")) {
                     HumanEntity human = event.getView().getPlayer();
-                    ItemMeta meta = is.getItemMeta();
-                    // set whose key it is
-                    List<String> loreList = meta.getLore();
-                    loreList.add(human.getName() + "'s TARDIS Key");
-                    meta.setLore(loreList);
-                    // set the uuid of the tardis owner
-                    NamespacedKey key = new NamespacedKey(plugin, "tardis-owner-uuid");
-                    meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, human.getUniqueId().toString());
-                    // save meta
-                    is.setItemMeta(meta);
-                    ci.setResult(is);
-
+                    if (human instanceof Player) {
+                        ItemMeta im = is.getItemMeta();
+                        im.getPersistentDataContainer().set(plugin.getTimeLordUuidKey(), plugin.getPersistentDataTypeUUID(), human.getUniqueId());
+                        List<String> lore = im.getLore();
+                        String format = ChatColor.AQUA + "" + ChatColor.ITALIC;
+                        lore.add(format + "This key belongs to");
+                        lore.add(format + human.getName());
+                        im.setLore(lore);
+                        is.setItemMeta(im);
+                        ci.setResult(is);
+                    }
                 }
             }
         }

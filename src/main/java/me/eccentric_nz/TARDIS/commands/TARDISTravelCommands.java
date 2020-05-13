@@ -654,11 +654,10 @@ public class TARDISTravelCommands implements CommandExecutor {
                                 if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                     new TARDISLand(plugin, id, player).exitVortex();
                                 }
-                                return true;
                             } else {
                                 TARDISMessage.send(player, "SAVE_NO_WORLD");
-                                return true;
                             }
+                            return true;
                         } else {
                             TARDISMessage.send(player, "TRAVEL_NO_PERM_SAVE");
                             return true;
@@ -804,7 +803,6 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     int count = checkLocation(location, player, id);
                                     if (count > 0) {
                                         TARDISMessage.send(player, "NOT_SAFE");
-                                        return true;
                                     } else {
                                         set.put("world", location.getWorld().getName());
                                         set.put("x", location.getBlockX());
@@ -818,8 +816,8 @@ public class TARDISTravelCommands implements CommandExecutor {
                                         if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                             new TARDISLand(plugin, id, player).exitVortex();
                                         }
-                                        return true;
                                     }
+                                    return true;
                                 } else {
                                     // automatically get highest block Y coord
                                     Location determiney = getCoordinateLocation(args, player, id);
@@ -827,7 +825,6 @@ public class TARDISTravelCommands implements CommandExecutor {
                                         int count = checkLocation(determiney, player, id);
                                         if (count > 0) {
                                             TARDISMessage.send(player, "NOT_SAFE");
-                                            return true;
                                         } else {
                                             set.put("world", determiney.getWorld().getName());
                                             set.put("x", determiney.getBlockX());
@@ -841,8 +838,8 @@ public class TARDISTravelCommands implements CommandExecutor {
                                             if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                                 new TARDISLand(plugin, id, player).exitVortex();
                                             }
-                                            return true;
                                         }
+                                        return true;
                                     }
                                 }
                                 break;
@@ -854,7 +851,6 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     int count = checkLocation(giveny, player, id);
                                     if (count > 0) {
                                         TARDISMessage.send(player, "NOT_SAFE");
-                                        return true;
                                     } else {
                                         set.put("world", giveny.getWorld().getName());
                                         set.put("x", giveny.getBlockX());
@@ -868,8 +864,8 @@ public class TARDISTravelCommands implements CommandExecutor {
                                         if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                             new TARDISLand(plugin, id, player).exitVortex();
                                         }
-                                        return true;
                                     }
+                                    return true;
                                 }
                                 break;
                         }
@@ -1031,7 +1027,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                     case 0:
                         // east
                         for (int east = startx; east < limite; east += step) {
-                            Biome chkb = w.getBiome(east, startz);
+                            Biome chkb = w.getBiome(east, w.getHighestBlockYAt(east, startz), startz);
                             if (chkb.equals(b)) {
                                 TARDISMessage.send(p, "BIOME_E", b.toString());
                                 return new Location(w, east, TARDISStaticLocationGetters.getHighestYin3x3(w, east, startz), startz);
@@ -1041,7 +1037,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                     case 1:
                         // south
                         for (int south = startz; south < limits; south += step) {
-                            Biome chkb = w.getBiome(startx, south);
+                            Biome chkb = w.getBiome(startx, w.getHighestBlockYAt(startx, south), south);
                             if (chkb.equals(b)) {
                                 TARDISMessage.send(p, "BIOME_S", b.toString());
                                 return new Location(w, startx, TARDISStaticLocationGetters.getHighestYin3x3(w, startx, south), south);
@@ -1051,7 +1047,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                     case 2:
                         // west
                         for (int west = startx; west > limitw; west -= step) {
-                            Biome chkb = w.getBiome(west, startz);
+                            Biome chkb = w.getBiome(west, w.getHighestBlockYAt(west, startz), startz);
                             if (chkb.equals(b)) {
                                 TARDISMessage.send(p, "BIOME_W", b.toString());
                                 return new Location(w, west, TARDISStaticLocationGetters.getHighestYin3x3(w, west, startz), startz);
@@ -1061,7 +1057,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                     case 3:
                         // north
                         for (int north = startz; north > limitn; north -= step) {
-                            Biome chkb = w.getBiome(startx, north);
+                            Biome chkb = w.getBiome(startx, w.getHighestBlockYAt(startx, north), north);
                             if (chkb.equals(b)) {
                                 TARDISMessage.send(p, "BIOME_N", b.toString());
                                 return new Location(w, startx, TARDISStaticLocationGetters.getHighestYin3x3(w, startx, north), north);
