@@ -300,7 +300,7 @@ public class TARDISGiveCommand implements CommandExecutor {
             im.addItemFlags(ItemFlag.values());
             result.setItemMeta(im);
         }
-        if (item.equals("key")) {
+        if (item.equals("key") || item.equals("r-key")) {
             ItemMeta im = result.getItemMeta();
             im.getPersistentDataContainer().set(plugin.getTimeLordUuidKey(), plugin.getPersistentDataTypeUUID(), player.getUniqueId());
             List<String> lore = im.getLore();
