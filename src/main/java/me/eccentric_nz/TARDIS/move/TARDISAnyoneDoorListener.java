@@ -152,13 +152,12 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                         Material m = Material.getMaterial(key);
                         
                         // using admin sonic?
-                        boolean adminSonic = false;
+                        boolean canToggleLock = false;
                         String[] split = plugin.getRecipesConfig().getString("shaped.Sonic Screwdriver.result").split(":");
                         Material sonic = Material.valueOf(split[0]);
                         if (material.equals(sonic) && player.hasPermission("tardis.sonic.admin"))
-                            adminSonic = true;
-                        
-                        
+                            canToggleLock = true;
+
                         UUID ownerUUID = null;
                         HashMap<String, Object> wherett = new HashMap<>();
                         wherett.put("tardis_id", id);
@@ -166,42 +165,39 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                         if (rstt.resultSet()) {
                             ownerUUID = rstt.getTardis().getUuid();
                         }
-                        boolean usingKey = false;
-                        if (stack.hasItemMeta() && stack.getItemMeta().hasLore()) {
+                        
+                        if (!canToggleLock && material.equals(m) && stack.hasItemMeta() && stack.getItemMeta().hasLore()) {
                                 UUID keyUUID = stack.getItemMeta().getPersistentDataContainer().get(plugin.getTimeLordUuidKey(), plugin.getPersistentDataTypeUUID());
                                 if (keyUUID != null && keyUUID.equals(ownerUUID))
-                                    usingKey = true;
+                                    canToggleLock = true;
                         }
                         
-                        if (action == Action.LEFT_CLICK_BLOCK && (material.equals(m) || adminSonic)) {
+                        if (action == Action.LEFT_CLICK_BLOCK && canToggleLock) {
                             // Only the key with the UUID of the owner can lock/unlock
-                            if (adminSonic || usingKey) {
-                                //ResultSetTardisID rs = new ResultSetTardisID(plugin);
-                                int locked = (rsd.isLocked()) ? 0 : 1;
-                                String message = (rsd.isLocked()) ? plugin.getLanguage().getString("DOOR_UNLOCK") : plugin.getLanguage().getString("DOOR_DEADLOCK");
-                                HashMap<String, Object> setl = new HashMap<>();
-                                setl.put("locked", locked);
-                                HashMap<String, Object> wherel = new HashMap<>();
-                                wherel.put("tardis_id", rsd.getTardis_id());
-                                // always lock / unlock both doors
-                                plugin.getQueryFactory().doUpdate("doors", setl, wherel);
-                                TARDISMessage.send(player, "DOOR_LOCK", message);
-                            } else if (material.isAir()) { // knock with hand
-                                // only outside the TARDIS
-                                if (doortype == 0) {
-                                    // only if companion
-                                    ResultSetCompanions rsc = new ResultSetCompanions(plugin, id);
-                                    if (rsc.getCompanions().contains(playerUUID)) {
-                                        if (ownerUUID != null) {
-                                            // only if Time Lord is inside
-                                            HashMap<String, Object> wherev = new HashMap<>();
-                                            wherev.put("uuid", ownerUUID.toString());
-                                            ResultSetTravellers rsv = new ResultSetTravellers(plugin, wherev, false);
-                                            if (rsv.resultSet()) {
-                                                Player tl = plugin.getServer().getPlayer(ownerUUID);
-                                                Sound knock = (blockType.equals(Material.IRON_DOOR)) ? Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR : Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR;
-                                                tl.getWorld().playSound(tl.getLocation(), knock, 3.0F, 3.0F);
-                                            }
+                            int locked = (rsd.isLocked()) ? 0 : 1;
+                            String message = (rsd.isLocked()) ? plugin.getLanguage().getString("DOOR_UNLOCK") : plugin.getLanguage().getString("DOOR_DEADLOCK");
+                            HashMap<String, Object> setl = new HashMap<>();
+                            setl.put("locked", locked);
+                            HashMap<String, Object> wherel = new HashMap<>();
+                            wherel.put("tardis_id", rsd.getTardis_id());
+                            // always lock / unlock both doors
+                            plugin.getQueryFactory().doUpdate("doors", setl, wherel);
+                            TARDISMessage.send(player, "DOOR_LOCK", message);
+                        } else if (material.isAir()) { // knock with hand
+                            // only outside the TARDIS
+                            if (doortype == 0) {
+                                // only if companion
+                                ResultSetCompanions rsc = new ResultSetCompanions(plugin, id);
+                                if (rsc.getCompanions().contains(playerUUID)) {
+                                    if (ownerUUID != null) {
+                                        // only if Time Lord is inside
+                                        HashMap<String, Object> wherev = new HashMap<>();
+                                        wherev.put("uuid", ownerUUID.toString());
+                                        ResultSetTravellers rsv = new ResultSetTravellers(plugin, wherev, false);
+                                        if (rsv.resultSet()) {
+                                            Player tl = plugin.getServer().getPlayer(ownerUUID);
+                                            Sound knock = (blockType.equals(Material.IRON_DOOR)) ? Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR : Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR;
+                                            tl.getWorld().playSound(tl.getLocation(), knock, 3.0F, 3.0F);
                                         }
                                     }
                                 }
@@ -225,7 +221,7 @@ public class TARDISAnyoneDoorListener extends TARDISDoorListener implements List
                                     TARDISMessage.send(player, "HANDBRAKE_ENGAGE");
                                     return;
                                 }
-                                if (!rsd.isLocked() || usingKey) {
+                                if (!rsd.isLocked() || canToggleLock) {
                                     // toogle the door open/closed
                                     if (Tag.DOORS.isTagged(blockType)) {
                                         if (doortype == 0 || doortype == 1) {
