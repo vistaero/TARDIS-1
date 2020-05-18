@@ -157,7 +157,7 @@ public class TARDISDoorClickListener extends TARDISDoorListener implements Liste
                                 }
                                 // must be the owner
                                 ResultSetTardisID rs = new ResultSetTardisID(plugin);
-                                if (rs.fromUUID(player.getUniqueId().toString())) {
+                                if (rs.fromUUID(playerUUID.toString())) {
                                     if (rs.getTardis_id() != id) {
                                         TARDISMessage.send(player, "DOOR_LOCK_UNLOCK");
                                         return;
@@ -195,8 +195,9 @@ public class TARDISDoorClickListener extends TARDISDoorListener implements Liste
                                     ResultSetCompanions rsc = new ResultSetCompanions(plugin, id);
                                     if (rsc.getCompanions().contains(playerUUID) || rs.getTardis().isAbandoned()) {
                                         if (!rsd.isLocked()) {
-                                            // toogle the door open/closed
-                                            if (Tag.DOORS.isTagged(blockType)) {
+                                            boolean isPoliceBoxBlue = (rs.getTardis().getPreset().equals(PRESET.POLICE_BOX_BLUE) || rs.getTardis().getPreset().equals(PRESET.POLICE_BOX_BLUE_OPEN));
+                                            // toggle the door open/closed
+                                            if (Tag.DOORS.isTagged(blockType) || (blockType.equals(Material.OAK_TRAPDOOR) && isPoliceBoxBlue)) {
                                                 if (doortype == 0 || doortype == 1) {
                                                     boolean open = TARDISStaticUtils.isDoorOpen(block);
                                                     if (plugin.getTrackerKeeper().getHasClickedHandbrake().contains(id) && doortype == 1) {
@@ -205,7 +206,11 @@ public class TARDISDoorClickListener extends TARDISDoorListener implements Liste
                                                         new TARDISTakeoff(plugin).run(id, player, rs.getTardis().getBeacon());
                                                     }
                                                     // toggle the doors
-                                                    new TARDISDoorToggler(plugin, block, player, minecart, open, id).toggleDoors();
+                                                    if (isPoliceBoxBlue) {
+                                                        new TARDISModelChanger(plugin, block, player, id, doortype).toggleDoors();
+                                                    } else {
+                                                        new TARDISDoorToggler(plugin, block, player, minecart, open, id).toggleDoors();
+                                                    }
                                                 }
                                             } else if (Tag.TRAPDOORS.isTagged(blockType)) {
                                                 TrapDoor door_data = (TrapDoor) block.getBlockData();
@@ -360,7 +365,7 @@ public class TARDISDoorClickListener extends TARDISDoorListener implements Liste
                                                     } else {
                                                         String[] companionData = companions.split(":");
                                                         for (String c : companionData) {
-                                                            if (c.equalsIgnoreCase(player.getUniqueId().toString())) {
+                                                            if (c.equalsIgnoreCase(playerUUID.toString())) {
                                                                 chkCompanion = true;
                                                                 break;
                                                             }
@@ -376,8 +381,8 @@ public class TARDISDoorClickListener extends TARDISDoorListener implements Liste
                                                 COMPASS innerD = idl.getD();
                                                 // check for entities near the police box
                                                 TARDISPetsAndFollowers petsAndFollowers = null;
-                                                if (plugin.getConfig().getBoolean("allow.mob_farming") && player.hasPermission("tardis.farm") && !plugin.getTrackerKeeper().getFarming().contains(player.getUniqueId()) && willFarm) {
-                                                    plugin.getTrackerKeeper().getFarming().add(player.getUniqueId());
+                                                if (plugin.getConfig().getBoolean("allow.mob_farming") && player.hasPermission("tardis.farm") && !plugin.getTrackerKeeper().getFarming().contains(playerUUID) && willFarm) {
+                                                    plugin.getTrackerKeeper().getFarming().add(playerUUID);
                                                     TARDISFarmer tf = new TARDISFarmer(plugin);
                                                     petsAndFollowers = tf.farmAnimals(block_loc, d, id, player.getPlayer(), tardis_loc.getWorld().getName(), playerWorld.getName());
                                                 }
@@ -494,7 +499,7 @@ public class TARDISDoorClickListener extends TARDISDoorListener implements Liste
                                                     return;
                                                 }
                                                 // check traveled to
-                                                if (plugin.getConfig().getBoolean("travel.allow_end_after_visit") && !new ResultSetTraveledTo(plugin).resultSet(player, Environment.THE_END)) {
+                                                if (plugin.getConfig().getBoolean("travel.allow_end_after_visit") && !new ResultSetTravelledTo(plugin).resultSet(playerUUID.toString(), "THE_END")) {
                                                     TARDISMessage.send(player, "TRAVEL_NOT_VISITED", "End");
                                                     return;
                                                 }
@@ -512,7 +517,7 @@ public class TARDISDoorClickListener extends TARDISDoorListener implements Liste
                                                     return;
                                                 }
                                                 // check traveled to
-                                                if (plugin.getConfig().getBoolean("travel.allow_nether_after_visit") && !new ResultSetTraveledTo(plugin).resultSet(player, Environment.NETHER)) {
+                                                if (plugin.getConfig().getBoolean("travel.allow_nether_after_visit") && !new ResultSetTravelledTo(plugin).resultSet(playerUUID.toString(), "NETHER")) {
                                                     TARDISMessage.send(player, "TRAVEL_NOT_VISITED", "Nether");
                                                     return;
                                                 }
