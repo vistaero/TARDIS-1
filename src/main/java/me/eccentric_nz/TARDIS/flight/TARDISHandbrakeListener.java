@@ -22,18 +22,20 @@ import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitDamager;
 import me.eccentric_nz.TARDIS.artron.TARDISArtronIndicator;
 import me.eccentric_nz.TARDIS.artron.TARDISArtronLevels;
+import me.eccentric_nz.TARDIS.builders.TARDISTimeRotor;
 import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISSounds;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -175,7 +177,21 @@ public class TARDISHandbrakeListener implements Listener {
                                         return;
                                     }
                                     new TARDISTakeoff(plugin).run(id, block, handbrake_loc, player, beac_on, beacon, bar);
+                                    // start time rotor?
+                                    if (tardis.getSchematic().getPermission().equals("rotor") && tardis.getRotor() != null) {
+                                        ItemFrame itemFrame = TARDISTimeRotor.getItemFrame(tardis.getRotor());
+                                        if (itemFrame != null) {
+                                            TARDISTimeRotor.setRotor(TARDISTimeRotor.getRotorModelData(itemFrame), itemFrame, true);
+                                        }
+                                    }
                                 } else {
+                                    // stop time rotor?
+                                    if (tardis.getSchematic().getPermission().equals("rotor") && tardis.getRotor() != null) {
+                                        ItemFrame itemFrame = TARDISTimeRotor.getItemFrame(tardis.getRotor());
+                                        if (itemFrame != null) {
+                                            TARDISTimeRotor.setRotor(TARDISTimeRotor.getRotorModelData(itemFrame), itemFrame, false);
+                                        }
+                                    }
                                     TARDISSounds.playTARDISSound(handbrake_loc, "tardis_handbrake_engage");
                                     // Changes the lever to on
                                     TARDISHandbrake.setLevers(block, true, inside, handbrake_loc.toString(), id, plugin);
@@ -216,6 +232,7 @@ public class TARDISHandbrakeListener implements Listener {
                                     plugin.getQueryFactory().doUpdate("tardis", set, whereh);
                                 }
                             }
+                            
                         }
                     }
                 }

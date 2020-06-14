@@ -5,7 +5,7 @@ name: TARDIS
 load: POSTWORLD
 loadbefore: [ItemSlotMachine]
 depend: [TARDISChunkGenerator]
-softdepend: [Blocklocker,Citizens,Essentials,Factions,GriefPrevention,LibsDisguises,Lockette,LockettePro,LWC,MultiInv,Multiverse-Core,Multiverse-Adventure,Multiverse-Inventories,MultiWorld,My_Worlds,PerWorldInventory,PlaceholderAPI,ProtocolLib,Towny,WorldBorder,WorldGuard,TARDISWeepingAngels]
+softdepend: [Blocklocker,Essentials,Factions,GriefPrevention,LibsDisguises,Lockette,LockettePro,LWC,MultiInv,Multiverse-Core,Multiverse-Adventure,Multiverse-Inventories,MultiWorld,My_Worlds,PerWorldInventory,PlaceholderAPI,Towny,WorldBorder,WorldGuard]
 website: http://tardisjenkins.duckdns.org:8080/job/TARDIS/
 dev-url: http://github.com/eccentricdevotion/TARDIS/
 url: http://eccentricdevotion.github.io/TARDIS/
@@ -370,6 +370,9 @@ permissions:
   tardis.sonic.arrow:
     description: Allows a player to use the pickup arrows function of the sonic screwdriver.
     default: op
+  tardis.sonic.knockback:
+    description: Allows a player to use the entity knockback function of the sonic screwdriver.
+    default: op
   tardis.store:
     description: Allows the Artron Energy to be stored in an Artron Storage Cell.
     default: op
@@ -463,6 +466,18 @@ permissions:
     default: true
   tardis.forcefield:
     description: Allow a player to turn on the TARDIS force field.
+    default: op
+  tardis.scanner.map:
+    description: Allow a player to add and use the TARDIS scanner map.
+    default: op
+  tardis.weather.clear:
+    description: Allow a player to change the weather to clear.
+    default: op
+  tardis.weather.rain:
+    description: Allow a player to change the weather to raining.
+    default: op
+  tardis.weather.thunder:
+    description: Allow a player to change the weather to a thunderstorm.
     default: op
 commands:
   tardis:
@@ -932,6 +947,9 @@ commands:
     forcefield:
       description: Toggle the TARDIS forcefield on and off.
       usage: /<command> forcefield [on|off]
+    font:
+      description: Toggle whether to use the TARDIS-Resource-Pack unicode space font on and off.
+      usage: /<command> font [on|off]
   tardisarea:
     aliases: tarea
     description: Set up predefined TARDIS travel areas.
@@ -1221,3 +1239,13 @@ commands:
     description: Used by TARDIS admins to run commands as another Time Lord. Currently only works for the /tardis theme [clean|repair] command.
     permission: tardis.admin
     usage: /<command> [player|off]
+  tardisweather:
+    aliases: [/tw, tweather]
+    description: Change the weather in the world the player is in (or where their TARDIS is if they are inside it).
+    permission: tardis.use
+    usage: /<command> [clear|rain|thunder]
+  tardistime:
+    aliases: [ttime]
+    description: Change the time in the world the player is in (or where their TARDIS is if they are inside it).
+    permission: tardis.admin
+    usage: /<command> [morning|noon|night|midnight|?AM|?PM|ticks]

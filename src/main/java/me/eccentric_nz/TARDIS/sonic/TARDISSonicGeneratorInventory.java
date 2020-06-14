@@ -52,7 +52,6 @@ class TARDISSonicGeneratorInventory {
      *
      * @return an Array of itemStacks (an inventory)
      */
-
     private ItemStack[] getItemStack() {
 
         ItemStack[] stack = new ItemStack[54];
@@ -102,7 +101,16 @@ class TARDISSonicGeneratorInventory {
         dard.setCustomModelData(GUISonicGenerator.STANDARD_SONIC.getCustomModelData());
         sta.setItemMeta(dard);
         stack[27] = sta;
-        // bio-scanner uprgrade
+        // knockback upgrade
+        if (player.hasPermission("tardis.sonic.knockback")) {
+            ItemStack knock = new ItemStack(Material.BOWL, 1);
+            ItemMeta back = knock.getItemMeta();
+            back.setDisplayName("Knockback Upgrade");
+            back.setCustomModelData(GUISonicGenerator.KNOCKBACK_UPGRADE.getCustomModelData());
+            knock.setItemMeta(back);
+            stack[28] = knock;
+        }
+        // bio-scanner upgrade
         if (player.hasPermission("tardis.sonic.bio")) {
             ItemStack bio = new ItemStack(Material.BOWL, 1);
             ItemMeta scan = bio.getItemMeta();

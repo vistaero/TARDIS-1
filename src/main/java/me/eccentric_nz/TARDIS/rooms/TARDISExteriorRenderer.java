@@ -23,7 +23,7 @@ import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.utility.TARDISBlockSetters;
 import me.eccentric_nz.TARDIS.utility.TARDISEntityTracker;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -275,7 +275,7 @@ public class TARDISExteriorRenderer {
             }
         }
         // if enabled add static entities
-        if (plugin.getPM().isPluginEnabled("Citizens") && plugin.getConfig().getBoolean("preferences.render_entities")) {
+        if (plugin.getConfig().getBoolean("preferences.render_entities")) {
             plugin.debug("rendering entities");
             new TARDISEntityTracker(plugin).addNPCs(exterior, location, p.getUniqueId());
         }

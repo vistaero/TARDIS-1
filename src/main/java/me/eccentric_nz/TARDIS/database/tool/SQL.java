@@ -124,7 +124,7 @@ public class SQL {
 
             "CREATE TABLE IF NOT EXISTS %spaper_bag (paper_bag_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', flavour_1 varchar(12) DEFAULT '', amount_1 int(2) DEFAULT '0', flavour_2 varchar(12) DEFAULT '', amount_2 int(2) DEFAULT '0', flavour_3 varchar(12) DEFAULT '', amount_3 int(2) DEFAULT '0', flavour_4 varchar(12) DEFAULT '', amount_4 int(2) DEFAULT '0', PRIMARY KEY (paper_bag_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
-            "CREATE TABLE IF NOT EXISTS %splayer_prefs (pp_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', player varchar(32), `key_item` varchar(32) DEFAULT '', sfx_on int(1) DEFAULT '0', quotes_on int(1) DEFAULT '0', artron_level int(11) DEFAULT '0', wall varchar(64) DEFAULT 'ORANGE_WOOL', floor varchar(64) DEFAULT 'LIGHT_GRAY_WOOL', siege_wall varchar(64) DEFAULT 'GRAY_TERRACOTTA', siege_floor varchar(64) DEFAULT 'BLACK_TERRACOTTA', auto_on int(1) DEFAULT '0', beacon_on int(1) DEFAULT '1', hads_on int(1) DEFAULT '1', hads_type varchar(12) DEFAULT 'DISPLACEMENT', build_on int(1) DEFAULT '1', eps_on int(1) DEFAULT '0', eps_message text, lamp varchar(64) DEFAULT '', language varchar(32) DEFAULT 'ENGLISH', texture_on int(1) DEFAULT '0', texture_in varchar(512) DEFAULT '', texture_out varchar(512) DEFAULT 'default', submarine_on int(1) DEFAULT '0', dnd_on int(1) DEFAULT '0', minecart_on int(1) DEFAULT '0', renderer_on int(1) DEFAULT '1', wool_lights_on int(1) DEFAULT '0', ctm_on int(1) DEFAULT '0', sign_on int(1) DEFAULT '1', telepathy_on int(1) DEFAULT '0', travelbar_on int(1) DEFAULT '0', farm_on int(1) DEFAULT '1', lanterns_on int(1) DEFAULT '0', policebox_textures_on int(1) DEFAULT '1', auto_siege_on int(1) DEFAULT '0', flying_mode int(1) DEFAULT '1', difficulty int(1) DEFAULT '0', auto_powerup_on int(1) DEFAULT '0', auto_rescue_on int(1) DEFAULT '0', hum varchar(24) DEFAULT '', PRIMARY KEY (pp_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
+            "CREATE TABLE IF NOT EXISTS %splayer_prefs (pp_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', player varchar(32), `key_item` varchar(32) DEFAULT '', sfx_on int(1) DEFAULT '0', quotes_on int(1) DEFAULT '0', artron_level int(11) DEFAULT '0', wall varchar(64) DEFAULT 'ORANGE_WOOL', floor varchar(64) DEFAULT 'LIGHT_GRAY_WOOL', siege_wall varchar(64) DEFAULT 'GRAY_TERRACOTTA', siege_floor varchar(64) DEFAULT 'BLACK_TERRACOTTA', auto_on int(1) DEFAULT '0', beacon_on int(1) DEFAULT '1', hads_on int(1) DEFAULT '1', hads_type varchar(12) DEFAULT 'DISPLACEMENT', build_on int(1) DEFAULT '1', eps_on int(1) DEFAULT '0', eps_message text, lamp varchar(64) DEFAULT '', language varchar(32) DEFAULT 'ENGLISH', texture_on int(1) DEFAULT '0', texture_in varchar(512) DEFAULT '', texture_out varchar(512) DEFAULT 'default', submarine_on int(1) DEFAULT '0', dnd_on int(1) DEFAULT '0', minecart_on int(1) DEFAULT '0', renderer_on int(1) DEFAULT '1', wool_lights_on int(1) DEFAULT '0', ctm_on int(1) DEFAULT '0', sign_on int(1) DEFAULT '1', telepathy_on int(1) DEFAULT '0', travelbar_on int(1) DEFAULT '0', farm_on int(1) DEFAULT '1', lanterns_on int(1) DEFAULT '0', policebox_textures_on int(1) DEFAULT '1', auto_siege_on int(1) DEFAULT '0', flying_mode int(1) DEFAULT '1', difficulty int(1) DEFAULT '0', auto_powerup_on int(1) DEFAULT '0', auto_rescue_on int(1) DEFAULT '0', font_on int(1) DEFAULT '0', hum varchar(24) DEFAULT '', PRIMARY KEY (pp_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
             "CREATE TABLE IF NOT EXISTS %sportals (portal_id int(11) NOT NULL AUTO_INCREMENT, portal varchar(512) DEFAULT '', teleport varchar(512) DEFAULT '', direction varchar(5) DEFAULT '', tardis_id int(11) DEFAULT '0', abandoned int(1) DEFAULT '0', PRIMARY KEY (portal_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
@@ -136,7 +136,7 @@ public class SQL {
 
             "CREATE TABLE IF NOT EXISTS %ssiege (siege_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', tardis_id int(11) DEFAULT '0', PRIMARY KEY (siege_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
-            "CREATE TABLE IF NOT EXISTS %ssonic (sonic_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', activated int(1) DEFAULT '0', sonic_type varchar(16) DEFAULT '', model int(11) DEFAULT '10000011', bio int(1) DEFAULT '0', diamond int(1) DEFAULT '0', emerald int(1) DEFAULT '0', redstone int(1) DEFAULT '0', painter int(1) DEFAULT '0', ignite int(1) DEFAULT '0', arrow int(1) DEFAULT '0', PRIMARY KEY (sonic_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
+            "CREATE TABLE IF NOT EXISTS %ssonic (sonic_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', activated int(1) DEFAULT '0', sonic_type varchar(16) DEFAULT '', model int(11) DEFAULT '10000011', bio int(1) DEFAULT '0', diamond int(1) DEFAULT '0', emerald int(1) DEFAULT '0', redstone int(1) DEFAULT '0', painter int(1) DEFAULT '0', ignite int(1) DEFAULT '0', arrow int(1) DEFAULT '0', knockback int(1) DEFAULT '0', sonic_uuid varchar(48) DEFAULT '', PRIMARY KEY (sonic_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
             "CREATE TABLE IF NOT EXISTS %sstorage (storage_id int(11) NOT NULL AUTO_INCREMENT, tardis_id int(11) DEFAULT '0', uuid varchar(48) DEFAULT '', owner varchar(32) DEFAULT '', saves_one text NULL, saves_two text NULL, areas text NULL, presets_one text NULL, presets_two text NULL, biomes_one text NULL, biomes_two text NULL, players text NULL, circuits text NULL, console text NULL, PRIMARY KEY (storage_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
@@ -144,7 +144,7 @@ public class SQL {
 
             "CREATE TABLE IF NOT EXISTS %stag (tag_id int(11) NOT NULL AUTO_INCREMENT, player varchar(32) DEFAULT '', `time` bigint(20) DEFAULT '0', PRIMARY KEY (tag_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
-            "CREATE TABLE IF NOT EXISTS %stardis (tardis_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', owner varchar(32) DEFAULT '', last_known_name varchar(32) DEFAULT '', chunk varchar(64) DEFAULT '', tips int(4) DEFAULT '0', size varchar(32) DEFAULT '', abandoned int(1) DEFAULT '0', artron_level int(11) DEFAULT '0', replaced text NULL, companions text NULL, handbrake_on int(1) DEFAULT '1', iso_on int(1) DEFAULT '0', hidden int(1) DEFAULT '0', recharging int(1) DEFAULT '0', tardis_init int(1) DEFAULT '0', adapti_on int(1) DEFAULT '0', chameleon_preset varchar(32) DEFAULT 'FACTORY', chameleon_demat varchar(32) DEFAULT 'FACTORY', creeper varchar(512) DEFAULT '', beacon varchar(512) DEFAULT '', eps varchar(512) DEFAULT '', rail varchar(512) DEFAULT '', renderer varchar(512) DEFAULT '', zero varchar(512) DEFAULT '', powered_on int(1) DEFAULT '0', lights_on int(1) DEFAULT '1', siege_on int(1) DEFAULT '0', lastuse bigint(20), monsters int(2) DEFAULT '0', PRIMARY KEY (tardis_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
+            "CREATE TABLE IF NOT EXISTS %stardis (tardis_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', owner varchar(32) DEFAULT '', last_known_name varchar(32) DEFAULT '', chunk varchar(64) DEFAULT '', tips int(4) DEFAULT '0', size varchar(32) DEFAULT '', abandoned int(1) DEFAULT '0', artron_level int(11) DEFAULT '0', replaced text NULL, companions text NULL, handbrake_on int(1) DEFAULT '1', iso_on int(1) DEFAULT '0', hidden int(1) DEFAULT '0', recharging int(1) DEFAULT '0', tardis_init int(1) DEFAULT '0', adapti_on int(1) DEFAULT '0', chameleon_preset varchar(32) DEFAULT 'FACTORY', chameleon_demat varchar(32) DEFAULT 'FACTORY', creeper varchar(512) DEFAULT '', beacon varchar(512) DEFAULT '', eps varchar(512) DEFAULT '', rail varchar(512) DEFAULT '', renderer varchar(512) DEFAULT '', zero varchar(512) DEFAULT '', rotor varchar(48) DEFAULT '', powered_on int(1) DEFAULT '0', lights_on int(1) DEFAULT '1', siege_on int(1) DEFAULT '0', lastuse bigint(20), monsters int(2) DEFAULT '0', PRIMARY KEY (tardis_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
             "CREATE TABLE IF NOT EXISTS %stransmats (transmat_id int(11) NOT NULL AUTO_INCREMENT, tardis_id int(11) DEFAULT '0', name varchar(64) DEFAULT '', world varchar(64) DEFAULT '', x float(7,1) DEFAULT '0', y float(3,1) DEFAULT '0', z float(7,1) DEFAULT '0', yaw float(7,1) DEFAULT '0.0', PRIMARY KEY (transmat_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
@@ -213,7 +213,7 @@ public class SQL {
 
             "INSERT INTO `%spaper_bag` (`paper_bag_id`, `uuid`, `flavour_1`, `amount_1`, `flavour_2`, `amount_2`, `flavour_3`, `amount_3`, `flavour_4`, `amount_4`) VALUES ",
 
-            "INSERT INTO `%splayer_prefs` (`pp_id`, `uuid`, `player`, `key_item`, `sfx_on`, `quotes_on`, `artron_level`, `wall`, `floor`,  `siege_wall`, `siege_floor`, `auto_on`, `beacon_on`, `hads_on`, `hads_type`, `build_on`, `eps_on`, `eps_message`, `lamp`, `language`, `texture_on`, `texture_in`, `texture_out`, `submarine_on`, `dnd_on`, `minecart_on`, `renderer_on`, `wool_lights_on`, `ctm_on`, `sign_on`, `telepathy_on`, `travelbar_on`, `farm_on`,  `lanterns_on`, `policebox_textures_on`, `auto_siege_on`, `flying_mode`, `difficulty`, `auto_powerup_on`, `auto_rescue_on`, `hum`) VALUES ",
+            "INSERT INTO `%splayer_prefs` (`pp_id`, `uuid`, `player`, `key_item`, `sfx_on`, `quotes_on`, `artron_level`, `wall`, `floor`,  `siege_wall`, `siege_floor`, `auto_on`, `beacon_on`, `hads_on`, `hads_type`, `build_on`, `eps_on`, `eps_message`, `lamp`, `language`, `texture_on`, `texture_in`, `texture_out`, `submarine_on`, `dnd_on`, `minecart_on`, `renderer_on`, `wool_lights_on`, `ctm_on`, `sign_on`, `telepathy_on`, `travelbar_on`, `farm_on`,  `lanterns_on`, `policebox_textures_on`, `auto_siege_on`, `flying_mode`, `difficulty`, `auto_powerup_on`, `auto_rescue_on`, `font_on`, `hum`) VALUES ",
 
             "INSERT INTO `%sportals` (`portal_id`, `portal`, `teleport`, `direction`, `tardis_id`, `abandoned`) VALUES ",
 
@@ -225,7 +225,7 @@ public class SQL {
 
             "INSERT INTO `%ssiege` (`siege_id`, `uuid`, `tardis_id`) VALUES ",
 
-            "INSERT INTO `%ssonic` (`sonic_id`, `uuid`, `activated`, `sonic_type`, `model`, `bio`, `diamond`, `emerald`, `redstone`, `painter`, `ignite`, `arrow`) VALUES ",
+            "INSERT INTO `%ssonic` (`sonic_id`, `uuid`, `activated`, `sonic_type`, `model`, `bio`, `diamond`, `emerald`, `redstone`, `painter`, `ignite`, `arrow`, `knockback`, `sonic_uuid`) VALUES ",
 
             "INSERT INTO `%sstorage` (`storage_id`, `tardis_id`, `uuid`, `owner`, `saves_one`, `saves_two`, `areas`, `presets_one`, `presets_two`, `biomes_one`, `biomes_two`, `players`, `circuits`, `console`) VALUES ",
 
@@ -233,7 +233,7 @@ public class SQL {
 
             "INSERT INTO `%stag` (`tag_id`, `player`, `time`) VALUES ",
 
-            "INSERT INTO `%stardis` (`tardis_id`, `uuid`, `owner`, `last_known_name`, `chunk`, `tips`, `size`, `abandoned`, `artron_level`, `replaced`, `companions`, `handbrake_on`, `iso_on`, `hidden`, `recharging`, `tardis_init`, `adapti_on`, `chameleon_preset`, `chameleon_demat`, `creeper`, `beacon`, `eps`, `rail`, `renderer`, `zero`, `powered_on`, `lights_on`, `siege_on`, `lastuse`, `monsters`) VALUES ",
+            "INSERT INTO `%stardis` (`tardis_id`, `uuid`, `owner`, `last_known_name`, `chunk`, `tips`, `size`, `abandoned`, `artron_level`, `replaced`, `companions`, `handbrake_on`, `iso_on`, `hidden`, `recharging`, `tardis_init`, `adapti_on`, `chameleon_preset`, `chameleon_demat`, `creeper`, `beacon`, `eps`, `rail`, `renderer`, `zero`, `rotor`, `powered_on`, `lights_on`, `siege_on`, `lastuse`, `monsters`) VALUES ",
 
             "INSERT INTO `%stransmats` (`transmat_id`, `tardis_id`, `name`, `world`, `x`, `y`, `z`, `yaw`) VALUES ",
 
@@ -302,7 +302,7 @@ public class SQL {
 
             "(%s, '%s', '%s', %s, '%s', %s, '%s', %s, '%s', %s)",
 
-            "(%s, '%s', '%s', '%s', %s, %s, %s, '%s', '%s', '%s', '%s', %s, %s, %s, '%s', %s, %s, '%s', '%s', '%s', %s, '%s', '%s', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '%s')",
+            "(%s, '%s', '%s', '%s', %s, %s, %s, '%s', '%s', '%s', '%s', %s, %s, %s, '%s', %s, %s, '%s', '%s', '%s', %s, '%s', '%s', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '%s')",
 
             "(%s, '%s', '%s', '%s', %s, %s)",
 
@@ -314,7 +314,7 @@ public class SQL {
 
             "(%s, '%s', %s)",
 
-            "(%s, '%s', %s, '%s', %s, %s, %s, %s, %s, %s, %s, %s)",
+            "(%s, '%s', %s, '%s', %s, %s, %s, %s, %s, %s, %s, %s, %s, '%s')",
 
             "(%s, %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
 
@@ -322,7 +322,7 @@ public class SQL {
 
             "(%s, '%s', %s)",
 
-            "(%s, '%s', '%s', '%s', '%s', %s, '%s', %s, %s, '%s', '%s', %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, %s, %s, %s, %s)",
+            "(%s, '%s', '%s', '%s', '%s', %s, '%s', %s, %s, '%s', '%s', %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, %s, %s, %s, %s)",
 
             "(%s, %s, '%s', '%s', %s, %s, %s, %s)",
 

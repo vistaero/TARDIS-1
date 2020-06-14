@@ -19,7 +19,7 @@ package me.eccentric_nz.TARDIS.commands.preferences;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.artron.TARDISBeaconToggler;
 import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -37,7 +37,7 @@ class TARDISToggleOnOffCommand {
 
     TARDISToggleOnOffCommand(TARDIS plugin) {
         this.plugin = plugin;
-        was = Arrays.asList("auto", "auto_powerup", "auto_siege", "beacon", "build", "ctm", "difficulty", "dnd", "eps", "farm", "hads", "minecart", "renderer", "submarine", "travelbar", "telepathy");
+        was = Arrays.asList("auto", "auto_powerup", "auto_siege", "beacon", "build", "ctm", "difficulty", "dnd", "eps", "farm", "font", "hads", "minecart", "renderer", "submarine", "travelbar", "telepathy");
     }
 
     public boolean toggle(Player player, String[] args) {

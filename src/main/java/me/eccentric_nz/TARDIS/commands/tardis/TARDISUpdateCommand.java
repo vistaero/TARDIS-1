@@ -27,7 +27,8 @@ import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Farm;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.UPDATEABLE;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISUpdateLister;
 import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -52,7 +53,7 @@ class TARDISUpdateCommand {
 
     boolean startUpdate(Player player, String[] args) {
         if (player.hasPermission("tardis.update")) {
-            if (args.length == 1 && plugin.getPM().isPluginEnabled("ProtocolLib")) {
+            if (args.length == 1) {
                 return new TARDISUpdateChatGUI(plugin).showInterface(player, args);
             } else if (args.length < 2) {
                 TARDISMessage.send(player, "TOO_FEW_ARGS");
@@ -210,6 +211,12 @@ class TARDISUpdateCommand {
                 }
                 if (!plugin.getUtils().canGrowRooms(tardis.getChunk())) {
                     TARDISMessage.send(player, "ARS_OWN_WORLD");
+                    return true;
+                }
+            }
+            if (updateable.equals(UPDATEABLE.WEATHER)) {
+                if (!player.hasPermission("tardis.weather.clear") && !player.hasPermission("tardis.weather.rain") && !player.hasPermission("tardis.weather.thunder")) {
+                    TARDISMessage.send(player, "NO_PERMS");
                     return true;
                 }
             }

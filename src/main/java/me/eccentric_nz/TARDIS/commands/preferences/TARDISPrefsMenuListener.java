@@ -29,7 +29,8 @@ import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
 import me.eccentric_nz.TARDIS.forcefield.TARDISForceField;
 import me.eccentric_nz.TARDIS.listeners.TARDISMenuListener;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.sonic.TARDISSonicConfiguratorInventory;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -58,29 +59,30 @@ public class TARDISPrefsMenuListener extends TARDISMenuListener implements Liste
         super(plugin);
         this.plugin = plugin;
         lookup.put("Auto Power Up", "auto_powerup_on");
-        lookup.put("Autonomous", "auto_on");
-        lookup.put("Autonomous Siege", "auto_siege_on");
         lookup.put("Auto-rescue", "auto_rescue_on");
+        lookup.put("Autonomous Siege", "auto_siege_on");
+        lookup.put("Autonomous", "auto_on");
         lookup.put("Beacon", "beacon_on");
-        lookup.put("Do Not Disturb", "dnd_on");
-        lookup.put("Emergency Programme One", "eps_on");
-        lookup.put("Hostile Action Displacement System", "hads_on");
-        lookup.put("Who Quotes", "quotes_on");
-        lookup.put("Exterior Rendering Room", "renderer_on");
-        lookup.put("Interior SFX", "sfx_on");
-        lookup.put("Submarine Mode", "submarine_on");
-        lookup.put("Resource Pack Switching", "texture_on");
         lookup.put("Companion Build", "build_on");
-        lookup.put("Wool For Lights Off", "wool_lights_on");
         lookup.put("Connected Textures", "ctm_on");
-        lookup.put("Preset Sign", "sign_on");
-        lookup.put("Travel Bar", "travelbar_on");
-        lookup.put("Police Box Textures", "policebox_textures_on");
-        lookup.put("Mob Farming", "farm_on");
-        lookup.put("Telepathic Circuit", "telepathy_on");
+        lookup.put("Do Not Disturb", "dnd_on");
         lookup.put("Easy Difficulty", "difficulty");
-        lookup.put("Minecart Sounds", "minecart_on");
+        lookup.put("Emergency Programme One", "eps_on");
+        lookup.put("Exterior Rendering Room", "renderer_on");
+        lookup.put("Hostile Action Displacement System", "hads_on");
+        lookup.put("Interior SFX", "sfx_on");
         lookup.put("Lanterns", "lanterns_on");
+        lookup.put("Minecart Sounds", "minecart_on");
+        lookup.put("Mob Farming", "farm_on");
+        lookup.put("Police Box Textures", "policebox_textures_on");
+        lookup.put("Preset Sign", "sign_on");
+        lookup.put("Resource Pack Switching", "texture_on");
+        lookup.put("Submarine Mode", "submarine_on");
+        lookup.put("Telepathic Circuit", "telepathy_on");
+        lookup.put("Travel Bar", "travelbar_on");
+        lookup.put("Unicode Font", "font_on");
+        lookup.put("Who Quotes", "quotes_on");
+        lookup.put("Wool For Lights Off", "wool_lights_on");
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -126,7 +128,7 @@ public class TARDISPrefsMenuListener extends TARDISMenuListener implements Liste
                         }
                         return;
                     }
-                    if (slot == 27 && im.getDisplayName().equals("Flight Mode")) {
+                    if (slot == 28 && im.getDisplayName().equals("Flight Mode")) {
                         List<String> lore = im.getLore();
                         // cycle through flight modes
                         TARDISSetFlightCommand.FlightMode flight = TARDISSetFlightCommand.FlightMode.valueOf(lore.get(0));
@@ -212,7 +214,7 @@ public class TARDISPrefsMenuListener extends TARDISMenuListener implements Liste
                         }
                         return;
                     }
-                    if (slot == 33 && im.getDisplayName().equals("TARDIS Map")) {
+                    if (slot == 32 && im.getDisplayName().equals("TARDIS Map")) {
                         // must be in the TARDIS
                         HashMap<String, Object> where = new HashMap<>();
                         where.put("uuid", uuid.toString());
@@ -230,6 +232,18 @@ public class TARDISPrefsMenuListener extends TARDISMenuListener implements Liste
                         } else {
                             TARDISMessage.send(p, "NOT_IN_TARDIS");
                         }
+                        return;
+                    }
+                    if (slot == 33 && im.getDisplayName().equals("Sonic Configurator")) {
+                        // close this gui and load the Sonic Configurator
+                        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                            Inventory sonic_inv = plugin.getServer().createInventory(p, 27, ChatColor.DARK_RED + "Sonic Configurator");
+                            // close inventory
+                            p.closeInventory();
+                            // open new inventory
+                            sonic_inv.setContents(new TARDISSonicConfiguratorInventory().getConfigurator());
+                            p.openInventory(sonic_inv);
+                        }, 1L);
                         return;
                     }
                     if (slot == 35 && im.getDisplayName().equals("Admin Menu")) {

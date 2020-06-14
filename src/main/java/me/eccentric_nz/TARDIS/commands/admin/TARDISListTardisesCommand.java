@@ -20,9 +20,16 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
 import me.eccentric_nz.TARDIS.database.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TableGenerator;
+import me.eccentric_nz.TARDIS.messaging.TableGenerator.Alignment;
+import me.eccentric_nz.TARDIS.messaging.TableGenerator.Receiver;
+import me.eccentric_nz.TARDIS.messaging.TableGeneratorCustomFont;
+import me.eccentric_nz.TARDIS.messaging.TableGeneratorSmallChar;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -91,6 +98,14 @@ class TARDISListTardisesCommand {
             ResultSetTardis rsl = new ResultSetTardis(plugin, new HashMap<>(), limit, true, 0);
             if (rsl.resultSet()) {
                 TARDISMessage.send(sender, "TARDIS_LOCS");
+                TableGenerator tg;
+                if (TableGenerator.getSenderPrefs(sender)) {
+                    tg = new TableGeneratorCustomFont(Alignment.LEFT, Alignment.LEFT, Alignment.LEFT, Alignment.RIGHT, Alignment.RIGHT, Alignment.RIGHT);
+                } else {
+                    tg = new TableGeneratorSmallChar(Alignment.LEFT, Alignment.LEFT, Alignment.LEFT, Alignment.RIGHT, Alignment.RIGHT, Alignment.RIGHT);
+                }
+                tg.addRow(ChatColor.GOLD + "" + ChatColor.UNDERLINE + "ID", ChatColor.GOLD + "" + ChatColor.UNDERLINE + "Time Lord", ChatColor.GOLD + "" + ChatColor.UNDERLINE + "World", ChatColor.GOLD + "" + ChatColor.UNDERLINE + "X", ChatColor.GOLD + "" + ChatColor.UNDERLINE + "Y", ChatColor.GOLD + "" + ChatColor.UNDERLINE + "Z");
+                tg.addRow();
                 for (Tardis t : rsl.getData()) {
                     HashMap<String, Object> wherecl = new HashMap<>();
                     wherecl.put("tardis_id", t.getTardis_id());
@@ -99,9 +114,14 @@ class TARDISListTardisesCommand {
                         TARDISMessage.send(sender, "CURRENT_NOT_FOUND");
                         return true;
                     }
-                    sender.sendMessage("ID: " + t.getTardis_id() + ", Time Lord: " + t.getOwner() + ", Location: " + rsc.getWorld().getName() + ":" + rsc.getX() + ":" + rsc.getY() + ":" + rsc.getZ());
+                    tg.addRow("" + t.getTardis_id(), t.getOwner(), rsc.getWorld().getName(), "" + rsc.getX(), "" + rsc.getY(), "" + rsc.getZ());
                 }
-                TARDISMessage.send(sender, "TARDIS_LOCS_INFO");
+                for (String line : tg.generate(sender instanceof Player ? Receiver.CLIENT : Receiver.CONSOLE, true, true)) {
+                    sender.sendMessage(line);
+                }
+                if (rsl.getData().size() > 18) {
+                    TARDISMessage.send(sender, "TARDIS_LOCS_INFO");
+                }
             } else {
                 TARDISMessage.send(sender, "TARDIS_LOCS_NONE");
             }

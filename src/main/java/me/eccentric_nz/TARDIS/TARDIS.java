@@ -16,6 +16,7 @@
  */
 package me.eccentric_nz.TARDIS;
 
+import io.papermc.lib.PaperLib;
 import me.eccentric_nz.TARDIS.ARS.ARSConverter;
 import me.eccentric_nz.TARDIS.achievement.TARDISAchievementFactory;
 import me.eccentric_nz.TARDIS.api.TARDII;
@@ -26,7 +27,6 @@ import me.eccentric_nz.TARDIS.artron.TARDISStandbyMode;
 import me.eccentric_nz.TARDIS.builders.TARDISConsoleLoader;
 import me.eccentric_nz.TARDIS.builders.TARDISPresetBuilderFactory;
 import me.eccentric_nz.TARDIS.chameleon.ConstructsConverter;
-import me.eccentric_nz.TARDIS.chameleon.TARDISChameleonPoliceBox;
 import me.eccentric_nz.TARDIS.chameleon.TARDISChameleonPreset;
 import me.eccentric_nz.TARDIS.chatGUI.TARDISChatGUIJSON;
 import me.eccentric_nz.TARDIS.chemistry.block.ChemistryBlockRecipes;
@@ -127,7 +127,6 @@ public class TARDIS extends JavaPlugin {
     private String pluginName;
     private String resourcePack;
     private TARDISChameleonPreset presets;
-    private TARDISChameleonPoliceBox boxes;
     private TARDISPerceptionFilter filter;
     private TARDISPluginRespect pluginRespect;
     private TARDISSeedRecipe seeds;
@@ -163,6 +162,7 @@ public class TARDIS extends JavaPlugin {
     private NamespacedKey oldBlockKey;
     private NamespacedKey customBlockKey;
     private NamespacedKey timeLordUuidKey;
+    private NamespacedKey sonicUuidKey;
     private PersistentDataType<byte[], UUID> persistentDataTypeUUID;
     private QueryFactory queryFactory;
     private boolean updateFound = false;
@@ -173,7 +173,6 @@ public class TARDIS extends JavaPlugin {
         worldGuardOnServer = false;
         helperOnServer = false;
         invManager = INVENTORY_MANAGER.NONE;
-        versions.put("Citizens", "2.0.26");
         versions.put("Factions", "1.6.9.5");
         versions.put("GriefPrevention", "16.13");
         versions.put("LibsDisguises", "10.0.0");
@@ -184,9 +183,7 @@ public class TARDIS extends JavaPlugin {
         versions.put("MultiInv", "3.3.6");
         versions.put("My_Worlds", "1.15.2");
         versions.put("PerWorldInventory", "2.3.0");
-        versions.put("ProtocolLib", "4.5.0");
-        versions.put("TARDISChunkGenerator", "4.4");
-        versions.put("TARDISWeepingAngels", "3.2.1");
+        versions.put("TARDISChunkGenerator", "4.4.3");
         versions.put("Towny", "0.95");
         versions.put("WorldBorder", "1.9.0");
         versions.put("WorldGuard", "7.0.0");
@@ -200,6 +197,7 @@ public class TARDIS extends JavaPlugin {
         oldBlockKey = new NamespacedKey(this, "customBlock");
         customBlockKey = new NamespacedKey(this, "custom_block");
         timeLordUuidKey = new NamespacedKey(this, "timelord_uuid");
+        sonicUuidKey = new NamespacedKey(this, "sonic_uuid");
         persistentDataTypeUUID = new TARDISUUIDDataType();
         console = getServer().getConsoleSender();
         Version serverVersion = getServerVersion(getServer().getVersion());
@@ -225,6 +223,7 @@ public class TARDIS extends JavaPlugin {
                     return;
                 }
             }
+            PaperLib.suggestPaper(this);
             worldManager = WORLD_MANAGER.getWorldManager();
             saveDefaultConfig();
             reloadConfig();
@@ -324,8 +323,6 @@ public class TARDIS extends JavaPlugin {
             new TARDISChecker(this).checkAdvancements();
             presets = new TARDISChameleonPreset();
             presets.makePresets();
-            boxes = new TARDISChameleonPoliceBox();
-            boxes.makePresets();
             if (getConfig().getBoolean("preferences.walk_in_tardis")) {
                 new TARDISPortalPersister(this).load();
                 getServer().getScheduler().scheduleSyncRepeatingTask(this, new TARDISMonsterRunnable(this), 2400L, 2400L);
@@ -345,6 +342,8 @@ public class TARDIS extends JavaPlugin {
                 TARDISHadsPersister thp = new TARDISHadsPersister(this);
                 thp.load();
             }
+            TARDISTimeRotorLoader trl = new TARDISTimeRotorLoader(this);
+            trl.load();
             if (getConfig().getBoolean("allow.chemistry")) {
                 new ChemistryBlockRecipes(this).addRecipes();
                 new BleachRecipe(this).setRecipes();
@@ -382,9 +381,12 @@ public class TARDIS extends JavaPlugin {
                     getServer().dispatchCommand(getConsole(), "minecraft:reload");
                 }
             }, 199L);
+            // check TARDIS build
             if (getConfig().getBoolean("preferences.notify_update")) {
                 getServer().getScheduler().runTaskAsynchronously(this, new TARDISUpdateChecker(this));
             }
+            // check Spigot build
+            getServer().getScheduler().runTaskAsynchronously(this, new TARDISSpigotChecker(this));
             // resume any room growing
             new TARDISRoomPersister(this).resume();
             if (getConfig().getInt("allow.force_field") > 0) {
@@ -1013,7 +1015,7 @@ public class TARDIS extends JavaPlugin {
         if (getPM().isPluginEnabled("TARDISWeepingAngels")) {
             Plugin twa = getPM().getPlugin("TARDISWeepingAngels");
             Version version = new Version(twa.getDescription().getVersion());
-            return (version.compareTo(new Version("3.2")) >= 0);
+            return (version.compareTo(new Version("3.3")) >= 0);
         } else {
             return false;
         }
@@ -1124,10 +1126,6 @@ public class TARDIS extends JavaPlugin {
 
     public TARDISChameleonPreset getPresets() {
         return presets;
-    }
-
-    public TARDISChameleonPoliceBox getBoxes() {
-        return boxes;
     }
 
     public TARDISShapedRecipe getFigura() {
@@ -1255,6 +1253,10 @@ public class TARDIS extends JavaPlugin {
 
     public NamespacedKey getTimeLordUuidKey() {
         return timeLordUuidKey;
+    }
+
+    public NamespacedKey getSonicUuidKey() {
+        return sonicUuidKey;
     }
 
     public PersistentDataType<byte[], UUID> getPersistentDataTypeUUID() {

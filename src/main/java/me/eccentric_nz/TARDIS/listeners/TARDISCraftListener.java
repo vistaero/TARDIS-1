@@ -72,6 +72,7 @@ public class TARDISCraftListener implements Listener {
         t.put(Material.PURPUR_BLOCK, "ENDER"); // ender schematic designed by ToppanaFIN (player at thatsnotacreeper.com)
         t.put(Material.QUARTZ_BLOCK, "ARS"); // ARS
         t.put(Material.REDSTONE_BLOCK, "REDSTONE"); // redstone
+        t.put(Material.HONEYCOMB_BLOCK, "ROTOR"); // rotor
         t.put(Material.SANDSTONE_STAIRS, "PYRAMID"); // pyramid schematic designed by airomis (player at thatsnotacreeper.com)
         t.put(Material.WHITE_TERRACOTTA, "WAR"); // war doctor
         t.put(Material.CYAN_GLAZED_TERRACOTTA, "LEGACY_ELEVENTH"); // legacy_eleventh
@@ -131,6 +132,7 @@ public class TARDISCraftListener implements Listener {
                     List<String> lore = im.getLore();
                     lore.add("Walls: " + ci.getItem(6).getType().toString());
                     lore.add("Floors: " + ci.getItem(9).getType().toString());
+                    lore.add("Chameleon: FACTORY");
                     im.setLore(lore);
                     is.setItemMeta(im);
                     ci.setResult(is);
@@ -162,14 +164,18 @@ public class TARDISCraftListener implements Listener {
                     lam.setColor(Color.WHITE);
                     is.setItemMeta(lam);
                     ci.setResult(is);
-                } else if (dn.contains("Key")) {
+                } else if (dn.contains("Key") || dn.contains("Authorised Control")) {
                     HumanEntity human = event.getView().getPlayer();
                     if (human instanceof Player) {
                         ItemMeta im = is.getItemMeta();
                         im.getPersistentDataContainer().set(plugin.getTimeLordUuidKey(), plugin.getPersistentDataTypeUUID(), human.getUniqueId());
                         List<String> lore = im.getLore();
+                        if (lore == null) {
+                            lore = new ArrayList<>();
+                        }
                         String format = ChatColor.AQUA + "" + ChatColor.ITALIC;
-                        lore.add(format + "This key belongs to");
+                        String what = dn.contains("Key") ? "key" : "disk";
+                        lore.add(format + "This " + what + " belongs to");
                         lore.add(format + human.getName());
                         im.setLore(lore);
                         is.setItemMeta(im);

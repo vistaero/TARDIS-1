@@ -45,6 +45,7 @@ import me.eccentric_nz.TARDIS.commands.admin.TARDISAdminMenuListener;
 import me.eccentric_nz.TARDIS.commands.preferences.TARDISHumListener;
 import me.eccentric_nz.TARDIS.commands.preferences.TARDISKeyMenuListener;
 import me.eccentric_nz.TARDIS.commands.preferences.TARDISPrefsMenuListener;
+import me.eccentric_nz.TARDIS.commands.utils.TARDISWeatherListener;
 import me.eccentric_nz.TARDIS.companionGUI.TARDISCompanionAddGUIListener;
 import me.eccentric_nz.TARDIS.companionGUI.TARDISCompanionGUIListener;
 import me.eccentric_nz.TARDIS.control.TARDISControlListener;
@@ -107,12 +108,14 @@ class TARDISListenerRegisterer {
                 plugin.getPM().registerEvents(new TARDISAnyoneDoorListener(plugin), plugin);
                 plugin.getPM().registerEvents(new TARDISAnyoneMoveListener(plugin), plugin);
             } else {
+                plugin.getPM().registerEvents(new TARDISPoliceBoxDoorListener(plugin), plugin);
                 plugin.getPM().registerEvents(new TARDISDoorWalkListener(plugin), plugin);
                 plugin.getPM().registerEvents(new TARDISMoveListener(plugin), plugin);
             }
         } else {
             plugin.getPM().registerEvents(new TARDISDoorClickListener(plugin), plugin);
         }
+        plugin.getPM().registerEvents(new TARDISHangingListener(plugin), plugin);
         TARDISSonicListener sonicListener = new TARDISSonicListener(plugin);
         plugin.getPM().registerEvents(sonicListener, plugin);
         TARDISRenderRoomListener rendererListener = new TARDISRenderRoomListener(plugin);
@@ -198,9 +201,6 @@ class TARDISListenerRegisterer {
         plugin.getPM().registerEvents(new TARDISPresetListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISQuitListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISRecipeListener(plugin), plugin);
-        if (plugin.getPM().isPluginEnabled("ProjectRassilon")) {
-            plugin.getPM().registerEvents(new TARDISRegenerationListener(plugin), plugin);
-        }
         plugin.getPM().registerEvents(new TARDISRegulatorListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISRemoteKeyListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISRedstoneListener(plugin), plugin);
@@ -220,6 +220,7 @@ class TARDISListenerRegisterer {
         plugin.getPM().registerEvents(new TARDISSleepListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISSmelterListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISSonicEntityListener(plugin), plugin);
+        plugin.getPM().registerEvents(new TARDISSonicConfiguratorMenuListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISSonicGeneratorMenuListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISSonicGeneratorListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISSonicActivatorListener(plugin), plugin);
@@ -246,17 +247,11 @@ class TARDISListenerRegisterer {
         plugin.getPM().registerEvents(new TARDISWallFloorMenuListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISRecipeMenuListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISSeedMenuListener(plugin), plugin);
-        if (getNPCManager()) {
-            plugin.getPM().registerEvents(new TARDISNPCListener(plugin), plugin);
-        }
         if (plugin.getPM().isPluginEnabled("Multiverse-Adventure")) {
             plugin.getPM().registerEvents(new TARDISWorldResetListener(plugin), plugin);
         }
-        plugin.getPM().registerEvents(new TARDISZeroRoomChatListener(plugin), plugin);
-        if (plugin.getPM().isPluginEnabled("ProtocolLib")) {
-            if (plugin.getConfig().getBoolean("allow.zero_room")) {
-                new TARDISZeroRoomPacketListener(plugin);
-            }
+        if (plugin.getConfig().getBoolean("allow.zero_room")) {
+            plugin.getPM().registerEvents(new TARDISZeroRoomChatListener(plugin), plugin);
         }
         if (plugin.getConfig().getBoolean("arch.enabled")) {
             plugin.getPM().registerEvents(new TARDISFobWatchListener(plugin), plugin);
@@ -318,26 +313,10 @@ class TARDISListenerRegisterer {
             plugin.getPM().registerEvents(new BalloonListener(plugin), plugin);
             plugin.getPM().registerEvents(new InventoryHelper(plugin), plugin);
         }
-        if (plugin.getConfig().getBoolean("travel.allow_end_after_visit") || plugin.getConfig().getBoolean("travel.allow_end_after_visit")) {
+        if (plugin.getConfig().getBoolean("travel.allow_end_after_visit") || plugin.getConfig().getBoolean("travel.allow_nether_after_visit")) {
             plugin.getPM().registerEvents(new TARDISWorldChangeListener(plugin), plugin);
         }
+        plugin.getPM().registerEvents(new TARDISWeatherListener(plugin), plugin);
         return info;
-    }
-
-    private boolean getNPCManager() {
-        if (plugin.getPM().getPlugin("Citizens") != null && plugin.getPM().getPlugin("Citizens").isEnabled()) {
-            if (plugin.getConfig().getBoolean("allow.emergency_npc")) {
-                plugin.debug("Enabling Emergency Programme One!");
-            }
-            return true;
-        } else {
-            if (plugin.getConfig().getBoolean("allow.emergency_npc")) {
-                plugin.debug("Emergency Programme One was disabled as it requires the Citizens plugin!");
-            }
-            // set emergency_npc false as Citizens not found
-            plugin.getConfig().set("allow.emergency_npc", false);
-            plugin.saveConfig();
-            return false;
-        }
     }
 }

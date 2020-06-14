@@ -270,11 +270,11 @@ shaped:
     amount: 1
     lore: ''
   TARDIS Key:
-    easy_shape: '---,-R-,-G-'
+    easy_shape: R,G
     easy_ingredients:
       R: REDSTONE
       G: GOLD_NUGGET
-    hard_shape: '---,-C-,-G-'
+    hard_shape: C,G
     hard_ingredients:
       C: COMPARATOR
       G: GOLD_NUGGET
@@ -887,6 +887,98 @@ shaped:
     result: OAK_SIGN
     amount: 1
     lore: ''
+  Time Rotor Early:
+    easy_shape: 'CRC,GWG,GRG'
+    easy_ingredients:
+      C: GRAY_DYE
+      R: REDSTONE
+      W: CLOCK
+      G: GLASS_PANE
+    hard_shape: 'CRC,GWG,GRG'
+    hard_ingredients:
+      C: GRAY_DYE
+      R: REDSTONE_BLOCK
+      W: CLOCK
+      G: GLASS_PANE
+    result: LIGHT_GRAY_DYE
+    amount: 1
+    lore: ''
+  Time Rotor Tenth:
+    easy_shape: 'CRC,GWG,GRG'
+    easy_ingredients:
+      C: CYAN_DYE
+      R: REDSTONE
+      W: CLOCK
+      G: GLASS_PANE
+    hard_shape: 'CRC,GWG,GRG'
+    hard_ingredients:
+      C: CYAN_DYE
+      R: REDSTONE_BLOCK
+      W: CLOCK
+      G: GLASS_PANE
+    result: LIGHT_GRAY_DYE
+    amount: 1
+    lore: ''
+  Time Rotor Eleventh:
+    easy_shape: 'CRC,GWG,GRG'
+    easy_ingredients:
+      C: BROWN_DYE
+      R: REDSTONE
+      W: CLOCK
+      G: GLASS_PANE
+    hard_shape: 'CRC,GWG,GRG'
+    hard_ingredients:
+      C: BROWN_DYE
+      R: REDSTONE_BLOCK
+      W: CLOCK
+      G: GLASS_PANE
+    result: LIGHT_GRAY_DYE
+    amount: 1
+    lore: ''
+  Time Rotor Twelfth:
+    easy_shape: 'CRC,GWG,GRG'
+    easy_ingredients:
+      C: ORANGE_DYE
+      R: REDSTONE
+      W: CLOCK
+      G: GLASS_PANE
+    hard_shape: 'CRC,GWG,GRG'
+    hard_ingredients:
+      C: ORANGE_DYE
+      R: REDSTONE_BLOCK
+      W: CLOCK
+      G: GLASS_PANE
+    result: LIGHT_GRAY_DYE
+    amount: 1
+    lore: ''
+  Knockback Circuit:
+    easy_shape: '-K-,RSR,-R-'
+    easy_ingredients:
+      K: GOLDEN_SWORD
+      R: REDSTONE
+      S: SHIELD
+    hard_shape: '-K-,RSR,-R-'
+    hard_ingredients:
+      K: ENCHANTED_BOOK≈KNOCKBACK
+      R: REDSTONE
+      S: SHIELD
+    result: GLOWSTONE_DUST
+    amount: 1
+    lore: ''
+  Authorised Control Disk:
+    easy_shape: 'QRQ,RLR,QRQ'
+    easy_ingredients:
+      Q: QUARTZ
+      R: REDSTONE
+      L: GLASS_PANE
+    hard_shape: 'QRQ,RGR,QRQ'
+    hard_ingredients:
+      Q: QUARTZ
+      R: REDSTONE
+      G: GOLDEN_HELMET
+    result: MUSIC_DISC_FAR
+    amount: 1
+    lore: ''
 # -------------------
 # these are the shapeless recipes
 # -------------------
@@ -953,6 +1045,11 @@ shapeless:
     lore: ''
   Pickup Arrows Upgrade:
     recipe: BLAZE_ROD,GLOWSTONE_DUST=Pickup Arrows Circuit
+    result: BLAZE_ROD
+    amount: 1
+    lore: ''
+  Knockback Upgrade:
+    recipe: BLAZE_ROD,GLOWSTONE_DUST=Knockback Circuit
     result: BLAZE_ROD
     amount: 1
     lore: ''

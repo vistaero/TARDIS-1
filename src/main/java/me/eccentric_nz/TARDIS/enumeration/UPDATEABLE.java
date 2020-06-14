@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 eccentric_nz
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with plugin program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.eccentric_nz.TARDIS.enumeration;
 
 import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
@@ -19,7 +35,7 @@ public enum UPDATEABLE {
     CONDENSER(true, true, new RecipeChoice.MaterialChoice(Material.CHEST)),
     CONTROL(true, true, new RecipeChoice.MaterialChoice(Tag.SIGNS)),
     CREEPER(false, false, true),
-    DIRECTION(false, true),
+    DIRECTION(false, true, new RecipeChoice.MaterialChoice(Material.ITEM_FRAME)),
     DISPENSER(true, true, new RecipeChoice.MaterialChoice(Material.DISPENSER)),
     DOOR(false, true, new RecipeChoice.MaterialChoice(Material.IRON_DOOR)),
     EPS(false, false, true),
@@ -34,7 +50,9 @@ public enum UPDATEABLE {
     INFO(true, true, new RecipeChoice.MaterialChoice(Tag.SIGNS)),
     KEYBOARD(true, false, new RecipeChoice.MaterialChoice(Tag.SIGNS)),
     LIGHT(true, true),
+    MAP(false, false, new RecipeChoice.MaterialChoice(Material.ITEM_FRAME)),
     RAIL(false, false, new RecipeChoice.MaterialChoice(Tag.FENCES)),
+    ROTOR(false, false, new RecipeChoice.MaterialChoice(Material.ITEM_FRAME)),
     SAVE_SIGN(true, true, new RecipeChoice.MaterialChoice(Tag.SIGNS)),
     SCANNER(true, true),
     SIEGE(true, false),
@@ -48,6 +66,7 @@ public enum UPDATEABLE {
     TOGGLE_WOOL(true, true),
     VAULT(false, false, new RecipeChoice.MaterialChoice(Material.CHEST, Material.TRAPPED_CHEST)),
     VILLAGE(false, false, true),
+    WEATHER(true, true),
     WORLD_REPEATER(false, true, new RecipeChoice.MaterialChoice(Material.REPEATER)),
     X_REPEATER(false, true, new RecipeChoice.MaterialChoice(Material.REPEATER)),
     Y_REPEATER(false, true, new RecipeChoice.MaterialChoice(Material.REPEATER)),

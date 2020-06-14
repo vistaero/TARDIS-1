@@ -20,7 +20,8 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISSeedModel;
 import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
 import me.eccentric_nz.TARDIS.enumeration.RECIPE_ITEM;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISRecipeLister;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -61,6 +62,7 @@ public class TARDISRecipeCommands implements CommandExecutor {
         recipeItems.put("c-circuit", "TARDIS Chameleon Circuit");
         recipeItems.put("cell", "Artron Storage Cell");
         recipeItems.put("communicator", "TARDIS Communicator");
+        recipeItems.put("control", "Authorised Control Disk");
         recipeItems.put("custard", "Bowl of Custard");
         recipeItems.put("d-circuit", "Diamond Disruptor Circuit");
         recipeItems.put("e-circuit", "Emerald Environment Circuit");
@@ -75,6 +77,7 @@ public class TARDISRecipeCommands implements CommandExecutor {
         recipeItems.put("invisible", "TARDIS Invisibility Circuit");
         recipeItems.put("jammy-dodger", "Jammy Dodger");
         recipeItems.put("jelly-baby", "Orange Jelly Baby");
+        recipeItems.put("k-circuit", "Knockback Circuit");
         recipeItems.put("key", "TARDIS Key");
         recipeItems.put("keyboard", "TARDIS Keyboard Editor");
         recipeItems.put("l-circuit", "TARDIS Locator Circuit");
@@ -96,9 +99,14 @@ public class TARDISRecipeCommands implements CommandExecutor {
         recipeItems.put("rift-circuit", "Rift Circuit");
         recipeItems.put("rift-manipulator", "Rift Manipulator");
         recipeItems.put("rust", "Rust Plague Sword");
+        recipeItems.put("rotor_early", "Time Rotor Early");
+        recipeItems.put("rotor_tenth", "Time Rotor Tenth");
+        recipeItems.put("rotor_eleventh", "Time Rotor Eleventh");
+        recipeItems.put("rotor_twelfth", "Time Rotor Twelfth");
         recipeItems.put("s-circuit", "TARDIS Stattenheim Circuit");
         recipeItems.put("save-disk", "Save Storage Disk");
         recipeItems.put("scanner-circuit", "TARDIS Scanner Circuit");
+        recipeItems.put("seed", "");
         recipeItems.put("sonic", "Sonic Screwdriver");
         recipeItems.put("t-circuit", "TARDIS Temporal Circuit");
         recipeItems.put("tardis", "");
@@ -117,6 +125,7 @@ public class TARDISRecipeCommands implements CommandExecutor {
         t.put("FACTORY", Material.YELLOW_CONCRETE_POWDER); // factory schematic designed by Razihel
         t.put("PLANK", Material.BOOKSHELF); // plank
         t.put("REDSTONE", Material.REDSTONE_BLOCK); // redstone
+        t.put("ROTOR", Material.HONEYCOMB_BLOCK); // rotor
         t.put("STEAMPUNK", Material.COAL_BLOCK); // steampunk
         t.put("TOM", Material.LAPIS_BLOCK); // tom baker
         t.put("THIRTEENTH", Material.ORANGE_CONCRETE); // thirteenth designed by Razihel
@@ -161,11 +170,11 @@ public class TARDISRecipeCommands implements CommandExecutor {
                 TARDISMessage.send(player, "TOO_FEW_ARGS");
                 return false;
             }
-            if (args[0].equalsIgnoreCase("tardis") && args.length < 2) {
+            if ((args[0].equalsIgnoreCase("seed") || args[0].equalsIgnoreCase("tardis")) && args.length < 2) {
                 TARDISMessage.send(player, "TOO_FEW_ARGS");
                 return true;
             }
-            if (args[0].equalsIgnoreCase("tardis") && args.length == 2) {
+            if ((args[0].equalsIgnoreCase("seed") || args[0].equalsIgnoreCase("tardis")) && args.length == 2) {
                 if (!t.containsKey(args[1].toUpperCase(Locale.ENGLISH))) {
                     TARDISMessage.send(player, "ARG_NOT_VALID");
                     return true;
@@ -269,7 +278,7 @@ public class TARDISRecipeCommands implements CommandExecutor {
             lore.set(1, uses);
             im.setLore(lore);
         }
-        if (str.equals("Save Storage Disk") || str.equals("Preset Storage Disk") || str.equals("Biome Storage Disk") || str.equals("Player Storage Disk") || str.equals("Sonic Blaster")) {
+        if (str.equals("Blank Storage Disk") || str.equals("Save Storage Disk") || str.equals("Preset Storage Disk") || str.equals("Biome Storage Disk") || str.equals("Player Storage Disk") || str.equals("Authorised Control Disk") || str.equals("Sonic Blaster")) {
             im.addItemFlags(ItemFlag.values());
         }
         result.setAmount(1);
@@ -304,7 +313,7 @@ public class TARDISRecipeCommands implements CommandExecutor {
         ItemStack result = recipe.getResult();
         ItemMeta im = result.getItemMeta();
         im.setDisplayName(str);
-        if (str.equals("Blank Storage Disk") || str.equals("Save Storage Disk") || str.equals("Preset Storage Disk") || str.equals("Biome Storage Disk") || str.equals("Player Storage Disk") || str.equals("Sonic Blaster")) {
+        if (str.equals("Blank Storage Disk") || str.equals("Save Storage Disk") || str.equals("Preset Storage Disk") || str.equals("Biome Storage Disk") || str.equals("Player Storage Disk") || str.equals("Authorised Control Disk") || str.equals("Sonic Blaster")) {
             im.addItemFlags(ItemFlag.values());
         }
         RECIPE_ITEM recipeItem = RECIPE_ITEM.getByName(str);
@@ -345,6 +354,9 @@ public class TARDISRecipeCommands implements CommandExecutor {
         if (CONSOLES.getBY_NAMES().get(type.toUpperCase()).isCustom()) {
             model = 45;
             tardis = new ItemStack(Material.MUSHROOM_STEM, 1);
+        } else if (type.equalsIgnoreCase("ROTOR")) {
+            model = 44;
+            tardis = new ItemStack(Material.MUSHROOM_STEM, 1);
         } else {
             model = TARDISSeedModel.modelByString(type.toUpperCase());
             tardis = new ItemStack(Material.RED_MUSHROOM_BLOCK, 1);
@@ -355,7 +367,7 @@ public class TARDISRecipeCommands implements CommandExecutor {
         // set display name
         seed.setDisplayName(ChatColor.GOLD + "TARDIS Seed Block");
         List<String> lore = new ArrayList<>();
-        lore.add(type);
+        lore.add(type.toUpperCase());
         lore.add("Walls: ORANGE_WOOL");
         lore.add("Floors: LIGHT_GRAY_WOOL");
         lore.add("Chameleon: FACTORY");

@@ -46,6 +46,7 @@ class TARDISSQLiteDatabaseUpdater {
     private final List<String> inventoryupdates = new ArrayList<>();
     private final List<String> chameleonupdates = new ArrayList<>();
     private final List<String> farmingupdates = new ArrayList<>();
+    private final List<String> sonicupdates = new ArrayList<>();
     private final List<String> uuidUpdates = Arrays.asList("achievements", "ars", "player_prefs", "storage", "t_count", "tardis", "travellers");
     private final Statement statement;
     private final TARDIS plugin;
@@ -85,6 +86,7 @@ class TARDISSQLiteDatabaseUpdater {
         prefsupdates.add("floor TEXT DEFAULT 'LIGHT_GRAY_WOOL'");
         prefsupdates.add("flying_mode INTEGER DEFAULT 1");
         prefsupdates.add("hads_on INTEGER DEFAULT 1");
+        prefsupdates.add("font_on INTEGER DEFAULT 0");
         prefsupdates.add("hads_type TEXT DEFAULT 'DISPLACEMENT'");
         prefsupdates.add("hum TEXT DEFAULT ''");
         prefsupdates.add("key TEXT DEFAULT ''");
@@ -125,6 +127,7 @@ class TARDISSQLiteDatabaseUpdater {
         tardisupdates.add("rail TEXT DEFAULT ''");
         tardisupdates.add("recharging INTEGER DEFAULT 0");
         tardisupdates.add("renderer TEXT DEFAULT ''");
+        tardisupdates.add("rotor TEXT DEFAULT ''");
         tardisupdates.add("siege_on INTEGER DEFAULT 0");
         tardisupdates.add("tardis_init INTEGER DEFAULT 0");
         tardisupdates.add("tips INTEGER DEFAULT '-1'");
@@ -138,6 +141,10 @@ class TARDISSQLiteDatabaseUpdater {
         chameleonupdates.add("asymmetric INTEGER DEFAULT 0");
         farmingupdates.add("apiary TEXT DEFAULT ''");
         farmingupdates.add("bamboo TEXT DEFAULT ''");
+        sonicupdates.add("arrow INTEGER DEFAULT 0");
+        sonicupdates.add("knockback INTEGER DEFAULT 0");
+        sonicupdates.add("model INTEGER DEFAULT 10000011");
+        sonicupdates.add("sonic_uuid TEXT DEFAULT ''");
     }
 
     /**
@@ -295,6 +302,16 @@ class TARDISSQLiteDatabaseUpdater {
                     statement.executeUpdate(f_alter);
                 }
             }
+            for (String s : sonicupdates) {
+                String[] fsplit = s.split(" ");
+                String s_query = "SELECT sql FROM sqlite_master WHERE tbl_name = '" + prefix + "sonic' AND sql LIKE '%" + fsplit[0] + "%'";
+                ResultSet rss = statement.executeQuery(s_query);
+                if (!rss.next()) {
+                    i++;
+                    String s_alter = "ALTER TABLE " + prefix + "sonic ADD " + s;
+                    statement.executeUpdate(s_alter);
+                }
+            }
             // add biome to current location
             String bio_query = "SELECT sql FROM sqlite_master WHERE tbl_name = '" + prefix + "current' AND sql LIKE '%biome%'";
             ResultSet rsbio = statement.executeQuery(bio_query);
@@ -318,22 +335,6 @@ class TARDISSQLiteDatabaseUpdater {
                 i++;
                 String rep_alter = "ALTER TABLE " + prefix + "t_count ADD repair INTEGER DEFAULT 0";
                 statement.executeUpdate(rep_alter);
-            }
-            // add arrow to sonic
-            String arrow_query = "SELECT sql FROM sqlite_master WHERE tbl_name = '" + prefix + "sonic' AND sql LIKE '%arrow%'";
-            ResultSet rsarrow = statement.executeQuery(arrow_query);
-            if (!rsarrow.next()) {
-                i++;
-                String arrow_alter = "ALTER TABLE " + prefix + "sonic ADD arrow INTEGER DEFAULT 0";
-                statement.executeUpdate(arrow_alter);
-            }
-            // add model to sonic
-            String model_query = "SELECT sql FROM sqlite_master WHERE tbl_name = '" + prefix + "sonic' AND sql LIKE '%model%'";
-            ResultSet rsmodel = statement.executeQuery(model_query);
-            if (!rsmodel.next()) {
-                i++;
-                String model_alter = "ALTER TABLE " + prefix + "sonic ADD model INTEGER DEFAULT 10000011";
-                statement.executeUpdate(model_alter);
             }
             // add tardis_id to dispersed
             String dispersed_query = "SELECT sql FROM sqlite_master WHERE tbl_name = '" + prefix + "dispersed' AND sql LIKE '%tardis_id%'";

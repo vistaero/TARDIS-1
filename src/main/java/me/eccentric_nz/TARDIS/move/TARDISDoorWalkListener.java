@@ -24,11 +24,11 @@ import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.flight.TARDISTakeoff;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.mobfarming.TARDISFarmer;
 import me.eccentric_nz.TARDIS.mobfarming.TARDISFollowerSpawner;
 import me.eccentric_nz.TARDIS.mobfarming.TARDISPetsAndFollowers;
 import me.eccentric_nz.TARDIS.travel.TARDISDoorLocation;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISResourcePackChanger;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
@@ -229,9 +229,9 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                 ResultSetCompanions rsc = new ResultSetCompanions(plugin, id);
                                 if (rsc.getCompanions().contains(playerUUID) || rs.getTardis().isAbandoned()) {
                                     if (!rsd.isLocked()) {
-                                        boolean isPoliceBoxBlue = (rs.getTardis().getPreset().equals(PRESET.POLICE_BOX_BLUE) || rs.getTardis().getPreset().equals(PRESET.POLICE_BOX_BLUE_OPEN));
+                                        boolean isPoliceBox = (rs.getTardis().getPreset().isColoured());
                                         // toggle the door open/closed
-                                        if (Tag.DOORS.isTagged(blockType) || (blockType.equals(Material.OAK_TRAPDOOR) && isPoliceBoxBlue)) {
+                                        if (Tag.DOORS.isTagged(blockType) || (blockType.equals(Material.OAK_TRAPDOOR) && isPoliceBox)) {
                                             if (doortype == 0 || doortype == 1) {
                                                 boolean open = TARDISStaticUtils.isDoorOpen(block);
                                                 if (!material.equals(m) && doortype == 0 && !open) {
@@ -253,8 +253,8 @@ public class TARDISDoorWalkListener extends TARDISDoorListener implements Listen
                                                     new TARDISTakeoff(plugin).run(id, player, rs.getTardis().getBeacon());
                                                 }
                                                 // toggle the door
-                                                if (isPoliceBoxBlue) {
-                                                    new TARDISModelChanger(plugin, block, player, id, doortype).toggleDoors();
+                                                if (isPoliceBox) {
+                                                    new TARDISCustomModelDataChanger(plugin, block, player, id).toggleOuterDoor();
                                                 } else {
                                                     new TARDISDoorToggler(plugin, block, player, minecart, open, id).toggleDoors();
                                                 }

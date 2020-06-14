@@ -101,6 +101,7 @@ public class TARDISPrefsMenuInventory {
         values.add(rsp.isLanternsOn());
         values.add(rsp.isMinecartOn());
         values.add(rsp.isEasyDifficulty());
+        values.add(rsp.useCustomFont());
 
         // get TARDIS preset
         Tardis tardis = null;
@@ -142,7 +143,7 @@ public class TARDISPrefsMenuInventory {
         ght_im.setLore(Collections.singletonList(mode_value));
         ght_im.setCustomModelData(GUIPlayerPreferences.FLIGHT_MODE.getCustomModelData());
         fli.setItemMeta(ght_im);
-        stack[27] = fli;
+        stack[28] = fli;
         // interior hum sound
         ItemStack hum = new ItemStack(Material.BOWL, 1);
         ItemMeta hum_im = hum.getItemMeta();
@@ -166,7 +167,14 @@ public class TARDISPrefsMenuInventory {
         map.setDisplayName("TARDIS Map");
         map.setCustomModelData(GUIPlayerPreferences.TARDIS_MAP.getCustomModelData());
         tt.setItemMeta(map);
-        stack[33] = tt;
+        stack[32] = tt;
+        // map
+        ItemStack sonic = new ItemStack(Material.BOWL, 1);
+        ItemMeta config = sonic.getItemMeta();
+        config.setDisplayName("Sonic Configurator");
+        config.setCustomModelData(GUIPlayerPreferences.SONIC_CONFIGURATOR.getCustomModelData());
+        sonic.setItemMeta(config);
+        stack[33] = sonic;
         if (plugin.getServer().getPlayer(uuid).hasPermission("tardis.admin")) {
             // admin
             ItemStack ad = new ItemStack(Material.NETHER_STAR, 1);

@@ -21,7 +21,8 @@ import me.eccentric_nz.TARDIS.custommodeldata.TARDISSeedModel;
 import me.eccentric_nz.TARDIS.database.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISGiveLister;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -67,6 +68,7 @@ public class TARDISGiveCommand implements CommandExecutor {
         items.put("c-circuit", "TARDIS Chameleon Circuit");
         items.put("cell", "Artron Storage Cell");
         items.put("communicator", "TARDIS Communicator");
+        items.put("control", "Authorised Control Disk");
         items.put("custard", "Bowl of Custard");
         items.put("d-circuit", "Diamond Disruptor Circuit");
         items.put("e-circuit", "Emerald Environment Circuit");
@@ -81,6 +83,7 @@ public class TARDISGiveCommand implements CommandExecutor {
         items.put("invisible", "TARDIS Invisibility Circuit");
         items.put("jammy-dodger", "Jammy Dodger");
         items.put("jelly-baby", "Orange Jelly Baby");
+        items.put("k-circuit", "Knockback Circuit");
         items.put("key", "TARDIS Key");
         items.put("keyboard", "TARDIS Keyboard Editor");
         items.put("kit", "TARDIS Item Kit");
@@ -104,6 +107,10 @@ public class TARDISGiveCommand implements CommandExecutor {
         items.put("rift-circuit", "Rift Circuit");
         items.put("rift-manipulator", "Rift Manipulator");
         items.put("rust", "Rust Plague Sword");
+        items.put("rotor_early", "Time Rotor Early");
+        items.put("rotor_tenth", "Time Rotor Tenth");
+        items.put("rotor_eleventh", "Time Rotor Eleventh");
+        items.put("rotor_twelfth", "Time Rotor Twelfth");
         items.put("s-circuit", "TARDIS Stattenheim Circuit");
         items.put("save-disk", "Save Storage Disk");
         items.put("scanner-circuit", "TARDIS Scanner Circuit");
@@ -270,17 +277,22 @@ public class TARDISGiveCommand implements CommandExecutor {
             im.setLore(lore);
             result.setItemMeta(im);
         }
-        if (item.equals("blank") || item.equals("save-disk") || item.equals("preset-disk") || item.equals("biome-disk") || item.equals("player-disk") || item.equals("blaster")) {
+        if (item.equals("blank") || item.equals("save-disk") || item.equals("preset-disk") || item.equals("biome-disk") || item.equals("player-disk") || item.equals("blaster") || item.equals("control")) {
             ItemMeta im = result.getItemMeta();
             im.addItemFlags(ItemFlag.values());
             result.setItemMeta(im);
         }
-        if (item.equals("key") || item.equals("r-key")) {
+
+        if (item.equals("key") || item.equals("r-key") || item.equals("control")) {
             ItemMeta im = result.getItemMeta();
             im.getPersistentDataContainer().set(plugin.getTimeLordUuidKey(), plugin.getPersistentDataTypeUUID(), player.getUniqueId());
             List<String> lore = im.getLore();
+            if (lore == null) {
+                lore = new ArrayList<>();
+            }
             String format = ChatColor.AQUA + "" + ChatColor.ITALIC;
-            lore.add(format + "This key belongs to");
+            String what = item.equals("key") ? "key" : "disk";
+            lore.add(format + "This " + what + " belongs to");
             lore.add(format + player.getName());
             im.setLore(lore);
             result.setItemMeta(im);
@@ -302,12 +314,13 @@ public class TARDISGiveCommand implements CommandExecutor {
             result = recipe.getResult();
             if (result.hasItemMeta()) {
                 ItemMeta im = result.getItemMeta();
-                if (im.hasDisplayName() && im.getDisplayName().contains("Key")) {
+                if (im.hasDisplayName() && (im.getDisplayName().contains("Key") || im.getDisplayName().contains("Authorised Control Disk"))) {
                     im.getPersistentDataContainer().set(plugin.getTimeLordUuidKey(), plugin.getPersistentDataTypeUUID(), player.getUniqueId());
                     if (im.hasLore()) {
                         List<String> lore = im.getLore();
                         String format = ChatColor.AQUA + "" + ChatColor.ITALIC;
-                        lore.add(format + "This key belongs to");
+                        String what = im.getDisplayName().contains("Key") ? "key" : "disk";
+                        lore.add(format + "This " + what + " belongs to");
                         lore.add(format + player.getName());
                         im.setLore(lore);
                     }
@@ -387,6 +400,9 @@ public class TARDISGiveCommand implements CommandExecutor {
         if (CONSOLES.getBY_NAMES().containsKey(type)) {
             if (CONSOLES.getBY_NAMES().get(type).isCustom()) {
                 model = 45;
+                is = new ItemStack(Material.MUSHROOM_STEM, 1);
+            } else if (type.equalsIgnoreCase("ROTOR")) {
+                model = 44;
                 is = new ItemStack(Material.MUSHROOM_STEM, 1);
             } else {
                 model = TARDISSeedModel.modelByString(type);

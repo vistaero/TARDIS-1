@@ -26,7 +26,7 @@ import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.rooms.TARDISRoomData;
 import me.eccentric_nz.TARDIS.rooms.TARDISRoomRunnable;
 import me.eccentric_nz.TARDIS.schematic.TARDISSchematicGZip;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -61,7 +61,7 @@ class TARDISARSRunnable implements Runnable {
 
     @Override
     public void run() {
-        String whichroom = room.toString();
+        String whichroom = room.getConfigPath();
         HashMap<String, Object> where = new HashMap<>();
         where.put("uuid", p.getUniqueId().toString());
         ResultSetTardis rs = new ResultSetTardis(plugin, where, "", false, 0);

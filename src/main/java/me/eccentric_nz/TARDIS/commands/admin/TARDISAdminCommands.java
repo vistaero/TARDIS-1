@@ -24,7 +24,7 @@ import me.eccentric_nz.TARDIS.database.tool.Converter;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.enumeration.USE_CLAY;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -158,7 +158,6 @@ public class TARDISAdminCommands implements CommandExecutor {
         firstsBool.put("rooms_require_blocks", "growth");
         firstsBool.put("set_biome", "police_box");
         firstsBool.put("sfx", "allow");
-        firstsBool.put("sky_biome", "creation");
         firstsBool.put("spawn_eggs", "allow");
         firstsBool.put("spawn_random_monsters", "preferences");
         firstsBool.put("strike_lightning", "preferences");
@@ -168,6 +167,7 @@ public class TARDISAdminCommands implements CommandExecutor {
         firstsBool.put("use_worldguard", "preferences");
         firstsBool.put("village_travel", "allow");
         firstsBool.put("walk_in_tardis", "preferences");
+        firstsBool.put("weather_set", "allow");
         firstsBool.put("wg_flag_set", "allow");
         firstsBool.put("zero_room", "allow");
         // integer

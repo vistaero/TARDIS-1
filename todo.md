@@ -1,30 +1,23 @@
 # TODO
 
-## Next version `4.4`
-1. New features
-   * Test villager farming
-   * Remove / alter the Artron furnace now there is a Smoker / Blast Furnace?
-2. Test player preference to bypass `tardis rescue accept`
-3. Test `invisibility` setting in TARDIS areas
-4. Test Handles transmat requests
-5. Test Tardis biome travel world selection - `/ttravel biome [biome] [world]`
-6. Actually use `TARDISArtronLevels#checkLevel()`?
-7. Update documentation...
-8. 13th Doctor's and Factory TARDIS console
+## Next version `4.4.2`
+1. Update documentation...
+2. 13th Doctor's and Factory TARDIS console
    * Add advanced console and disk storage to schematics
-9. Set Master button to ON (In Lazarus GUI) when it is in use
-10. Use the Vortex Manipulator to teleport past force fields
+3. Set Master button to ON (In Lazarus GUI) when it is in use
+4. Use the Vortex Manipulator to teleport past force fields
+5. Tardis Space/Time Throttle - [Bukkit #1449](https://dev.bukkit.org/projects/tardis/issues/1449)
+6. Optional world name in `/tardistravel` - [Bukkit #1275](https://dev.bukkit.org/projects/tardis/issues/1275)
+7. Time travel - [Bukkit #1182](https://dev.bukkit.org/projects/tardis/issues/1182)
+8. Room Blueprints - [Bukkit #1110](https://dev.bukkit.org/projects/tardis/issues/1110) + could tie in with [Bukkit #1034](https://dev.bukkit.org/projects/tardis/issues/1034)
+9. More sudo commands - [Bukkit #1109](https://dev.bukkit.org/projects/tardis/issues/1109)
 
-## Future version `?+`
-* TARDISSonicBlaster addon? - _unlikely_
-* Add more API Events that other plugins can listen for? - _unlikely_
-   * Sonic Screwdriver events
-   * Mob farming / ejection events
+## Minecraft 1.16
+1. Add new blocks and nether biomes
+2. Use Smithing recipes to upgrade sonic screwdrivers / add biome to biome disks etc
 
 ## Resource Pack / TARDISWeepingAngels
-1. Custom Time Rotor model
-2. Rare armour drops
-3. Re-skin mobs for Resource pack, and add new mob sounds
+1. Re-skin mobs for Resource pack, and add new mob sounds
    * Clockwork Droid
    * Hath _started_
    * Endermites -> Cybermats
@@ -33,7 +26,7 @@
    * Slimes -> Adipose
    * Husk -> Sycorax
    * Stray -> Scarecrows
-4. Custom GUI textures for TARDIS GUIs - _now possible with Optifine, but don't get applied to Spigot generated GUIs :(_
+2. Custom GUI textures for TARDIS GUIs - _now possible with Optifine, but don't get applied to Spigot generated GUIs :(_
 
 ## Minecraft Bedrock Edition
 1. Recreate everything :)

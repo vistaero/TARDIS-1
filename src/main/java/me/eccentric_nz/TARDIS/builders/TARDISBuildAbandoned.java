@@ -478,7 +478,13 @@ class TARDISBuildAbandoned implements Runnable {
                 plugin.getGeneralKeeper().getProtectBlockMap().put(loc, dbID);
             }
             // if it's the door, don't set it just remember its block then do it at the end
-            if (type.equals(Material.IRON_DOOR)) { // doors
+            if (type.equals(Material.HONEYCOMB_BLOCK) && schm.getPermission().equals("rotor")) {
+                /*
+                 * spawn an item frame and place the time rotor in it
+                 */
+                TARDISBlockSetters.setBlock(world, x, y, z, Material.STONE_BRICKS);
+                TARDISTimeRotor.setItemFrame(schm, new Location(world, x, y + 1, z), dbID);
+            } else if (type.equals(Material.IRON_DOOR)) { // doors
                 postDoorBlocks.put(world.getBlockAt(x, y, z), data);
             } else if (type.equals(Material.REDSTONE_TORCH)) {
                 postRedstoneTorchBlocks.put(world.getBlockAt(x, y, z), data);
@@ -511,25 +517,25 @@ class TARDISBuildAbandoned implements Runnable {
                     Directional directional = (Directional) data;
                     switch (j) {
                         case 2:
-                            directional.setFacing(BlockFace.EAST);
+                            directional.setFacing(BlockFace.WEST);
                             data = directional;
                             postRepeaterBlocks.put(world.getBlockAt(x, y, z), data);
                             plugin.getQueryFactory().insertSyncControl(dbID, 3, repeater, 0);
                             break;
                         case 3:
-                            directional.setFacing(BlockFace.SOUTH);
+                            directional.setFacing(BlockFace.NORTH);
                             data = directional;
                             postRepeaterBlocks.put(world.getBlockAt(x, y, z), data);
                             plugin.getQueryFactory().insertSyncControl(dbID, 2, repeater, 0);
                             break;
                         case 4:
-                            directional.setFacing(BlockFace.NORTH);
+                            directional.setFacing(BlockFace.SOUTH);
                             data = directional;
                             postRepeaterBlocks.put(world.getBlockAt(x, y, z), data);
                             plugin.getQueryFactory().insertSyncControl(dbID, 5, repeater, 0);
                             break;
                         default:
-                            directional.setFacing(BlockFace.WEST);
+                            directional.setFacing(BlockFace.EAST);
                             data = directional;
                             postRepeaterBlocks.put(world.getBlockAt(x, y, z), data);
                             plugin.getQueryFactory().insertSyncControl(dbID, 4, repeater, 0);

@@ -22,7 +22,7 @@ import me.eccentric_nz.TARDIS.arch.TARDISArchPersister;
 import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISResourcePackChanger;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
 import org.bukkit.Chunk;
@@ -172,8 +172,15 @@ public class TARDISJoinListener implements Listener {
         if (plugin.isDisguisesOnServer() && plugin.getConfig().getBoolean("arch.enabled")) {
             new TARDISArchPersister(plugin).reArch(player.getUniqueId());
         }
+        // add to perception filter team
         if (plugin.getConfig().getBoolean("allow.perception_filter")) {
             plugin.getFilter().addPlayer(player);
+        }
+        // add to zero room occupants
+        if (plugin.getConfig().getBoolean("allow.zero_room")) {
+            if (player.getLocation().getWorld().getName().equals("TARDIS_Zero_Room") && !plugin.getTrackerKeeper().getZeroRoomOccupants().contains(player.getUniqueId())) {
+                plugin.getTrackerKeeper().getZeroRoomOccupants().add(player.getUniqueId());
+            }
         }
         // notify updates
         if (plugin.getConfig().getBoolean("preferences.notify_update") && plugin.isUpdateFound() && player.isOp()) {

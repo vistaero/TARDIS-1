@@ -44,6 +44,7 @@ class TARDISMySQLDatabaseUpdater {
     private final List<String> inventoryupdates = new ArrayList<>();
     private final List<String> chameleonupdates = new ArrayList<>();
     private final List<String> farmingupdates = new ArrayList<>();
+    private final List<String> sonicupdates = new ArrayList<>();
     private final HashMap<String, String> uuidUpdates = new HashMap<>();
     private final Statement statement;
     private final TARDIS plugin;
@@ -68,6 +69,7 @@ class TARDISMySQLDatabaseUpdater {
         tardisupdates.add("abandoned int(1) DEFAULT '0'");
         tardisupdates.add("powered_on int(1) DEFAULT '0'");
         tardisupdates.add("renderer varchar(512) DEFAULT ''");
+        tardisupdates.add("rotor varchar(48) DEFAULT ''");
         tardisupdates.add("siege_on int(1) DEFAULT '0'");
         tardisupdates.add("zero varchar(512) DEFAULT ''");
         prefsupdates.add("auto_rescue_on int(1) DEFAULT '0'");
@@ -78,6 +80,7 @@ class TARDISMySQLDatabaseUpdater {
         prefsupdates.add("dnd_on int(1) DEFAULT '0'");
         prefsupdates.add("farm_on int(1) DEFAULT '0'");
         prefsupdates.add("flying_mode int(1) DEFAULT '1'");
+        prefsupdates.add("font_on int(1) DEFAULT '0'");
         prefsupdates.add("hads_type varchar(12) DEFAULT 'DISPLACEMENT'");
         prefsupdates.add("hum varchar(24) DEFAULT ''");
         prefsupdates.add("language varchar(32) DEFAULT 'ENGLISH'");
@@ -105,6 +108,10 @@ class TARDISMySQLDatabaseUpdater {
         chameleonupdates.add("asymmetric int(1) DEFAULT '0'");
         farmingupdates.add("apiary varchar(512) DEFAULT ''");
         farmingupdates.add("bamboo varchar(512) DEFAULT ''");
+        sonicupdates.add("arrow int(1) DEFAULT '0'");
+        sonicupdates.add("knockback int(1) DEFAULT '0'");
+        sonicupdates.add("model int(11) DEFAULT '10000011'");
+        sonicupdates.add("sonic_uuid varchar(48) DEFAULT ''");
     }
 
     /**
@@ -212,6 +219,16 @@ class TARDISMySQLDatabaseUpdater {
                     statement.executeUpdate(f_alter);
                 }
             }
+            for (String s : sonicupdates) {
+                String[] ssplit = s.split(" ");
+                String s_query = "SHOW COLUMNS FROM " + prefix + "sonic LIKE '" + ssplit[0] + "'";
+                ResultSet ssa = statement.executeQuery(s_query);
+                if (!ssa.next()) {
+                    i++;
+                    String s_alter = "ALTER TABLE " + prefix + "sonic ADD " + s;
+                    statement.executeUpdate(s_alter);
+                }
+            }
             // update data type for `lamp` in player_prefs
             String lamp_check = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + prefix + "player_prefs' AND COLUMN_NAME = 'lamp'";
             ResultSet rslc = statement.executeQuery(lamp_check);
@@ -266,22 +283,6 @@ class TARDISMySQLDatabaseUpdater {
                 i++;
                 String rep_alter = "ALTER TABLE " + prefix + "t_count ADD repair int(3) DEFAULT '0'";
                 statement.executeUpdate(rep_alter);
-            }
-            // add arrow to sonic
-            String arrow_query = "SHOW COLUMNS FROM " + prefix + "sonic LIKE 'arrow'";
-            ResultSet rsarrow = statement.executeQuery(arrow_query);
-            if (!rsarrow.next()) {
-                i++;
-                String arrow_alter = "ALTER TABLE " + prefix + "sonic ADD arrow int(1) DEFAULT '0'";
-                statement.executeUpdate(arrow_alter);
-            }
-            // add model to sonic
-            String model_query = "SHOW COLUMNS FROM " + prefix + "sonic LIKE 'model'";
-            ResultSet rsmodel = statement.executeQuery(model_query);
-            if (!rsmodel.next()) {
-                i++;
-                String model_alter = "ALTER TABLE " + prefix + "sonic ADD model int(11) DEFAULT '10000011'";
-                statement.executeUpdate(model_alter);
             }
             // add task to vortex
             String vortex_query = "SHOW COLUMNS FROM " + prefix + "vortex LIKE 'task'";

@@ -21,6 +21,7 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.ResultSetCount;
 import me.eccentric_nz.TARDIS.database.ResultSetDiskStorage;
 import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.tardischunkgenerator.TARDISChunkGenerator;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -76,7 +77,7 @@ public class TARDISUtils {
         // check they are still in the TARDIS world
         World world = plugin.getServer().getWorlds().get(0);
         String name = "";
-        if (player.isOnline()) {
+        if (player != null && player.isOnline()) {
             world = player.getLocation().getWorld();
             name = world.getName();
         }

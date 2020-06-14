@@ -58,7 +58,10 @@ public enum CONTROL {
     SAVES(32, "save-sign", false, true),
     SCANNER(33, "scanner", false, false),
     CONDENSER(34, "condenser", false, false),
-    CLOISTER_BELL(35, "bell", true, false);
+    CLOISTER_BELL(35, "bell", true, false),
+    ROTOR(36, "", false, false),
+    MAP(37, "map", false, false),
+    WEATHER(38, "weather", false, false);
 
     private final int id;
     private final String update;

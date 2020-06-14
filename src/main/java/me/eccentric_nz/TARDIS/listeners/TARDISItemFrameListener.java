@@ -17,18 +17,29 @@
 package me.eccentric_nz.TARDIS.listeners;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetControls;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.builders.TARDISTimeRotor;
+import me.eccentric_nz.TARDIS.control.TARDISScannerMap;
+import me.eccentric_nz.TARDIS.database.*;
+import me.eccentric_nz.TARDIS.enumeration.CONTROL;
+import me.eccentric_nz.TARDIS.handles.TARDISHandlesProcessor;
+import me.eccentric_nz.TARDIS.handles.TARDISHandlesProgramInventory;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
+import me.eccentric_nz.TARDIS.utility.TARDISSounds;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Rotation;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -48,11 +59,12 @@ public class TARDISItemFrameListener implements Listener {
     public void onItemFrameClick(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
         if (event.getRightClicked() instanceof ItemFrame) {
+            ItemFrame frame = (ItemFrame) event.getRightClicked();
             UUID uuid = player.getUniqueId();
-            // did they run the `/tardis update direction` command?
+            // did they run the `/tardis update direction|frame|rotor|map` command?
             if (plugin.getTrackerKeeper().getPlayers().containsKey(uuid)) {
-                String control = plugin.getTrackerKeeper().getPlayers().get(uuid);
-                if (control.equalsIgnoreCase("DIRECTION") || control.equalsIgnoreCase("FRAME")) {
+                CONTROL control = CONTROL.valueOf(plugin.getTrackerKeeper().getPlayers().get(uuid).toUpperCase());
+                if (control.equals(CONTROL.DIRECTION) || control.equals(CONTROL.FRAME) || control.equals(CONTROL.ROTOR) || control.equals(CONTROL.MAP)) {
                     // check they have a TARDIS
                     ResultSetTardisID rst = new ResultSetTardisID(plugin);
                     if (!rst.fromUUID(uuid.toString())) {
@@ -60,31 +72,72 @@ public class TARDISItemFrameListener implements Listener {
                         return;
                     }
                     int id = rst.getTardis_id();
-                    String l = event.getRightClicked().getLocation().toString();
-                    // check whether they have a direction item frame already
-                    HashMap<String, Object> where = new HashMap<>();
-                    where.put("location", l);
-                    where.put("type", control.equalsIgnoreCase("DIRECTION") ? 18 : 27);
-                    ResultSetControls rsc = new ResultSetControls(plugin, where, false);
-                    HashMap<String, Object> set = new HashMap<>();
-                    if (rsc.resultSet()) {
-                        // update location
-                        set.put("location", l);
-                        HashMap<String, Object> whereu = new HashMap<>();
-                        whereu.put("tardis_id", id);
-                        whereu.put("type", control.equalsIgnoreCase("DIRECTION") ? 18 : 27);
-                        plugin.getQueryFactory().doUpdate("controls", set, whereu);
-                    } else {
-                        // add control
-                        plugin.getQueryFactory().insertControl(id, control.equalsIgnoreCase("DIRECTION") ? 18 : 27, l, 0);
+                    switch (control) {
+                        case DIRECTION:
+                        case FRAME:
+                        case MAP:
+                            if (control.equals(CONTROL.MAP) && !player.hasPermission("tardis.scanner.map")) {
+                                plugin.getTrackerKeeper().getPlayers().remove(uuid);
+                                TARDISMessage.send(player, "NO_PERM_MAP");
+                                return;
+                            }
+                            if (control.equals(CONTROL.MAP)) {
+                                // frame must have a MAP or FILLED_MAP in it
+                                ItemStack map = frame.getItem();
+                                if (map.getType() != Material.MAP && map.getType() != Material.FILLED_MAP) {
+                                    plugin.getTrackerKeeper().getPlayers().remove(uuid);
+                                    TARDISMessage.send(player, "SCANNER_NO_MAP");
+                                    return;
+                                }
+                            }
+                            String l = frame.getLocation().toString();
+                            // check whether they have a direction item frame already
+                            HashMap<String, Object> where = new HashMap<>();
+                            where.put("location", l);
+                            where.put("type", control.getId());
+                            ResultSetControls rsc = new ResultSetControls(plugin, where, false);
+                            HashMap<String, Object> set = new HashMap<>();
+                            if (rsc.resultSet()) {
+                                // update location
+                                set.put("location", l);
+                                HashMap<String, Object> whereu = new HashMap<>();
+                                whereu.put("tardis_id", id);
+                                whereu.put("type", control.getId());
+                                plugin.getQueryFactory().doUpdate("controls", set, whereu);
+                            } else {
+                                // add control
+                                plugin.getQueryFactory().insertControl(id, control.getId(), l, 0);
+                            }
+                            plugin.getTrackerKeeper().getPlayers().remove(uuid);
+                            String which;
+                            if (control.equals(CONTROL.DIRECTION)) {
+                                which = "Direction";
+                            } else if (control.equals(CONTROL.FRAME)) {
+                                which = "Chameleon";
+                            } else {
+                                which = "Scanner Map";
+                                // place a map
+                                HashMap<String, Object> wherec = new HashMap<>();
+                                wherec.put("tardis_id", id);
+                                ResultSetCurrentLocation rscl = new ResultSetCurrentLocation(plugin, wherec);
+                                if (rscl.resultSet()) {
+                                    Location scan_loc = new Location(rscl.getWorld(), rscl.getX(), rscl.getY(), rscl.getZ());
+                                    new TARDISScannerMap(TARDIS.plugin, scan_loc, frame).setMap();
+                                }
+                            }
+                            TARDISMessage.send(player, "FRAME_UPDATE", which);
+                            break;
+                        default:
+                            // ROTOR
+                            UUID trit = frame.getUniqueId();
+                            TARDISTimeRotor.updateRotorRecord(id, trit.toString());
+                            plugin.getGeneralKeeper().getTimeRotors().put(id, trit);
+                            plugin.getTrackerKeeper().getPlayers().remove(uuid);
+                            TARDISMessage.send(player, "ROTOR_UPDATE");
                     }
-                    plugin.getTrackerKeeper().getPlayers().remove(uuid);
-                    TARDISMessage.send(player, control.equalsIgnoreCase("DIRECTION") ? "DIRECTION_UPDATE" : "CHAM_UPDATE");
                     return;
                 }
             }
-            ItemFrame frame = (ItemFrame) event.getRightClicked();
-            // if the item frame has a tripwire hook in it
             // check if it is a TARDIS direction item frame
             String l = frame.getLocation().toString();
             HashMap<String, Object> where = new HashMap<>();
@@ -102,6 +155,7 @@ public class TARDISItemFrameListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
+                // if the item frame has a tripwire hook in it
                 if (frame.getItem().getType().equals(Material.TRIPWIRE_HOOK)) {
                     if (plugin.getConfig().getBoolean("allow.power_down") && !rso.getTardis().isPowered_on()) {
                         TARDISMessage.send(player, "POWER_DOWN");
@@ -152,7 +206,8 @@ public class TARDISItemFrameListener implements Listener {
                         frame.setRotation(r);
                         TARDISMessage.send(player, "DIRECTON_SET", direction);
                     }
-                } else // are they placing a tripwire hook?
+                } else {
+                    // are they placing a tripwire hook?
                     if (frame.getItem().getType().isAir() && player.getInventory().getItemInMainHand().getType().equals(Material.TRIPWIRE_HOOK)) {
                         // get current tardis direction
                         HashMap<String, Object> wherec = new HashMap<>();
@@ -181,7 +236,168 @@ public class TARDISItemFrameListener implements Listener {
                             }, 4L);
                         }
                     }
+                }
+            }
+            if (!player.hasPermission("tardis.handles.use")) {
+                TARDISMessage.send(player, "NO_PERMS");
+                return;
+            }
+            // is it an already registered handles frame?
+            HashMap<String, Object> whereh = new HashMap<>();
+            whereh.put("location", l);
+            whereh.put("type", 26);
+            ResultSetControls rsh = new ResultSetControls(plugin, whereh, false);
+            if (rsh.resultSet()) {
+                ItemStack is = frame.getItem();
+                if (isHandles(is)) {
+                    // play sound
+                    TARDISSounds.playTARDISSound(player, "handles");
+                    ItemMeta im = is.getItemMeta();
+                    im.setCustomModelData(10000002);
+                    is.setItemMeta(im);
+                    frame.setItem(is);
+                    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                        im.setCustomModelData(10000001);
+                        is.setItemMeta(im);
+                        frame.setItem(is);
+                    }, 20L);
+                    if (!player.hasPermission("tardis.handles.program")) {
+                        TARDISMessage.send(player, "NO_PERMS");
+                        return;
+                    }
+                    if (player.isSneaking()) {
+                        // open programming GUI
+                        ItemStack[] handles = new TARDISHandlesProgramInventory(plugin, 0).getHandles();
+                        Inventory hgui = plugin.getServer().createInventory(player, 54, ChatColor.DARK_RED + "Handles Program");
+                        hgui.setContents(handles);
+                        player.openInventory(hgui);
+                    } else {
+                        // check if item in hand is a Handles program disk
+                        ItemStack disk = player.getInventory().getItemInMainHand();
+                        if (disk != null && disk.getType().equals(Material.MUSIC_DISC_WARD) && disk.hasItemMeta()) {
+                            ItemMeta dim = disk.getItemMeta();
+                            if (dim.hasDisplayName() && ChatColor.stripColor(dim.getDisplayName()).equals("Handles Program Disk")) {
+                                // get the program_id from the disk
+                                int pid = TARDISNumberParsers.parseInt(dim.getLore().get(1));
+                                // query the database
+                                ResultSetProgram rsp = new ResultSetProgram(plugin, pid);
+                                if (rsp.resultSet()) {
+                                    // send program to processor
+                                    new TARDISHandlesProcessor(plugin, rsp.getProgram(), player, pid).processDisk();
+                                    // check in the disk
+                                    HashMap<String, Object> set = new HashMap<>();
+                                    set.put("checked", 0);
+                                    HashMap<String, Object> wherep = new HashMap<>();
+                                    wherep.put("program_id", pid);
+                                    plugin.getQueryFactory().doUpdate("programs", set, wherep);
+                                    player.getInventory().setItemInMainHand(null);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                ItemStack is = player.getInventory().getItemInMainHand();
+                if (isHandles(is)) {
+                    // cannot place unless inside the TARDIS
+                    if (!plugin.getUtils().inTARDISWorld(event.getPlayer())) {
+                        TARDISMessage.handlesSend(player, "HANDLES_TARDIS");
+                        event.setCancelled(true);
+                        return;
+                    }
+                    // must have a TARDIS
+                    ResultSetTardisID rst = new ResultSetTardisID(plugin);
+                    if (rst.fromUUID(uuid.toString())) {
+                        // check if they have a handles block
+                        HashMap<String, Object> wherec = new HashMap<>();
+                        wherec.put("tardis_id", rst.getTardis_id());
+                        wherec.put("type", 26);
+                        ResultSetControls rsc = new ResultSetControls(plugin, wherec, false);
+                        if (!rsc.resultSet()) {
+                            String newLocation = frame.getLocation().toString();
+                            plugin.getQueryFactory().insertControl(rst.getTardis_id(), 26, newLocation, 0);
+                        } else {
+                            event.setCancelled(true);
+                            TARDISMessage.send(event.getPlayer(), "HANDLES_PLACED");
+                        }
+                    } else {
+                        TARDISMessage.handlesSend(player, "HANDLES_NO_COMMAND");
+                        event.setCancelled(true);
+                    }
+                }
             }
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onItemFrameDamage(EntityDamageByEntityEvent event) {
+        if (event.getEntityType().equals(EntityType.ITEM_FRAME)) {
+            ItemFrame frame = (ItemFrame) event.getEntity();
+            ItemStack is = frame.getItem();
+            Player player = null;
+            if (event.getDamager() instanceof Player) {
+                player = (Player) event.getDamager();
+            }
+            if (isHandles(is)) {
+                // check location
+                HashMap<String, Object> where = new HashMap<>();
+                where.put("type", 26);
+                where.put("location", frame.getLocation().toString());
+                ResultSetControls rsc = new ResultSetControls(plugin, where, false);
+                if (!rsc.resultSet()) {
+                    return;
+                }
+                if (player != null) {
+                    if (player.isSneaking()) {
+                        event.setCancelled(true);
+                        TARDISSounds.playTARDISSound(player, "handles");
+                        ItemMeta im = is.getItemMeta();
+                        im.setCustomModelData(10000002);
+                        is.setItemMeta(im);
+                        frame.setItem(is);
+                        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                            im.setCustomModelData(10000001);
+                            is.setItemMeta(im);
+                            frame.setItem(is);
+                        }, 40L);
+                    } else {
+                        // is it the players handles?
+                        ResultSetTardisID rst = new ResultSetTardisID(plugin);
+                        if (rst.fromUUID(player.getUniqueId().toString()) && rsc.getTardis_id() == rst.getTardis_id()) {
+                            // remove control record
+                            HashMap<String, Object> wherec = new HashMap<>();
+                            wherec.put("c_id", rsc.getC_id());
+                            plugin.getQueryFactory().doDelete("controls", wherec);
+                        } else {
+                            event.setCancelled(true);
+                        }
+                    }
+                } else {
+                    event.setCancelled(true);
+                }
+            } else if (plugin.getGeneralKeeper().getProtectBlockMap().containsKey(event.getEntity().getLocation().getBlock().getLocation().toString())) {
+                event.setCancelled(true);
+            } else if (player != null && is.getType() == Material.FILLED_MAP) {
+                // check location
+                HashMap<String, Object> where = new HashMap<>();
+                where.put("type", 37);
+                where.put("location", frame.getLocation().toString());
+                ResultSetControls rsc = new ResultSetControls(plugin, where, false);
+                if (!rsc.resultSet()) {
+                    return;
+                }
+                TARDISMessage.send(player, "SCANNER_MAP");
+            }
+        }
+    }
+
+    private boolean isHandles(ItemStack is) {
+        if (is != null && is.getType().equals(Material.BIRCH_BUTTON) && is.hasItemMeta()) {
+            ItemMeta im = is.getItemMeta();
+            if (im.hasDisplayName() && im.getDisplayName().equals("Handles")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

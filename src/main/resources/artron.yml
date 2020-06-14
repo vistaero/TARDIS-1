@@ -39,6 +39,7 @@ upgrades:
   plank: 5000
   pyramid: 5000
   redstone: 7500
+  rotor: 5000
   steampunk: 5000
   thirteenth: 8000
   tom: 5000
@@ -76,5 +77,6 @@ sonic_generator:
   painter: 10
   ignite: 10
   arrow: 10
+  knockback: 10
 shell: 500
 custard_cream: 25

@@ -18,7 +18,7 @@ package me.eccentric_nz.TARDIS.ARS;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -51,7 +51,7 @@ class TARDISARSJettisonRunnable implements Runnable {
 
     @Override
     public void run() {
-        String r = room.toString();
+        String r = room.getConfigPath();
         // remove the room
         World w = slot.getChunk().getWorld();
         int x = slot.getX();

@@ -23,7 +23,7 @@ import me.eccentric_nz.TARDIS.database.ResultSetSonic;
 import me.eccentric_nz.TARDIS.database.ResultSetTardisArtron;
 import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Sonic;
-import me.eccentric_nz.TARDIS.utility.TARDISMessage;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -118,6 +118,10 @@ public class TARDISSonicGeneratorListener implements Listener {
             String dn = (s.getSonicType().equals(ChatColor.RESET)) ? "Sonic Screwdriver" : s.getSonicType() + "Sonic Screwdriver";
             screw.setDisplayName(dn);
             List<String> upgrades = new ArrayList<>();
+            if (s.hasKnockback()) {
+                upgrades.add("Knockback Upgrade");
+                cost += (int) (plugin.getArtronConfig().getDouble("sonic_generator.knockback") * full);
+            }
             if (s.hasBio()) {
                 upgrades.add("Bio-scanner Upgrade");
                 cost += (int) (plugin.getArtronConfig().getDouble("sonic_generator.bio") * full);
