@@ -18,16 +18,17 @@ package me.eccentric_nz.TARDIS.desktop;
 
 import me.eccentric_nz.TARDIS.ARS.TARDISARSMethods;
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetARS;
-import me.eccentric_nz.TARDIS.database.ResultSetControls;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetARS;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetControls;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Archive;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.ConsoleSize;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.schematic.ArchiveReset;
 import me.eccentric_nz.TARDIS.schematic.ResultSetArchive;
-import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -53,7 +54,7 @@ class TARDISThemeProcessor {
         // get upgrade data
         TARDISUpgradeData tud = plugin.getTrackerKeeper().getUpgrades().get(uuid);
         Player player = plugin.getServer().getPlayer(uuid);
-        if (plugin.getHandlesConfig().getBoolean("enabled") && player.hasPermission("tardis.handles")) {
+        if (plugin.getHandlesConfig().getBoolean("enabled") && TARDISPermission.hasPermission(player, "tardis.handles")) {
             HashMap<String, Object> wheret = new HashMap<>();
             wheret.put("uuid", uuid.toString());
             ResultSetTardis rs = new ResultSetTardis(plugin, wheret, "", false, 2);
@@ -149,14 +150,14 @@ class TARDISThemeProcessor {
         String config_path = (archive_next != null) ? "upgrades.archive." + archive_next.getConsoleSize().getConfigPath() : "upgrades." + tud.getSchematic().getPermission().toLowerCase(Locale.ENGLISH);
         int amount = plugin.getArtronConfig().getInt(config_path);
         TARDISThemeRunnable ttr;
-        boolean master = tud.getPrevious().getPermission().equals("master");
+        boolean hasLava = tud.getPrevious().getPermission().equals("master") || tud.getPrevious().getPermission().equals("delta");
         if (tud.getPrevious().equals(tud.getSchematic()) && archive_next == null) {
             // reduce the cost of the theme change
             amount = Math.round((plugin.getArtronConfig().getInt("just_wall_floor") / 100F) * amount);
             ttr = new TARDISWallFloorRunnable(plugin, uuid, tud);
         } else {
             // check for master
-            if (master) {
+            if (hasLava) {
                 // remove lava and water
                 new TARDISDelavafier(plugin, uuid).swap();
             }
@@ -164,13 +165,13 @@ class TARDISThemeProcessor {
         }
         plugin.getQueryFactory().alterEnergyLevel("tardis", -amount, wherea, plugin.getServer().getPlayer(uuid));
         // start the rebuild
-        long initial_delay = (master) ? 45L : 5L;
+        long initial_delay = (hasLava) ? 45L : 5L;
         long delay = Math.round(20 / plugin.getConfig().getDouble("growth.room_speed"));
         int task = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, ttr, initial_delay, delay);
         ttr.setTaskID(task);
     }
 
-    private boolean compare(SCHEMATIC prev, SCHEMATIC next) {
+    private boolean compare(Schematic prev, Schematic next) {
         // special case for archives
         if (archive_next != null && archive_prev == null) {
             return (!prev.getPermission().equals(archive_next.getName()) && ((prev.getConsoleSize().equals(ConsoleSize.SMALL) && !archive_next.getConsoleSize().equals(ConsoleSize.SMALL)) || (!prev.getConsoleSize().equals(ConsoleSize.TALL) && archive_next.getConsoleSize().equals(ConsoleSize.TALL))));
@@ -183,7 +184,7 @@ class TARDISThemeProcessor {
         }
     }
 
-    private boolean checkARSGrid(SCHEMATIC prev, SCHEMATIC next, UUID uuid) {
+    private boolean checkARSGrid(Schematic prev, Schematic next, UUID uuid) {
         // get ARS
         HashMap<String, Object> where = new HashMap<>();
         where.put("uuid", uuid.toString());

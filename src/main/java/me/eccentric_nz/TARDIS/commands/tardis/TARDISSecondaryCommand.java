@@ -17,9 +17,10 @@
 package me.eccentric_nz.TARDIS.commands.tardis;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
-import me.eccentric_nz.TARDIS.enumeration.UPDATEABLE;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisID;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.enumeration.Updateable;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import org.bukkit.entity.Player;
@@ -39,7 +40,7 @@ class TARDISSecondaryCommand {
     }
 
     boolean startSecondary(Player player, String[] args) {
-        if (player.hasPermission("tardis.update")) {
+        if (TARDISPermission.hasPermission(player, "tardis.update")) {
             if (args.length < 2) {
                 TARDISMessage.send(player, "TOO_FEW_ARGS");
                 return false;
@@ -55,9 +56,9 @@ class TARDISSecondaryCommand {
                 TARDISMessage.send(player, "SEC_REMOVE_CLICK_BLOCK");
                 return true;
             }
-            UPDATEABLE updateable;
+            Updateable updateable;
             try {
-                updateable = UPDATEABLE.valueOf(TARDISStringUtils.toScoredUppercase(args[1]));
+                updateable = Updateable.valueOf(TARDISStringUtils.toScoredUppercase(args[1]));
             } catch (IllegalArgumentException e) {
                 TARDISMessage.send(player, "UPDATE_NOT_VALID");
                 return false;

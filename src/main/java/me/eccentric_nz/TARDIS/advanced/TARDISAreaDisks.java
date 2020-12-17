@@ -17,10 +17,11 @@
 package me.eccentric_nz.TARDIS.advanced;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetAreas;
-import me.eccentric_nz.TARDIS.database.ResultSetDiskStorage;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetAreas;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetDiskStorage;
 import me.eccentric_nz.TARDIS.database.data.Area;
-import me.eccentric_nz.TARDIS.enumeration.STORAGE;
+import me.eccentric_nz.TARDIS.enumeration.Storage;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -61,7 +62,7 @@ class TARDISAreaDisks {
             // cycle through areas
             rsa.getData().forEach((a) -> {
                 String name = a.getAreaName();
-                if (p.hasPermission("tardis.area." + name) || p.hasPermission("tardis.area.*")) {
+                if (TARDISPermission.hasPermission(p, "tardis.area." + name) || TARDISPermission.hasPermission(p, "tardis.area.*")) {
                     ItemStack is = new ItemStack(Material.MUSIC_DISC_BLOCKS, 1);
                     ItemMeta im = is.getItemMeta();
                     im.setDisplayName("Area Storage Disk");
@@ -78,7 +79,7 @@ class TARDISAreaDisks {
         ItemStack[] stack = new ItemStack[54];
         // set default top slots
         try {
-            stack = TARDISSerializeInventory.itemStacksFromString(STORAGE.AREA.getEmpty());
+            stack = TARDISSerializeInventory.itemStacksFromString(Storage.AREA.getEmpty());
         } catch (IOException ex) {
             plugin.debug("Could not get make Area Disk Inventory: " + ex);
         }
@@ -145,7 +146,7 @@ class TARDISAreaDisks {
                     // cycle through areas
                     for (Area map : rsa.getData()) {
                         String name = map.getAreaName();
-                        if ((!player_has.contains(name) && p.hasPermission("tardis.area." + name)) || (!player_has.contains(name) && p.hasPermission("tardis.area.*"))) {
+                        if ((!player_has.contains(name) && TARDISPermission.hasPermission(p, "tardis.area." + name)) || (!player_has.contains(name) && TARDISPermission.hasPermission(p, "tardis.area.*"))) {
                             // add new area if there is room
                             int empty = getNextEmptySlot(inv);
                             if (empty != -1) {

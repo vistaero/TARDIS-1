@@ -22,12 +22,14 @@ import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitDamager;
 import me.eccentric_nz.TARDIS.artron.TARDISArtronIndicator;
 import me.eccentric_nz.TARDIS.artron.TARDISArtronLevels;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.TARDISTimeRotor;
-import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
-import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
+import me.eccentric_nz.TARDIS.database.resultset.*;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
+import me.eccentric_nz.TARDIS.enumeration.DiskCircuit;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISSounds;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
@@ -59,6 +61,11 @@ public class TARDISHandbrakeListener implements Listener {
 
     public TARDISHandbrakeListener(TARDIS plugin) {
         this.plugin = plugin;
+    }
+
+    public static void toggleBeacon(String str, boolean on) {
+        Block b = TARDISStaticLocationGetters.getLocationFromDB(str).getBlock();
+        b.setBlockData((on) ? TARDISConstants.GLASS : TARDISConstants.POWER);
     }
 
     /**
@@ -108,7 +115,7 @@ public class TARDISHandbrakeListener implements Listener {
                     event.setCancelled(true);
                     int id = tmp_id;
                     TARDISCircuitChecker tcc = null;
-                    if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(player, event.getAction().equals(Action.LEFT_CLICK_BLOCK))) {
+                    if (!plugin.getDifficulty().equals(Difficulty.EASY) && !plugin.getUtils().inGracePeriod(player, event.getAction().equals(Action.LEFT_CLICK_BLOCK))) {
                         tcc = new TARDISCircuitChecker(plugin, id);
                         tcc.getCircuits();
                     }
@@ -134,7 +141,7 @@ public class TARDISHandbrakeListener implements Listener {
                             return;
                         }
                         UUID ownerUUID = tardis.getUuid();
-                        if ((tardis.isIso_on() && !uuid.equals(ownerUUID) && event.isCancelled() && !player.hasPermission("tardis.skeletonkey")) || plugin.getTrackerKeeper().getJohnSmith().containsKey(uuid)) {
+                        if ((tardis.isIso_on() && !uuid.equals(ownerUUID) && event.isCancelled() && !TARDISPermission.hasPermission(player, "tardis.skeletonkey")) || plugin.getTrackerKeeper().getJohnSmith().containsKey(uuid)) {
                             // check if cancelled so we don't get double messages from the bind listener
                             TARDISMessage.send(player, "ISO_HANDS_OFF");
                             return;
@@ -152,9 +159,11 @@ public class TARDISHandbrakeListener implements Listener {
                             ResultSetPlayerPrefs rsp = new ResultSetPlayerPrefs(plugin, uuid.toString());
                             boolean beac_on = true;
                             boolean bar = false;
+                            SpaceTimeThrottle spaceTimeThrottle = SpaceTimeThrottle.NORMAL;
                             if (rsp.resultSet()) {
                                 beac_on = rsp.isBeaconOn();
                                 bar = rsp.isTravelbarOn();
+                                spaceTimeThrottle = SpaceTimeThrottle.getByDelay().get(rsp.getThrottle());
                             }
                             if (action == Action.RIGHT_CLICK_BLOCK) {
                                 if (tardis.isHandbrake_on()) {
@@ -176,9 +185,9 @@ public class TARDISHandbrakeListener implements Listener {
                                         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getTrackerKeeper().getHasClickedHandbrake().removeAll(Collections.singleton(id)), 600L);
                                         return;
                                     }
-                                    new TARDISTakeoff(plugin).run(id, block, handbrake_loc, player, beac_on, beacon, bar);
+                                    new TARDISTakeoff(plugin).run(id, block, handbrake_loc, player, beac_on, beacon, bar, spaceTimeThrottle);
                                     // start time rotor?
-                                    if (tardis.getSchematic().getPermission().equals("rotor") && tardis.getRotor() != null) {
+                                    if (tardis.getRotor() != null) {
                                         ItemFrame itemFrame = TARDISTimeRotor.getItemFrame(tardis.getRotor());
                                         if (itemFrame != null) {
                                             TARDISTimeRotor.setRotor(TARDISTimeRotor.getRotorModelData(itemFrame), itemFrame, true);
@@ -186,7 +195,7 @@ public class TARDISHandbrakeListener implements Listener {
                                     }
                                 } else {
                                     // stop time rotor?
-                                    if (tardis.getSchematic().getPermission().equals("rotor") && tardis.getRotor() != null) {
+                                    if (tardis.getRotor() != null) {
                                         ItemFrame itemFrame = TARDISTimeRotor.getItemFrame(tardis.getRotor());
                                         if (itemFrame != null) {
                                             TARDISTimeRotor.setRotor(TARDISTimeRotor.getRotorModelData(itemFrame), itemFrame, false);
@@ -196,18 +205,17 @@ public class TARDISHandbrakeListener implements Listener {
                                     // Changes the lever to on
                                     TARDISHandbrake.setLevers(block, true, inside, handbrake_loc.toString(), id, plugin);
                                     // Check if it's at a recharge point
-                                    TARDISArtronLevels tal = new TARDISArtronLevels(plugin);
-                                    tal.recharge(id);
+                                    new TARDISArtronLevels(plugin).recharge(id);
                                     if (!beac_on && !beacon.isEmpty()) {
                                         toggleBeacon(beacon, false);
                                     }
                                     // Remove energy from TARDIS and sets database
                                     TARDISMessage.send(player, "HANDBRAKE_ON");
                                     if (plugin.getTrackerKeeper().getHasDestination().containsKey(id)) {
-                                        int amount = plugin.getTrackerKeeper().getHasDestination().get(id) * -1;
+                                        int amount = Math.round(plugin.getTrackerKeeper().getHasDestination().get(id) * spaceTimeThrottle.getArtronMultiplier());
                                         HashMap<String, Object> wheret = new HashMap<>();
                                         wheret.put("tardis_id", id);
-                                        plugin.getQueryFactory().alterEnergyLevel("tardis", amount, wheret, player);
+                                        plugin.getQueryFactory().alterEnergyLevel("tardis", -amount, wheret, player);
                                         if (!uuid.equals(ownerUUID)) {
                                             Player ptl = plugin.getServer().getPlayer(ownerUUID);
                                             if (ptl != null) {
@@ -223,7 +231,7 @@ public class TARDISHandbrakeListener implements Listener {
                                     if (tcc != null && plugin.getConfig().getBoolean("circuits.damage") && plugin.getConfig().getInt("circuits.uses.materialisation") > 0) {
                                         // decrement uses
                                         int uses_left = tcc.getMaterialisationUses();
-                                        new TARDISCircuitDamager(plugin, DISK_CIRCUIT.MATERIALISATION, uses_left, id, player).damage();
+                                        new TARDISCircuitDamager(plugin, DiskCircuit.MATERIALISATION, uses_left, id, player).damage();
                                     }
                                     HashMap<String, Object> set = new HashMap<>();
                                     set.put("handbrake_on", 1);
@@ -238,11 +246,6 @@ public class TARDISHandbrakeListener implements Listener {
                 }
             }
         }
-    }
-
-    public static void toggleBeacon(String str, boolean on) {
-        Block b = TARDISStaticLocationGetters.getLocationFromDB(str).getBlock();
-        b.setBlockData((on) ? TARDISConstants.GLASS : TARDISConstants.POWER);
     }
 
     private boolean isDoorOpen(int id) {

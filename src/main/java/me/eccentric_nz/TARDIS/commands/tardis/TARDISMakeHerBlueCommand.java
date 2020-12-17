@@ -19,12 +19,14 @@ package me.eccentric_nz.TARDIS.commands.tardis;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -76,7 +78,7 @@ class TARDISMakeHerBlueCommand {
         }
         int id = tardis.getTardis_id();
         TARDISCircuitChecker tcc = null;
-        if (!plugin.getDifficulty().equals(DIFFICULTY.EASY)) {
+        if (!plugin.getDifficulty().equals(Difficulty.EASY)) {
             tcc = new TARDISCircuitChecker(plugin, id);
             tcc.getCircuits();
         }
@@ -120,7 +122,7 @@ class TARDISMakeHerBlueCommand {
         HashMap<String, Object> set = new HashMap<>();
         set.put("chameleon_preset", "NEW");
         plugin.getQueryFactory().doUpdate("tardis", set, wherep);
-        BuildData bd = new BuildData(plugin, uuid.toString());
+        BuildData bd = new BuildData(uuid.toString());
         bd.setDirection(rsc.getDirection());
         bd.setLocation(l);
         bd.setMalfunction(false);
@@ -129,7 +131,8 @@ class TARDISMakeHerBlueCommand {
         bd.setRebuild(true);
         bd.setSubmarine(rsc.isSubmarine());
         bd.setTardisID(id);
-        bd.setBiome(rsc.getBiome());
+        bd.setTardisBiome(TARDISBiome.get(rsc.getBiomeKey()));
+        bd.setThrottle(SpaceTimeThrottle.REBUILD);
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), 20L);
         String message = (tardis.getPreset().equals(PRESET.JUNK_MODE)) ? "JUNK_PRESET_OFF" : "INVISIBILITY_REMOVED";
         TARDISMessage.send(player.getPlayer(), message);

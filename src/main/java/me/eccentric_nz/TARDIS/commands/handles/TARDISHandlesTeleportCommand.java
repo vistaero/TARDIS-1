@@ -19,13 +19,15 @@ package me.eccentric_nz.TARDIS.commands.handles;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
-import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
+import me.eccentric_nz.TARDIS.enumeration.Flag;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
+import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -72,7 +74,7 @@ public class TARDISHandlesTeleportCommand {
             return;
         }
         // plugin respect
-        if (plugin.getPluginRespect().getRespect(location, new Parameters(player, FLAG.getAPIFlags()))) {
+        if (plugin.getPluginRespect().getRespect(location, new Parameters(player, Flag.getAPIFlags()))) {
             // get direction
             HashMap<String, Object> wherecl = new HashMap<>();
             wherecl.put("tardis_id", id);
@@ -106,7 +108,7 @@ public class TARDISHandlesTeleportCommand {
             // rescue
             plugin.getTrackerKeeper().getRescue().put(id, uuid);
             // destroy TARDIS
-            DestroyData dd = new DestroyData(plugin, uuid.toString());
+            DestroyData dd = new DestroyData();
             dd.setDirection(rsc.getDirection());
             dd.setLocation(current);
             dd.setPlayer(player);
@@ -114,13 +116,14 @@ public class TARDISHandlesTeleportCommand {
             dd.setOutside(true);
             dd.setSubmarine(rsc.isSubmarine());
             dd.setTardisID(id);
-            dd.setBiome(rsc.getBiome());
+            dd.setTardisBiome(TARDISBiome.get(rsc.getBiomeKey()));
+            dd.setThrottle(SpaceTimeThrottle.NORMAL);
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                 plugin.getTrackerKeeper().getDematerialising().add(id);
                 plugin.getPresetDestroyer().destroyPreset(dd);
             }, delay);
             // move TARDIS
-            BuildData bd = new BuildData(plugin, uuid.toString());
+            BuildData bd = new BuildData(uuid.toString());
             bd.setDirection(rsc.getDirection());
             bd.setLocation(location);
             bd.setMalfunction(false);
@@ -129,6 +132,7 @@ public class TARDISHandlesTeleportCommand {
             bd.setRebuild(false);
             bd.setSubmarine(rsc.isSubmarine());
             bd.setTardisID(id);
+            bd.setThrottle(SpaceTimeThrottle.NORMAL);
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), delay * 2);
         }
     }

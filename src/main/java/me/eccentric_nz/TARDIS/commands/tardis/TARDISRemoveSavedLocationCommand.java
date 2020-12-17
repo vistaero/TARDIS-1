@@ -17,8 +17,9 @@
 package me.eccentric_nz.TARDIS.commands.tardis;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetDestinations;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetDestinations;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisID;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.entity.Player;
 
@@ -36,7 +37,7 @@ class TARDISRemoveSavedLocationCommand {
     }
 
     boolean doRemoveSave(Player player, String[] args) {
-        if (player.hasPermission("tardis.save")) {
+        if (TARDISPermission.hasPermission(player, "tardis.save")) {
             if (args.length < 2) {
                 TARDISMessage.send(player, "TOO_FEW_ARGS");
                 return false;

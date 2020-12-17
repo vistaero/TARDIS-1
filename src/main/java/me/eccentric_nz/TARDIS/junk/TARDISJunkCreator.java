@@ -17,13 +17,16 @@
 package me.eccentric_nz.TARDIS.junk;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.BuildData;
 import me.eccentric_nz.TARDIS.builders.TARDISBuilderInner;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
+import me.eccentric_nz.TARDIS.enumeration.Consoles;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -45,7 +48,7 @@ class TARDISJunkCreator {
     }
 
     boolean createJunkTARDIS() {
-        if (!p.hasPermission("tardis.admin")) {
+        if (!TARDISPermission.hasPermission(p, "tardis.admin")) {
             TARDISMessage.send(p, "CMD_ADMIN");
             return true;
         }
@@ -91,7 +94,6 @@ class TARDISJunkCreator {
             setpp.put("player", "junk");
             setpp.put("wall", "ORANGE_WOOL");
             setpp.put("floor", "LIGHT_GRAY_WOOL");
-            setpp.put("lamp", "REDSTONE_LAMP");
             plugin.getQueryFactory().doInsert("player_prefs", setpp);
         }
         World chunkworld = plugin.getServer().getWorld(cw);
@@ -103,9 +105,9 @@ class TARDISJunkCreator {
         setlocs.put("y", l.getBlockY());
         setlocs.put("z", l.getBlockZ());
         setlocs.put("direction", "SOUTH");
-        plugin.getQueryFactory().insertLocations(setlocs, l.getBlock().getBiome().toString(), lastInsertId);
+        plugin.getQueryFactory().insertLocations(setlocs, TARDISStaticUtils.getBiomeAt(l).getKey().toString(), lastInsertId);
         // build the TARDIS at the location
-        BuildData bd = new BuildData(plugin, "00000000-aaaa-bbbb-cccc-000000000000");
+        BuildData bd = new BuildData(null);
         bd.setDirection(COMPASS.SOUTH);
         bd.setLocation(l);
         bd.setMalfunction(false);
@@ -114,9 +116,9 @@ class TARDISJunkCreator {
         bd.setRebuild(false);
         bd.setSubmarine(false);
         bd.setTardisID(lastInsertId);
-        bd.setBiome(l.getBlock().getBiome());
+        bd.setThrottle(SpaceTimeThrottle.JUNK);
         // build the TARDIS in the Vortex
-        TARDISBuilderInner builder = new TARDISBuilderInner(plugin, CONSOLES.SCHEMATICFor("junk"), chunkworld, lastInsertId, p, wall_type, floor_type, true);
+        TARDISBuilderInner builder = new TARDISBuilderInner(plugin, Consoles.schematicFor("junk"), chunkworld, lastInsertId, p, wall_type, floor_type, true);
         int task = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, builder, 1L, 3L);
         builder.setTask(task);
         // build the TARDIS in the world

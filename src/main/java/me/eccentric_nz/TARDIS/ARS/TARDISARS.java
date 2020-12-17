@@ -16,7 +16,7 @@
  */
 package me.eccentric_nz.TARDIS.ARS;
 
-import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
+import me.eccentric_nz.TARDIS.enumeration.Consoles;
 
 import java.util.HashMap;
 
@@ -44,7 +44,9 @@ public enum TARDISARS implements ARS {
     KITCHEN("PUMPKIN", "Kitchen", 1),
     LAZARUS("FURNACE", "Genetic Manipulator", 1),
     LIBRARY("ENCHANTING_TABLE", "Library", 1),
+    MAZE("LODESTONE", "Maze", 1),
     MUSHROOM("GRAVEL", "Mycellium", 1),
+    NETHER("BLACKSTONE", "Nether", 1),
     PASSAGE("CLAY", "Passage", 1),
     POOL("SNOW_BLOCK", "Pool", 1),
     RAIL("HOPPER", "Rail Transfer Station", 1),
@@ -63,11 +65,18 @@ public enum TARDISARS implements ARS {
     SLOT("STONE", "Empty slot", 0),
     CONSOLE("", "Console", 0);
 
+    private final static HashMap<String, ARS> EXTENDED_MATERIAL = new HashMap<>();
+
+    static {
+        for (ARS room : values()) {
+            EXTENDED_MATERIAL.put(room.getMaterial(), room);
+        }
+    }
+
     private final String material;
     private final String descriptiveName;
     private final String configPath;
     private final int offset;
-    private final static HashMap<String, ARS> EXTENDED_MATERIAL = new HashMap<>();
 
     TARDISARS(String material, String descriptiveName, int offset) {
         this.material = material;
@@ -76,11 +85,24 @@ public enum TARDISARS implements ARS {
         this.offset = offset;
     }
 
-    TARDISARS(String material, String descriptiveName, String configPath, int offset) {
-        this.material = material;
-        this.descriptiveName = descriptiveName;
-        this.configPath = configPath;
-        this.offset = offset;
+    /**
+     * Attempts to get the TARDISARS for the given material.
+     *
+     * @param mat the Material of the ARS to get
+     * @return ARS if found, or null
+     */
+    public static ARS ARSFor(String mat) {
+        if (Consoles.getBY_MATERIALS().containsKey(mat)) {
+            return CONSOLE;
+        } else {
+            return EXTENDED_MATERIAL.getOrDefault(mat, SLOT);
+        }
+    }
+
+    public static void addNewARS(ARS room) {
+        if (!EXTENDED_MATERIAL.containsKey(room.getMaterial())) {
+            EXTENDED_MATERIAL.put(room.getMaterial(), room);
+        }
     }
 
     /**
@@ -121,31 +143,5 @@ public enum TARDISARS implements ARS {
     @Override
     public int getOffset() {
         return offset;
-    }
-
-    static {
-        for (ARS room : values()) {
-            EXTENDED_MATERIAL.put(room.getMaterial(), room);
-        }
-    }
-
-    /**
-     * Attempts to get the TARDISARS for the given material.
-     *
-     * @param mat the Material of the ARS to get
-     * @return ARS if found, or null
-     */
-    public static ARS ARSFor(String mat) {
-        if (CONSOLES.getBY_MATERIALS().containsKey(mat)) {
-            return CONSOLE;
-        } else {
-            return EXTENDED_MATERIAL.getOrDefault(mat, SLOT);
-        }
-    }
-
-    public static void addNewARS(ARS room) {
-        if (!EXTENDED_MATERIAL.containsKey(room.getMaterial())) {
-            EXTENDED_MATERIAL.put(room.getMaterial(), room);
-        }
     }
 }

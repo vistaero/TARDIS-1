@@ -20,15 +20,14 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
 import me.eccentric_nz.TARDIS.api.event.TARDISHADSEvent;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
-import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
-import me.eccentric_nz.TARDIS.enumeration.HADS;
-import me.eccentric_nz.TARDIS.enumeration.PRESET;
-import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
+import me.eccentric_nz.TARDIS.enumeration.*;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
+import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
+import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World.Environment;
@@ -103,7 +102,7 @@ class TARDISHostileDisplacement {
                 }
                 if (safe) {
                     Location fl = (rsc.isSubmarine()) ? sub : l;
-                    if (plugin.getPluginRespect().getRespect(fl, new Parameters(player, FLAG.getNoMessageFlags()))) {
+                    if (plugin.getPluginRespect().getRespect(fl, new Parameters(player, Flag.getNoMessageFlags()))) {
                         // sound the cloister bell at current location for dematerialisation
                         TARDISCloisterBell bell = new TARDISCloisterBell(plugin, 5, id, current, plugin.getServer().getPlayer(uuid), true, "HADS displacement", false);
                         int taskID = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, bell, 2L, 70L);
@@ -129,7 +128,7 @@ class TARDISHostileDisplacement {
                         long delay = 1L;
                         // move TARDIS
                         plugin.getTrackerKeeper().getInVortex().add(id);
-                        DestroyData dd = new DestroyData(plugin, uuid.toString());
+                        DestroyData dd = new DestroyData();
                         dd.setDirection(d);
                         dd.setLocation(current);
                         dd.setPlayer(player);
@@ -137,12 +136,14 @@ class TARDISHostileDisplacement {
                         dd.setOutside(true);
                         dd.setSubmarine(rsc.isSubmarine());
                         dd.setTardisID(id);
-                        dd.setBiome(rsc.getBiome());
+                        TARDISBiome biome = TARDISStaticUtils.getBiomeAt(current);
+                        dd.setTardisBiome(biome);
+                        dd.setThrottle(SpaceTimeThrottle.NORMAL);
                         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                             plugin.getTrackerKeeper().getDematerialising().add(id);
                             plugin.getPresetDestroyer().destroyPreset(dd);
                         }, delay);
-                        BuildData bd = new BuildData(plugin, uuid.toString());
+                        BuildData bd = new BuildData(uuid.toString());
                         bd.setDirection(d);
                         bd.setLocation(fl);
                         bd.setMalfunction(false);
@@ -151,6 +152,7 @@ class TARDISHostileDisplacement {
                         bd.setRebuild(false);
                         bd.setSubmarine(rsc.isSubmarine());
                         bd.setTardisID(id);
+                        bd.setThrottle(SpaceTimeThrottle.NORMAL);
                         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), delay * 2);
                         // message time lord
                         String message = plugin.getPluginName() + ChatColor.RED + "H" + ChatColor.RESET + "ostile " + ChatColor.RED + "A" + ChatColor.RESET + "ction " + ChatColor.RED + "D" + ChatColor.RESET + "isplacement " + ChatColor.RED + "S" + ChatColor.RESET + "ystem " + plugin.getLanguage().getString("HADS_ENGAGED");

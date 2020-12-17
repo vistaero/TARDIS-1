@@ -17,10 +17,11 @@
 package me.eccentric_nz.TARDIS.listeners;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.TARDISTimeRotor;
 import me.eccentric_nz.TARDIS.control.TARDISScannerMap;
-import me.eccentric_nz.TARDIS.database.*;
-import me.eccentric_nz.TARDIS.enumeration.CONTROL;
+import me.eccentric_nz.TARDIS.database.resultset.*;
+import me.eccentric_nz.TARDIS.enumeration.Control;
 import me.eccentric_nz.TARDIS.handles.TARDISHandlesProcessor;
 import me.eccentric_nz.TARDIS.handles.TARDISHandlesProgramInventory;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
@@ -63,8 +64,8 @@ public class TARDISItemFrameListener implements Listener {
             UUID uuid = player.getUniqueId();
             // did they run the `/tardis update direction|frame|rotor|map` command?
             if (plugin.getTrackerKeeper().getPlayers().containsKey(uuid)) {
-                CONTROL control = CONTROL.valueOf(plugin.getTrackerKeeper().getPlayers().get(uuid).toUpperCase());
-                if (control.equals(CONTROL.DIRECTION) || control.equals(CONTROL.FRAME) || control.equals(CONTROL.ROTOR) || control.equals(CONTROL.MAP)) {
+                Control control = Control.valueOf(plugin.getTrackerKeeper().getPlayers().get(uuid).toUpperCase());
+                if (control.equals(Control.DIRECTION) || control.equals(Control.FRAME) || control.equals(Control.ROTOR) || control.equals(Control.MAP)) {
                     // check they have a TARDIS
                     ResultSetTardisID rst = new ResultSetTardisID(plugin);
                     if (!rst.fromUUID(uuid.toString())) {
@@ -76,12 +77,12 @@ public class TARDISItemFrameListener implements Listener {
                         case DIRECTION:
                         case FRAME:
                         case MAP:
-                            if (control.equals(CONTROL.MAP) && !player.hasPermission("tardis.scanner.map")) {
+                            if (control.equals(Control.MAP) && !TARDISPermission.hasPermission(player, "tardis.scanner.map")) {
                                 plugin.getTrackerKeeper().getPlayers().remove(uuid);
                                 TARDISMessage.send(player, "NO_PERM_MAP");
                                 return;
                             }
-                            if (control.equals(CONTROL.MAP)) {
+                            if (control.equals(Control.MAP)) {
                                 // frame must have a MAP or FILLED_MAP in it
                                 ItemStack map = frame.getItem();
                                 if (map.getType() != Material.MAP && map.getType() != Material.FILLED_MAP) {
@@ -110,9 +111,9 @@ public class TARDISItemFrameListener implements Listener {
                             }
                             plugin.getTrackerKeeper().getPlayers().remove(uuid);
                             String which;
-                            if (control.equals(CONTROL.DIRECTION)) {
+                            if (control.equals(Control.DIRECTION)) {
                                 which = "Direction";
-                            } else if (control.equals(CONTROL.FRAME)) {
+                            } else if (control.equals(Control.FRAME)) {
                                 which = "Chameleon";
                             } else {
                                 which = "Scanner Map";
@@ -129,9 +130,12 @@ public class TARDISItemFrameListener implements Listener {
                             break;
                         default:
                             // ROTOR
-                            UUID trit = frame.getUniqueId();
-                            TARDISTimeRotor.updateRotorRecord(id, trit.toString());
-                            plugin.getGeneralKeeper().getTimeRotors().put(id, trit);
+                            UUID rotorId = frame.getUniqueId();
+                            TARDISTimeRotor.updateRotorRecord(id, rotorId.toString());
+                            plugin.getGeneralKeeper().getTimeRotors().add(rotorId);
+                            // set fixed and invisible
+                            frame.setFixed(true);
+                            frame.setVisible(false);
                             plugin.getTrackerKeeper().getPlayers().remove(uuid);
                             TARDISMessage.send(player, "ROTOR_UPDATE");
                     }
@@ -238,16 +242,16 @@ public class TARDISItemFrameListener implements Listener {
                     }
                 }
             }
-            if (!player.hasPermission("tardis.handles.use")) {
-                TARDISMessage.send(player, "NO_PERMS");
-                return;
-            }
             // is it an already registered handles frame?
             HashMap<String, Object> whereh = new HashMap<>();
             whereh.put("location", l);
             whereh.put("type", 26);
             ResultSetControls rsh = new ResultSetControls(plugin, whereh, false);
             if (rsh.resultSet()) {
+                if (!TARDISPermission.hasPermission(player, "tardis.handles.use")) {
+                    TARDISMessage.send(player, "NO_PERMS");
+                    return;
+                }
                 ItemStack is = frame.getItem();
                 if (isHandles(is)) {
                     // play sound
@@ -255,13 +259,13 @@ public class TARDISItemFrameListener implements Listener {
                     ItemMeta im = is.getItemMeta();
                     im.setCustomModelData(10000002);
                     is.setItemMeta(im);
-                    frame.setItem(is);
+                    frame.setItem(is, false);
                     plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                         im.setCustomModelData(10000001);
                         is.setItemMeta(im);
-                        frame.setItem(is);
+                        frame.setItem(is, false);
                     }, 20L);
-                    if (!player.hasPermission("tardis.handles.program")) {
+                    if (!TARDISPermission.hasPermission(player, "tardis.handles.program")) {
                         TARDISMessage.send(player, "NO_PERMS");
                         return;
                     }
@@ -299,6 +303,10 @@ public class TARDISItemFrameListener implements Listener {
             } else {
                 ItemStack is = player.getInventory().getItemInMainHand();
                 if (isHandles(is)) {
+                    if (!TARDISPermission.hasPermission(player, "tardis.handles.use")) {
+                        TARDISMessage.send(player, "NO_PERMS");
+                        return;
+                    }
                     // cannot place unless inside the TARDIS
                     if (!plugin.getUtils().inTARDISWorld(event.getPlayer())) {
                         TARDISMessage.handlesSend(player, "HANDLES_TARDIS");
@@ -354,11 +362,11 @@ public class TARDISItemFrameListener implements Listener {
                         ItemMeta im = is.getItemMeta();
                         im.setCustomModelData(10000002);
                         is.setItemMeta(im);
-                        frame.setItem(is);
+                        frame.setItem(is, false);
                         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                             im.setCustomModelData(10000001);
                             is.setItemMeta(im);
-                            frame.setItem(is);
+                            frame.setItem(is, false);
                         }, 40L);
                     } else {
                         // is it the players handles?

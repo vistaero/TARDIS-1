@@ -18,13 +18,11 @@ package me.eccentric_nz.TARDIS.junk;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.database.ResultSetBlocks;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetBlocks;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
-import me.eccentric_nz.TARDIS.utility.TARDISBlockSetters;
-import me.eccentric_nz.TARDIS.utility.TARDISParticles;
-import me.eccentric_nz.TARDIS.utility.TARDISSounds;
-import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
+import me.eccentric_nz.TARDIS.utility.*;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -53,7 +51,7 @@ public class TARDISJunkDestroyer implements Runnable {
     private final Location effectsLoc;
     private Location vortexJunkLoc;
     private final World world;
-    private final Biome biome;
+    private final TARDISBiome biome;
     private int fryTask;
 
     public TARDISJunkDestroyer(TARDIS plugin, DestroyData pdd) {
@@ -68,7 +66,7 @@ public class TARDISJunkDestroyer implements Runnable {
         ez = junkLoc.getBlockZ() + 3;
         sz = junkLoc.getBlockZ() - 2;
         world = junkLoc.getWorld();
-        biome = this.pdd.getBiome();
+        biome = this.pdd.getTardisBiome();
     }
 
     @Override
@@ -106,20 +104,30 @@ public class TARDISJunkDestroyer implements Runnable {
                     int jvrtask = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, runnable, 1L, 20L);
                     runnable.setTask(jvrtask);
                 }
+                // what biome?
+                Biome b = null;
+                if (biome.getKey().getNamespace().equalsIgnoreCase("minecraft")) {
+                    try {
+                        b = Biome.valueOf(biome.name());
+                    } catch (IllegalArgumentException e) {
+                        // ignore
+                    }
+                }
                 List<Chunk> chunks = new ArrayList<>();
                 // remove blocks
                 for (int level = ey; level >= sy; level--) {
                     for (int row = ex; row >= sx; row--) {
                         for (int col = sz; col <= ez; col++) {
-                            Block b = world.getBlockAt(row, level, col);
-                            b.setBlockData(TARDISConstants.AIR);
-                            if (level == sy && ((b.getBiome().equals(Biome.THE_END) && !junkLoc.getWorld().getEnvironment().equals(Environment.THE_END)) || b.getBiome().equals(Biome.THE_VOID)) && biome != null) {
-                                if (!chunks.contains(b.getChunk())) {
-                                    chunks.add(b.getChunk());
+                            Block block = world.getBlockAt(row, level, col);
+                            block.setBlockData(TARDISConstants.AIR);
+                            TARDISBiome tardisBiome = TARDISStaticUtils.getBiomeAt(block.getLocation());
+                            if (level == sy && ((tardisBiome.equals(TARDISBiome.THE_END) && !junkLoc.getWorld().getEnvironment().equals(Environment.THE_END)) || tardisBiome.equals(TARDISBiome.THE_VOID)) && biome != null) {
+                                if (!chunks.contains(block.getChunk())) {
+                                    chunks.add(block.getChunk());
                                 }
                                 // reset the biome
                                 try {
-                                    world.setBiome(row, col, biome);
+                                    world.setBiome(row, col, b);
                                 } catch (NullPointerException e) {
                                     // remove TARDIS from tracker
                                     plugin.getTrackerKeeper().getDematerialising().remove(Integer.valueOf(pdd.getTardisID()));

@@ -19,19 +19,20 @@ package me.eccentric_nz.TARDIS.commands.admin;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.event.TARDISDestructionEvent;
 import me.eccentric_nz.TARDIS.builders.BiomeSetter;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
-import me.eccentric_nz.TARDIS.enumeration.WORLD_MANAGER;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
+import me.eccentric_nz.TARDIS.enumeration.WorldManager;
 import me.eccentric_nz.TARDIS.files.TARDISBlockLoader;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -49,6 +50,18 @@ public class TARDISDeleteCommand {
 
     TARDISDeleteCommand(TARDIS plugin) {
         this.plugin = plugin;
+    }
+
+    public static void cleanDatabase(int id) {
+        TARDISBlockLoader bl = new TARDISBlockLoader(TARDIS.plugin);
+        bl.unloadProtectedBlocks(id);
+        List<String> tables = Arrays.asList("ars", "back", "blocks", "chunks", "controls", "current", "destinations", "doors", "gravity_well", "homes", "junk", "lamps", "next", "tardis", "thevoid", "travellers", "vaults");
+        // remove record from database tables
+        tables.forEach((table) -> {
+            HashMap<String, Object> where = new HashMap<>();
+            where.put("tardis_id", id);
+            TARDIS.plugin.getQueryFactory().doDelete(table, where);
+        });
     }
 
     boolean deleteTARDIS(CommandSender sender, String[] args) {
@@ -92,7 +105,7 @@ public class TARDISDeleteCommand {
             Tardis tardis = rs.getTardis();
             int id = tardis.getTardis_id();
             int tips = tardis.getTIPS();
-            SCHEMATIC schm = tardis.getSchematic();
+            Schematic schm = tardis.getSchematic();
             String chunkLoc = tardis.getChunk();
             boolean hidden = tardis.isHidden();
             String[] cdata = chunkLoc.split(":");
@@ -110,14 +123,14 @@ public class TARDISDeleteCommand {
             // get the current location
             Location bb_loc = null;
             COMPASS d = COMPASS.EAST;
-            Biome biome = null;
+            TARDISBiome biome = TARDISBiome.PLAINS;
             HashMap<String, Object> wherecl = new HashMap<>();
             wherecl.put("tardis_id", id);
             ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, wherecl);
             if (rsc.resultSet()) {
                 bb_loc = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
                 d = rsc.getDirection();
-                biome = rsc.getBiome();
+                biome = TARDISBiome.get(rsc.getBiomeKey());
             }
             if (bb_loc == null) {
                 TARDISMessage.send(sender, "CURRENT_NOT_FOUND");
@@ -127,7 +140,7 @@ public class TARDISDeleteCommand {
             // destroy outer TARDIS
             if (!hidden) {
                 UUID u = rs.getTardis().getUuid();
-                DestroyData dd = new DestroyData(plugin, u.toString());
+                DestroyData dd = new DestroyData();
                 dd.setDirection(d);
                 dd.setLocation(bb_loc);
                 dd.setPlayer(plugin.getServer().getOfflinePlayer(u));
@@ -135,7 +148,8 @@ public class TARDISDeleteCommand {
                 dd.setOutside(false);
                 dd.setSubmarine(rsc.isSubmarine());
                 dd.setTardisID(id);
-                dd.setBiome(biome);
+                dd.setTardisBiome(biome);
+                dd.setThrottle(SpaceTimeThrottle.REBUILD);
                 plugin.getPresetDestroyer().destroyPreset(dd);
             } else {
                 // restore biome
@@ -148,13 +162,13 @@ public class TARDISDeleteCommand {
                     // delete TARDIS world
                     List<Player> players = cw.getPlayers();
                     players.forEach((p) -> p.kickPlayer("World scheduled for deletion!"));
-                    if (plugin.getWorldManager().equals(WORLD_MANAGER.MULTIVERSE)) {
+                    if (plugin.getWorldManager().equals(WorldManager.MULTIVERSE)) {
                         plugin.getServer().dispatchCommand(plugin.getConsole(), "mv remove " + wname);
                     }
-                    if (plugin.getWorldManager().equals(WORLD_MANAGER.MULTIWORLD)) {
+                    if (plugin.getWorldManager().equals(WorldManager.MULTIWORLD)) {
                         plugin.getServer().dispatchCommand(plugin.getConsole(), "mw unload " + wname);
                     }
-                    if (plugin.getWorldManager().equals(WORLD_MANAGER.MYWORLDS)) {
+                    if (plugin.getWorldManager().equals(WorldManager.MYWORLDS)) {
                         plugin.getServer().dispatchCommand(plugin.getConsole(), "myworlds unload " + wname);
                     }
                     if (plugin.getPM().isPluginEnabled("WorldBorder")) {
@@ -177,17 +191,5 @@ public class TARDISDeleteCommand {
             return true;
         }
         return true;
-    }
-
-    public static void cleanDatabase(int id) {
-        TARDISBlockLoader bl = new TARDISBlockLoader(TARDIS.plugin);
-        bl.unloadProtectedBlocks(id);
-        List<String> tables = Arrays.asList("ars", "back", "blocks", "chunks", "controls", "current", "destinations", "doors", "gravity_well", "homes", "junk", "lamps", "next", "tardis", "thevoid", "travellers", "vaults");
-        // remove record from database tables
-        tables.forEach((table) -> {
-            HashMap<String, Object> where = new HashMap<>();
-            where.put("tardis_id", id);
-            TARDIS.plugin.getQueryFactory().doDelete(table, where);
-        });
     }
 }

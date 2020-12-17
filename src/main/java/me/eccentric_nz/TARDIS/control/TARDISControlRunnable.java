@@ -17,9 +17,9 @@
 package me.eccentric_nz.TARDIS.control;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetConsole;
-import me.eccentric_nz.TARDIS.database.ResultSetOccupied;
-import me.eccentric_nz.TARDIS.enumeration.WORLD_MANAGER;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetConsole;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetOccupied;
+import me.eccentric_nz.TARDIS.enumeration.WorldManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Tag;
 import org.bukkit.block.Sign;
@@ -58,12 +58,12 @@ public class TARDISControlRunnable implements Runnable {
                                     sign.setLine(2, "");
                                 } else {
                                     String worldname = (rsc.getWorld() != null) ? rsc.getWorld() : "";
-                                    if (plugin.getWorldManager().equals(WORLD_MANAGER.MULTIVERSE) && !worldname.equals("")) {
+                                    if (plugin.getWorldManager().equals(WorldManager.MULTIVERSE) && !worldname.equals("")) {
                                         worldname = plugin.getMVHelper().getAlias(worldname);
                                     }
                                     sign.setLine(0, ChatColor.DARK_PURPLE + worldname);
-                                    sign.setLine(1, rsc.getLocation());
-                                    sign.setLine(2, rsc.getBiome());
+                                    sign.setLine(1, ChatColor.BLACK + rsc.getLocation());
+                                    sign.setLine(2, ChatColor.BLACK + rsc.getBiome());
                                 }
                                 sign.setLine(3, ChatColor.BLUE + rsc.getPreset());
                                 sign.update();
@@ -80,7 +80,7 @@ public class TARDISControlRunnable implements Runnable {
                                 // get the sign
                                 Sign sign = (Sign) rsc.getSign().getState();
                                 // update the data
-                                sign.setLine(0, plugin.getLanguage().getString("ARTRON_DISPLAY"));
+                                sign.setLine(0, ChatColor.BLACK + plugin.getLanguage().getString("ARTRON_DISPLAY"));
                                 sign.setLine(1, ChatColor.AQUA + plugin.getLanguage().getString("ARTRON_MAX") + ":" + plugin.getArtronConfig().getInt("full_charge"));
                                 sign.setLine(2, ChatColor.GREEN + plugin.getLanguage().getString("ARTRON_REMAINING") + ":" + current_level);
                                 sign.setLine(3, ChatColor.LIGHT_PURPLE + plugin.getLanguage().getString("ARTRON_PERCENT") + ":" + percent + "%");

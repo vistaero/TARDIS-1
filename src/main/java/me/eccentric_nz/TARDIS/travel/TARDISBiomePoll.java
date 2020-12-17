@@ -20,7 +20,7 @@ import com.google.common.base.Strings;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
+import me.eccentric_nz.TARDIS.enumeration.Flag;
 import me.eccentric_nz.TARDIS.flight.TARDISLand;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.Location;
@@ -32,7 +32,7 @@ import java.util.HashMap;
 public class TARDISBiomePoll implements Runnable {
 
     private final TARDIS plugin;
-    private final TARDISBiomeFinder biomeFinder;
+    private final TARDISBiomeFinderOld biomeFinder;
     private final long timeout;
     private final Player player;
     private final int id;
@@ -40,7 +40,7 @@ public class TARDISBiomePoll implements Runnable {
     private int taskid;
     private int dots = 0;
 
-    public TARDISBiomePoll(TARDIS plugin, TARDISBiomeFinder biomeFinder, long timeout, Player player, int id, COMPASS direction) {
+    public TARDISBiomePoll(TARDIS plugin, TARDISBiomeFinderOld biomeFinder, long timeout, Player player, int id, COMPASS direction) {
         this.plugin = plugin;
         this.biomeFinder = biomeFinder;
         this.timeout = timeout;
@@ -60,7 +60,7 @@ public class TARDISBiomePoll implements Runnable {
                 Location tb = biomeFinder.getLocation();
                 // cancel biome finder
                 plugin.getServer().getScheduler().cancelTask(biomeFinder.getTaskid());
-                if (!plugin.getPluginRespect().getRespect(tb, new Parameters(player, FLAG.getDefaultFlags()))) {
+                if (!plugin.getPluginRespect().getRespect(tb, new Parameters(player, Flag.getDefaultFlags()))) {
                     if (plugin.getConfig().getBoolean("travel.no_destination_malfunctions")) {
                         plugin.getTrackerKeeper().getMalfunction().put(id, true);
                     } else {

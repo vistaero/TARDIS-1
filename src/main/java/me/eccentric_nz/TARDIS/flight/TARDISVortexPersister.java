@@ -20,10 +20,16 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.builders.BuildData;
 import me.eccentric_nz.TARDIS.builders.TARDISInstantPoliceBox;
 import me.eccentric_nz.TARDIS.builders.TARDISInstantPreset;
-import me.eccentric_nz.TARDIS.database.*;
+import me.eccentric_nz.TARDIS.database.TARDISDatabaseConnection;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetBackLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetControls;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
 import me.eccentric_nz.TARDIS.destroyers.TARDISDeinstantPreset;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -32,7 +38,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -45,10 +50,10 @@ public class TARDISVortexPersister {
     private final TARDIS plugin;
     private final TARDISDatabaseConnection service = TARDISDatabaseConnection.getINSTANCE();
     private final Connection connection = service.getConnection();
+    private final String prefix;
     private PreparedStatement ps = null;
     private ResultSet rs = null;
     private int count = 0;
-    private final String prefix;
 
     public TARDISVortexPersister(TARDIS plugin) {
         this.plugin = plugin;
@@ -105,14 +110,16 @@ public class TARDISVortexPersister {
                             whereb.put("tardis_id", id);
                             ResultSetBackLocation rsb = new ResultSetBackLocation(plugin, whereb);
                             if (rsb.resultSet()) {
-                                DestroyData dd = new DestroyData(plugin, uuid.toString());
+                                DestroyData dd = new DestroyData();
                                 Location location = new Location(rsb.getWorld(), rsb.getX(), rsb.getY(), rsb.getZ());
                                 dd.setLocation(location);
                                 dd.setDirection(rsb.getDirection());
                                 dd.setSubmarine(rsb.isSubmarine());
                                 dd.setTardisID(id);
-                                dd.setBiome(null);
+                                dd.setTardisBiome(null);
                                 dd.setSiege(false);
+                                dd.setThrottle(SpaceTimeThrottle.REBUILD);
+                                dd.setPlayer(Bukkit.getOfflinePlayer(uuid));
                                 while (!location.getChunk().isLoaded()) {
                                     location.getChunk().load();
                                 }
@@ -126,17 +133,17 @@ public class TARDISVortexPersister {
                         wherec.put("tardis_id", id);
                         ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, wherec);
                         if (rsc.resultSet()) {
-                            BuildData bd = new BuildData(plugin, uuid.toString());
+                            BuildData bd = new BuildData(uuid.toString());
                             bd.setTardisID(id);
                             Location location = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
                             bd.setLocation(location);
                             OfflinePlayer olp = plugin.getServer().getOfflinePlayer(uuid);
                             bd.setPlayer(olp);
                             bd.setRebuild(false);
-                            bd.setBiome(rsc.getBiome());
                             bd.setDirection(rsc.getDirection());
                             bd.setSubmarine(rsc.isSubmarine());
                             bd.setMalfunction(false);
+                            bd.setThrottle(SpaceTimeThrottle.REBUILD);
                             while (!location.getChunk().isLoaded()) {
                                 location.getChunk().load();
                             }
@@ -147,10 +154,10 @@ public class TARDISVortexPersister {
                                 new TARDISInstantPreset(plugin, bd, rs.getTardis().getPreset(), Material.LIGHT_GRAY_TERRACOTTA.createBlockData(), false).buildPreset();
                             }
                             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                                plugin.getTrackerKeeper().getInVortex().removeAll(Collections.singletonList(id));
-                                plugin.getTrackerKeeper().getDidDematToVortex().removeAll(Collections.singletonList(id));
+                                plugin.getTrackerKeeper().getInVortex().remove(id);
+                                plugin.getTrackerKeeper().getDidDematToVortex().remove(id);
                                 plugin.getTrackerKeeper().getDestinationVortex().remove(id);
-                                plugin.getTrackerKeeper().getDematerialising().removeAll(Collections.singletonList(id));
+                                plugin.getTrackerKeeper().getDematerialising().remove(id);
                             }, 20L);
                         }
                         land++;

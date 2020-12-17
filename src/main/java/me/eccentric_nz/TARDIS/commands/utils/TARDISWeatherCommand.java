@@ -18,9 +18,10 @@ package me.eccentric_nz.TARDIS.commands.utils;
 
 import com.google.common.collect.ImmutableList;
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.commands.TARDISCompleter;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.enumeration.WEATHER;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.enumeration.Weather;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -73,9 +74,9 @@ public class TARDISWeatherCommand extends TARDISCompleter implements CommandExec
                         return true;
                     }
                 }
-                WEATHER weather = WEATHER.fromString(args[0]);
+                Weather weather = Weather.fromString(args[0]);
                 String perm = weather.toString().toLowerCase();
-                if (!player.hasPermission("tardis.weather." + perm)) {
+                if (!TARDISPermission.hasPermission(player, "tardis.weather." + perm)) {
                     TARDISMessage.send(sender, "NO_PERMS");
                     return true;
                 }

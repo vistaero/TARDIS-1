@@ -17,9 +17,10 @@
 package me.eccentric_nz.TARDIS.howto;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.custommodeldata.GUISeeds;
-import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
+import me.eccentric_nz.TARDIS.enumeration.Consoles;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -57,8 +58,8 @@ public class TARDISSeedsInventory {
         ItemStack[] stack = new ItemStack[27];
         int i = 0;
         // get consoles
-        for (SCHEMATIC a : CONSOLES.getBY_NAMES().values()) {
-            if (player.hasPermission("tardis." + a.getPermission()) && !a.getSeedMaterial().equals(Material.COBBLESTONE)) {
+        for (Schematic a : Consoles.getBY_NAMES().values()) {
+            if (TARDISPermission.hasPermission(player, "tardis." + a.getPermission()) && !a.getSeedMaterial().equals(Material.COBBLESTONE)) {
                 Material m = Material.getMaterial(a.getSeed());
                 ItemStack is = new ItemStack(m, 1);
                 ItemMeta im = is.getItemMeta();
@@ -66,6 +67,7 @@ public class TARDISSeedsInventory {
                 List<String> lore = new ArrayList<>();
                 lore.add("Click to see recipe...");
                 im.setLore(lore);
+                im.setCustomModelData((m.equals(Material.NETHER_WART_BLOCK)) ? 2 : 1);
                 is.setItemMeta(im);
                 stack[i] = is;
                 i++;

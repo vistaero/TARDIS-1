@@ -23,10 +23,10 @@ import me.eccentric_nz.TARDIS.TARDISConstants;
 import me.eccentric_nz.TARDIS.chameleon.TARDISChameleonColumn;
 import me.eccentric_nz.TARDIS.chameleon.TARDISConstructColumn;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISMushroomBlockData;
-import me.eccentric_nz.TARDIS.database.ResultSetConstructSign;
-import me.eccentric_nz.TARDIS.database.ResultSetDoors;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetConstructSign;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetDoors;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
@@ -267,7 +267,7 @@ public class TARDISInstantPreset {
                         if (bd.isSubmarine() && mat.equals(Material.TORCH)) {
                             light = Material.GLOWSTONE.createBlockData();
                         } else {
-                            light = isPoliceBox ? bd.getLamp().createBlockData() : colData[yy];
+                            light = colData[yy];
                         }
                         if (mat.equals(Material.TORCH)) {
                             do_at_end.add(new ProblemBlock(new Location(world, xx, (y + yy), zz), light));
@@ -283,18 +283,22 @@ public class TARDISInstantPreset {
                         break;
                     case IRON_DOOR: // wood, iron & trap doors, rails
                     case RAIL:
-                    case OAK_DOOR:
-                    case BIRCH_DOOR:
-                    case SPRUCE_DOOR:
-                    case JUNGLE_DOOR:
                     case ACACIA_DOOR:
-                    case DARK_OAK_DOOR:
-                    case OAK_TRAPDOOR:
-                    case BIRCH_TRAPDOOR:
-                    case SPRUCE_TRAPDOOR:
-                    case JUNGLE_TRAPDOOR:
                     case ACACIA_TRAPDOOR:
+                    case BIRCH_DOOR:
+                    case BIRCH_TRAPDOOR:
+                    case CRIMSON_DOOR:
+                    case CRIMSON_TRAPDOOR:
+                    case DARK_OAK_DOOR:
                     case DARK_OAK_TRAPDOOR:
+                    case JUNGLE_DOOR:
+                    case JUNGLE_TRAPDOOR:
+                    case OAK_DOOR:
+                    case OAK_TRAPDOOR:
+                    case SPRUCE_DOOR:
+                    case SPRUCE_TRAPDOOR:
+                    case WARPED_DOOR:
+                    case WARPED_TRAPDOOR:
                         boolean door = false;
                         if (Tag.DOORS.isTagged(mat)) {
                             Bisected bisected = (Bisected) colData[yy];
@@ -461,13 +465,13 @@ public class TARDISInstantPreset {
                             TARDISBlockSetters.setBlockAndRemember(world, xx, (y + yy), zz, rotatable, bd.getTardisID());
                         }
                         break;
-                    case REDSTONE_BLOCK:
-                        if (!bd.getLamp().equals(Material.REDSTONE_LAMP) && isPoliceBox) {
-                            TARDISBlockSetters.setBlockAndRemember(world, xx, (y + yy), zz, Material.BLUE_WOOL, bd.getTardisID());
-                        } else {
-                            TARDISBlockSetters.setBlockAndRemember(world, xx, (y + yy), zz, colData[yy], bd.getTardisID());
-                        }
-                        break;
+//                    case REDSTONE_BLOCK:
+//                        if (isPoliceBox) {
+//                            TARDISBlockSetters.setBlockAndRemember(world, xx, (y + yy), zz, Material.BLUE_WOOL, bd.getTardisID());
+//                        } else {
+//                            TARDISBlockSetters.setBlockAndRemember(world, xx, (y + yy), zz, colData[yy], bd.getTardisID());
+//                        }
+//                        break;
                     case WHITE_TERRACOTTA:
                     case ORANGE_TERRACOTTA:
                     case MAGENTA_TERRACOTTA:

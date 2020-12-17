@@ -17,7 +17,8 @@
 package me.eccentric_nz.TARDIS.commands;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -69,7 +70,7 @@ public class TARDISTextureCommands implements CommandExecutor {
                 TARDISMessage.send(sender, "CMD_PLAYER");
                 return false;
             }
-            if (player.hasPermission("tardis.texture")) {
+            if (TARDISPermission.hasPermission(player, "tardis.texture")) {
                 // get the players preferences
                 String playerUUID = player.getUniqueId().toString();
                 ResultSetPlayerPrefs rsp = new ResultSetPlayerPrefs(plugin, playerUUID);

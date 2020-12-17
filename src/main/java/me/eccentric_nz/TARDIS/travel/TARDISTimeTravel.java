@@ -19,11 +19,12 @@ package me.eccentric_nz.TARDIS.travel;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
 import me.eccentric_nz.TARDIS.api.Parameters;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISMushroomBlockData;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
+import me.eccentric_nz.TARDIS.enumeration.Flag;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.*;
 import org.bukkit.Location;
@@ -32,6 +33,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.MultipleFacing;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -49,15 +52,111 @@ import java.util.Set;
  */
 public class TARDISTimeTravel {
 
-    private static final int[] START_LOC = new int[6];
-    private Location dest;
     private final TARDIS plugin;
     private final int attempts;
+    private Location dest;
 
     public TARDISTimeTravel(TARDIS plugin) {
         this.plugin = plugin;
         // add good materials
         attempts = plugin.getConfig().getInt("travel.random_attempts");
+    }
+
+    /**
+     * Checks if a random location is safe for the TARDIS Police Box to land at. The Police Box requires a clear 4 x 3 x
+     * 4 (d x w x h) area.
+     *
+     * @param startx a starting position in the x direction.
+     * @param starty a starting position in the y direction.
+     * @param startz a starting position in the z direction.
+     * @param resetx a copy of the starting x position to return to.
+     * @param resetz a copy of the starting z position to return to.
+     * @param w      the world the location check will take place in.
+     * @param d      the direction the Police Box is facing.
+     * @return the number of unsafe blocks
+     */
+    public static int safeLocation(int startx, int starty, int startz, int resetx, int resetz, World w, COMPASS d) {
+        int level, row, col, rowcount, colcount, count = 0;
+        switch (d) {
+            case EAST:
+            case WEST:
+                rowcount = 3;
+                colcount = 4;
+                break;
+            default:
+                rowcount = 4;
+                colcount = 3;
+                break;
+        }
+        for (level = 0; level < 4; level++) {
+            for (row = 0; row < rowcount; row++) {
+                for (col = 0; col < colcount; col++) {
+                    Block block = w.getBlockAt(startx, starty, startz);
+                    if (level == 0) {
+                        // check for item frame
+                        for (Entity e : w.getNearbyEntities(block.getLocation(), 1.5d, 1.5d, 1.5d)) {
+                            if (e instanceof ItemFrame) {
+                                count++;
+                                break;
+                            }
+                        }
+                    }
+                    Material mat = block.getType();
+                    if (!TARDISConstants.GOOD_MATERIALS.contains(mat)) {
+                        // check for siege cube
+                        if (TARDIS.plugin.getConfig().getBoolean("siege.enabled") && mat.equals(Material.BROWN_MUSHROOM_BLOCK)) {
+                            MultipleFacing mf = (MultipleFacing) block.getBlockData();
+                            if (!mf.getAsString().equals(TARDISMushroomBlockData.BROWN_MUSHROOM_DATA.get(2))) {
+                                count++;
+                                break;
+                            }
+                        } else if (w.getName().equals("Siluria") && mat.equals(Material.BAMBOO)) {
+                            // do nothing
+                        } else {
+                            count++;
+                        }
+                    }
+                    startx += 1;
+                }
+                startx = resetx;
+                startz += 1;
+            }
+            startz = resetz;
+            starty += 1;
+        }
+        return count;
+    }
+
+    /**
+     * Gets the starting location for safe location checking.
+     *
+     * @param loc a location object to check.
+     * @param d   the direction the Police Box is facing.
+     * @return an array containing x and z coordinates
+     */
+    public static int[] getStartLocation(Location loc, COMPASS d) {
+        int[] startLocation = new int[4];
+        switch (d) {
+            case EAST:
+                startLocation[0] = loc.getBlockX() - 2;
+                startLocation[1] = startLocation[0];
+                startLocation[2] = loc.getBlockZ() - 1;
+                startLocation[3] = startLocation[2];
+                break;
+            case SOUTH:
+                startLocation[0] = loc.getBlockX() - 1;
+                startLocation[1] = startLocation[0];
+                startLocation[2] = loc.getBlockZ() - 2;
+                startLocation[3] = startLocation[2];
+                break;
+            default:
+                startLocation[0] = loc.getBlockX() - 1;
+                startLocation[1] = startLocation[0];
+                startLocation[2] = loc.getBlockZ() - 1;
+                startLocation[3] = startLocation[2];
+                break;
+        }
+        return startLocation;
     }
 
     /**
@@ -88,7 +187,7 @@ public class TARDISTimeTravel {
         Set<String> worldlist = plugin.getPlanetsConfig().getConfigurationSection("planets").getKeys(false);
         List<World> allowedWorlds = new ArrayList<>();
 
-        if (e.equals("THIS") && plugin.getPlanetsConfig().getBoolean("planets." + this_world.getName() + ".time_travel")) {
+        if (e.equals("THIS") && plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(this_world.getName()) + ".time_travel")) {
             allowedWorlds.add(this_world);
         } else {
             worldlist.forEach((o) -> {
@@ -114,11 +213,11 @@ public class TARDISTimeTravel {
                         }
                     }
                     // remove the world the Police Box is in
-                    if (this_world != null && (allowedWorlds.size() > 1 || !plugin.getPlanetsConfig().getBoolean("planets." + this_world.getName() + ".time_travel"))) {
+                    if (this_world != null && (allowedWorlds.size() > 1 || !plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(this_world.getName()) + ".time_travel"))) {
                         allowedWorlds.remove(this_world);
                     }
                     // remove the world if the player doesn't have permission
-                    if (allowedWorlds.size() > 1 && plugin.getConfig().getBoolean("travel.per_world_perms") && !p.hasPermission("tardis.travel." + o)) {
+                    if (allowedWorlds.size() > 1 && plugin.getConfig().getBoolean("travel.per_world_perms") && !TARDISPermission.hasPermission(p, "tardis.travel." + o)) {
                         allowedWorlds.remove(ww);
                     }
                 }
@@ -157,7 +256,7 @@ public class TARDISTimeTravel {
                     if (highest > 40) {
                         Block currentBlock = randworld.getBlockAt(wherex, highest, wherez);
                         Location chunk_loc = currentBlock.getLocation();
-                        if (plugin.getPluginRespect().getRespect(chunk_loc, new Parameters(p, FLAG.getNoMessageFlags()))) {
+                        if (plugin.getPluginRespect().getRespect(chunk_loc, new Parameters(p, Flag.getNoMessageFlags()))) {
                             while (!randworld.getChunkAt(chunk_loc).isLoaded()) {
                                 randworld.getChunkAt(chunk_loc).load();
                             }
@@ -214,7 +313,7 @@ public class TARDISTimeTravel {
                                     // check if submarine is on
                                     ResultSetPlayerPrefs rsp = new ResultSetPlayerPrefs(plugin, p.getUniqueId().toString());
                                     if (rsp.resultSet()) {
-                                        if (rsp.isSubmarineOn() && TARDISStaticUtils.isOceanBiome(currentBlock.getBiome())) {
+                                        if (rsp.isSubmarineOn() && TARDISStaticUtils.isOceanBiome(TARDISStaticUtils.getBiomeAt(currentBlock.getLocation()))) {
                                             // get submarine location
                                             TARDISMessage.send(p, "SUB_SEARCH");
                                             Location underwater = submarine(currentBlock, d);
@@ -241,7 +340,7 @@ public class TARDISTimeTravel {
                                         currentBlock = currentBlock.getRelative(BlockFace.DOWN);
                                     }
                                     Location chunk_loc = currentBlock.getLocation();
-                                    if (plugin.getPluginRespect().getRespect(chunk_loc, new Parameters(p, FLAG.getNoMessageFlags()))) {
+                                    if (plugin.getPluginRespect().getRespect(chunk_loc, new Parameters(p, Flag.getNoMessageFlags()))) {
                                         while (!randworld.getChunkAt(chunk_loc).isLoaded()) {
                                             randworld.getChunkAt(chunk_loc).load();
                                         }
@@ -264,7 +363,7 @@ public class TARDISTimeTravel {
                                 break;
                             }
                         } else {
-                            if (!plugin.getPluginRespect().getRespect(new Location(randworld, wherex, highest, wherez), new Parameters(p, FLAG.getNoMessageFlags()))) {
+                            if (!plugin.getPluginRespect().getRespect(new Location(randworld, wherex, highest, wherez), new Parameters(p, Flag.getNoMessageFlags()))) {
                                 return null;
                             } else {
                                 highest = plugin.getConfig().getInt("travel.timeout_height");
@@ -277,62 +376,6 @@ public class TARDISTimeTravel {
                 break;
         }
         return dest;
-    }
-
-    /**
-     * Checks if a random location is safe for the TARDIS Police Box to land at. The Police Box requires a clear 4 x 3 x
-     * 4 (d x w x h) area.
-     *
-     * @param startx a starting position in the x direction.
-     * @param starty a starting position in the y direction.
-     * @param startz a starting position in the z direction.
-     * @param resetx a copy of the starting x position to return to.
-     * @param resetz a copy of the starting z position to return to.
-     * @param w      the world the location check will take place in.
-     * @param d      the direction the Police Box is facing.
-     * @return the number of unsafe blocks
-     */
-    public static int safeLocation(int startx, int starty, int startz, int resetx, int resetz, World w, COMPASS d) {
-        int level, row, col, rowcount, colcount, count = 0;
-        switch (d) {
-            case EAST:
-            case WEST:
-                rowcount = 3;
-                colcount = 4;
-                break;
-            default:
-                rowcount = 4;
-                colcount = 3;
-                break;
-        }
-        for (level = 0; level < 4; level++) {
-            for (row = 0; row < rowcount; row++) {
-                for (col = 0; col < colcount; col++) {
-                    Block block = w.getBlockAt(startx, starty, startz);
-                    Material mat = block.getType();
-                    if (!TARDISConstants.GOOD_MATERIALS.contains(mat)) {
-                        // check for siege cube
-                        if (TARDIS.plugin.getConfig().getBoolean("siege.enabled") && mat.equals(Material.BROWN_MUSHROOM_BLOCK)) {
-                            MultipleFacing mf = (MultipleFacing) block.getBlockData();
-                            if (!mf.getAsString().equals(TARDISMushroomBlockData.BROWN_MUSHROOM_DATA.get(2))) {
-                                count++;
-                                break;
-                            }
-                        } else if (w.getName().equals("Siluria") && mat.equals(Material.BAMBOO)) {
-                            // do nothing
-                        } else {
-                            count++;
-                        }
-                    }
-                    startx += 1;
-                }
-                startx = resetx;
-                startz += 1;
-            }
-            startz = resetz;
-            starty += 1;
-        }
-        return count;
     }
 
     /**
@@ -397,37 +440,6 @@ public class TARDISTimeTravel {
     }
 
     /**
-     * Gets the starting location for safe location checking.
-     *
-     * @param loc a location object to check.
-     * @param d   the direction the Police Box is facing.
-     * @return an array containing x and z coordinates
-     */
-    public static int[] getStartLocation(Location loc, COMPASS d) {
-        switch (d) {
-            case EAST:
-                START_LOC[0] = loc.getBlockX() - 2;
-                START_LOC[1] = START_LOC[0];
-                START_LOC[2] = loc.getBlockZ() - 1;
-                START_LOC[3] = START_LOC[2];
-                break;
-            case SOUTH:
-                START_LOC[0] = loc.getBlockX() - 1;
-                START_LOC[1] = START_LOC[0];
-                START_LOC[2] = loc.getBlockZ() - 2;
-                START_LOC[3] = START_LOC[2];
-                break;
-            default:
-                START_LOC[0] = loc.getBlockX() - 1;
-                START_LOC[1] = START_LOC[0];
-                START_LOC[2] = loc.getBlockZ() - 1;
-                START_LOC[3] = START_LOC[2];
-                break;
-        }
-        return START_LOC;
-    }
-
-    /**
      * Checks whether a NETHER location is safe to land at.
      *
      * @param nether a Nether world to search in.
@@ -454,7 +466,7 @@ public class TARDISTimeTravel {
         if (air >= 4 && (plugin.getGeneralKeeper().getGoodNether().contains(mat) || plugin.getPlanetsConfig().getBoolean("planets." + nether.getName() + ".false_nether"))) {
             Location netherLocation = startBlock.getLocation();
             netherLocation.setY(netherLocation.getY() + 1);
-            if (plugin.getPluginRespect().getRespect(netherLocation, new Parameters(p, FLAG.getNoMessageFlags()))) {
+            if (plugin.getPluginRespect().getRespect(netherLocation, new Parameters(p, Flag.getNoMessageFlags()))) {
                 // get start location for checking there is enough space
                 int gsl[] = getStartLocation(netherLocation, d);
                 startx = gsl[0];

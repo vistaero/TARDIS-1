@@ -17,7 +17,7 @@
 package me.eccentric_nz.TARDIS.builders;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
 
 /**
  * Data class for building the TARDIS exterior.
@@ -33,9 +33,7 @@ public final class BuildData extends MaterialisationData {
     private boolean rebuild;
     private boolean texture = true;
 
-    public BuildData(TARDIS plugin, String uuid) {
-        super(plugin, uuid);
-        // get player preferences
+    public BuildData(String uuid) {
         setPlayerDefaults(uuid);
     }
 
@@ -75,7 +73,6 @@ public final class BuildData extends MaterialisationData {
         this.texture = texture;
     }
 
-    @Override
     public void setPlayerDefaults(String uuid) {
         if (uuid == null) {
             // sane defaults
@@ -86,7 +83,6 @@ public final class BuildData extends MaterialisationData {
         } else {
             ResultSetPlayerPrefs rsp = new ResultSetPlayerPrefs(TARDIS.plugin, uuid);
             if (rsp.resultSet()) {
-                super.setLamp(rsp.getLamp());
                 texture = rsp.isPoliceboxTexturesOn();
                 addSign = rsp.isSignOn();
                 CTM = rsp.isCtmOn();

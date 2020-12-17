@@ -19,19 +19,20 @@ package me.eccentric_nz.TARDIS.flight;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.event.TARDISDematerialisationEvent;
 import me.eccentric_nz.TARDIS.builders.BiomeSetter;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetNextLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetNextLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import me.eccentric_nz.TARDIS.utility.TARDISSounds;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -89,8 +90,15 @@ public class TARDISDematerialiseToVortex implements Runnable {
             }
             COMPASS cd = rscl.getDirection();
             boolean sub = rscl.isSubmarine();
-            Biome biome = rscl.getBiome();
-            DestroyData dd = new DestroyData(plugin, uuid.toString());
+            TARDISBiome biome = TARDISBiome.get(rscl.getBiomeKey());
+            ResultSetPlayerPrefs rsp = new ResultSetPlayerPrefs(plugin, uuid.toString());
+            boolean minecart = false;
+            SpaceTimeThrottle spaceTimeThrottle = SpaceTimeThrottle.NORMAL;
+            if (rsp.resultSet()) {
+                minecart = rsp.isMinecartOn();
+                spaceTimeThrottle = spaceTimeThrottle.getByDelay().get(rsp.getThrottle());
+            }
+            DestroyData dd = new DestroyData();
             dd.setDirection(cd);
             dd.setLocation(l);
             dd.setPlayer(player);
@@ -98,7 +106,8 @@ public class TARDISDematerialiseToVortex implements Runnable {
             dd.setOutside(false);
             dd.setSubmarine(sub);
             dd.setTardisID(id);
-            dd.setBiome(biome);
+            dd.setTardisBiome(biome);
+            dd.setThrottle(spaceTimeThrottle);
             PRESET preset = tardis.getPreset();
             if (preset.equals(PRESET.JUNK_MODE)) {
                 HashMap<String, Object> wherenl = new HashMap<>();
@@ -110,15 +119,32 @@ public class TARDISDematerialiseToVortex implements Runnable {
                 }
                 Location exit = new Location(rsn.getWorld(), rsn.getX(), rsn.getY(), rsn.getZ());
                 dd.setFromToLocation(exit);
+                dd.setThrottle(SpaceTimeThrottle.JUNK);
             }
             plugin.getPM().callEvent(new TARDISDematerialisationEvent(player, tardis, l));
             if (!hidden && !plugin.getTrackerKeeper().getReset().contains(resetw)) {
-                ResultSetPlayerPrefs rsp = new ResultSetPlayerPrefs(plugin, uuid.toString());
-                boolean minecart = (rsp.resultSet()) && rsp.isMinecartOn();
                 // play demat sfx
                 if (!minecart) {
                     if (!preset.equals(PRESET.JUNK_MODE)) {
-                        String sound = (plugin.getTrackerKeeper().getMalfunction().get(id) && plugin.getTrackerKeeper().getHasDestination().containsKey(id)) ? "tardis_malfunction_takeoff" : "tardis_takeoff";
+                        String sound;
+                        if (plugin.getTrackerKeeper().getMalfunction().get(id) && plugin.getTrackerKeeper().getHasDestination().containsKey(id)) {
+                            sound = "tardis_malfunction_takeoff";
+                        } else {
+                            switch (spaceTimeThrottle) {
+                                case WARP:
+                                    sound = "tardis_takeoff_warp";
+                                    break;
+                                case RAPID:
+                                    sound = "tardis_takeoff_rapid";
+                                    break;
+                                case FASTER:
+                                    sound = "tardis_takeoff_faster";
+                                    break;
+                                default: // NORMAL
+                                    sound = "tardis_takeoff";
+                                    break;
+                            }
+                        }
                         TARDISSounds.playTARDISSound(handbrake, sound);
                         TARDISSounds.playTARDISSound(l, sound);
                     } else {

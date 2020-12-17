@@ -17,9 +17,11 @@
 package me.eccentric_nz.TARDIS.commands.tardis;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.chatGUI.TARDISUpdateChatGUI;
-import me.eccentric_nz.TARDIS.database.*;
+import me.eccentric_nz.TARDIS.database.TARDISBoundTransmatRemoval;
 import me.eccentric_nz.TARDIS.database.data.Transmat;
+import me.eccentric_nz.TARDIS.database.resultset.*;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -40,7 +42,7 @@ class TARDISTransmatCommand {
             TARDISMessage.send(player, "TOO_FEW_ARGS");
             return false;
         }
-        if (!player.hasPermission("tardis.transmat")) {
+        if (!TARDISPermission.hasPermission(player, "tardis.transmat")) {
             TARDISMessage.send(player, "NO_PERMS");
             return true;
         }
@@ -164,7 +166,7 @@ class TARDISTransmatCommand {
                     whered.put("name", args[2]);
                     ResultSetBind rsd = new ResultSetBind(plugin, whered);
                     if (rsd.resultSet()) {
-                        new BoundTransmatRemoval(plugin, id, args[2]).unbind();
+                        new TARDISBoundTransmatRemoval(plugin, id, args[2]).unbind();
                     }
                     TARDISMessage.send(player, "TRANSMAT_REMOVED");
                 } else {

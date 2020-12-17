@@ -17,10 +17,11 @@
 package me.eccentric_nz.TARDIS.advanced;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISMushroomBlockData;
-import me.eccentric_nz.TARDIS.database.*;
-import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
-import me.eccentric_nz.TARDIS.enumeration.GLOWSTONE_CIRCUIT;
+import me.eccentric_nz.TARDIS.database.resultset.*;
+import me.eccentric_nz.TARDIS.enumeration.DiskCircuit;
+import me.eccentric_nz.TARDIS.enumeration.GlowstoneCircuit;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
 import org.bukkit.ChatColor;
@@ -53,7 +54,7 @@ public class TARDISConsoleListener implements Listener {
 
     public TARDISConsoleListener(TARDIS plugin) {
         this.plugin = plugin;
-        for (DISK_CIRCUIT dc : DISK_CIRCUIT.values()) {
+        for (DiskCircuit dc : DiskCircuit.values()) {
             if (!onlythese.contains(dc.getMaterial())) {
                 onlythese.add(dc.getMaterial());
             }
@@ -66,7 +67,7 @@ public class TARDISConsoleListener implements Listener {
             return;
         }
         Player p = event.getPlayer();
-        if (!p.hasPermission("tardis.advanced")) {
+        if (!TARDISPermission.hasPermission(p, "tardis.advanced")) {
             return;
         }
         if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
@@ -120,7 +121,7 @@ public class TARDISConsoleListener implements Listener {
                                             ItemMeta cm = circuit.getItemMeta();
                                             if (circuit.getType().equals(Material.FILLED_MAP)) {
                                                 if (cm.hasDisplayName()) {
-                                                    GLOWSTONE_CIRCUIT glowstone = GLOWSTONE_CIRCUIT.getByName().get(cm.getDisplayName());
+                                                    GlowstoneCircuit glowstone = GlowstoneCircuit.getByName().get(cm.getDisplayName());
                                                     if (glowstone != null) {
                                                         circuit.setType(Material.GLOWSTONE_DUST);
                                                     }

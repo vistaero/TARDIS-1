@@ -18,15 +18,16 @@ package me.eccentric_nz.TARDIS.junk;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.commands.admin.TARDISDeleteCommand;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisID;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
+import me.eccentric_nz.TARDIS.enumeration.Consoles;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
 
 import java.util.HashMap;
@@ -52,34 +53,33 @@ class TARDISJunkDelete {
             int id = rs.getTardis_id();
             // get the current location
             Location bb_loc = null;
-            Biome biome = null;
             HashMap<String, Object> wherecl = new HashMap<>();
             wherecl.put("tardis_id", id);
             ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, wherecl);
             if (rsc.resultSet()) {
                 bb_loc = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
-                biome = rsc.getBiome();
             }
             if (bb_loc == null) {
                 TARDISMessage.send(sender, "CURRENT_NOT_FOUND");
                 return true;
             }
             // destroy junk TARDIS
-            DestroyData dd = new DestroyData(plugin, "00000000-aaaa-bbbb-cccc-000000000000");
+            DestroyData dd = new DestroyData();
             dd.setDirection(COMPASS.SOUTH);
             dd.setLocation(bb_loc);
             dd.setHide(false);
             dd.setOutside(false);
             dd.setSubmarine(rsc.isSubmarine());
             dd.setTardisID(id);
-            dd.setBiome(biome);
+            dd.setTardisBiome(TARDISBiome.get(rsc.getBiomeKey()));
+            dd.setThrottle(SpaceTimeThrottle.JUNK);
             plugin.getPresetDestroyer().destroyPreset(dd);
             // destroy the vortex TARDIS
             World cw = plugin.getServer().getWorld(plugin.getConfig().getString("creation.default_world_name"));
             // give the TARDIS time to remove itself as it's not hidden
             if (cw != null) {
                 plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                    plugin.getInteriorDestroyer().destroyInner(CONSOLES.SCHEMATICFor("junk"), id, cw, -999);
+                    plugin.getInteriorDestroyer().destroyInner(Consoles.schematicFor("junk"), id, cw, -999);
                     TARDISDeleteCommand.cleanDatabase(id);
                     TARDISMessage.send(sender, "JUNK_DELETED");
                 }, 20L);

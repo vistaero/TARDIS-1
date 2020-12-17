@@ -18,10 +18,11 @@ package me.eccentric_nz.TARDIS.commands.bind;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.database.ResultSetAreas;
-import me.eccentric_nz.TARDIS.database.ResultSetDestinations;
-import me.eccentric_nz.TARDIS.database.ResultSetTransmat;
-import me.eccentric_nz.TARDIS.enumeration.BIND;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetAreas;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetDestinations;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTransmat;
+import me.eccentric_nz.TARDIS.enumeration.Bind;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.ChatColor;
@@ -40,7 +41,7 @@ public class BindAdd {
         this.plugin = plugin;
     }
 
-    public boolean setClick(BIND bind, Player player, int id, String[] args) {
+    public boolean setClick(Bind bind, Player player, int id, String[] args) {
         String which = (args.length > 2) ? args[2] : "";
         int bind_id = 0;
         HashMap<String, Object> set = new HashMap<>();
@@ -93,7 +94,7 @@ public class BindAdd {
                     TARDISMessage.send(player, "AREA_NOT_FOUND", ChatColor.GREEN + "/tardis list areas" + ChatColor.RESET);
                     return true;
                 }
-                if (!player.hasPermission("tardis.area." + which) || !player.isPermissionSet("tardis.area." + which)) {
+                if (!TARDISPermission.hasPermission(player, "tardis.area." + which) || !player.isPermissionSet("tardis.area." + which)) {
                     TARDISMessage.send(player, "BIND_NO_AREA_PERM", which);
                     return true;
                 }

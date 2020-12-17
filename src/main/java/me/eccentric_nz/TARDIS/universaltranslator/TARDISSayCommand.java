@@ -17,7 +17,8 @@
 package me.eccentric_nz.TARDIS.universaltranslator;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -46,7 +47,7 @@ public class TARDISSayCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("tardissay")) {
-            if (!sender.hasPermission("tardis.translate")) {
+            if (!TARDISPermission.hasPermission(sender, "tardis.translate")) {
                 TARDISMessage.send(sender, "NO_PERMS");
                 return false;
             }

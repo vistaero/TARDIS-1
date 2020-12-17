@@ -20,13 +20,13 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitDamager;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetLamps;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetLamps;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
-import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
+import me.eccentric_nz.TARDIS.enumeration.DiskCircuit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -103,9 +103,9 @@ public class TARDISMalfunction {
         if (rsl.resultSet()) {
             // should we damage circuits?
             int malfunctionDamage = plugin.getConfig().getInt("circuits.malfunction_damage");
-            if (plugin.getConfig().getBoolean("circuits.damage") && malfunctionDamage > 0 && !plugin.getDifficulty().equals(DIFFICULTY.EASY)) {
+            if (plugin.getConfig().getBoolean("circuits.damage") && malfunctionDamage > 0 && !plugin.getDifficulty().equals(Difficulty.EASY)) {
                 // choose a random circuit
-                DISK_CIRCUIT circuit = DISK_CIRCUIT.getTardisCircuits().get(TARDISConstants.RANDOM.nextInt(DISK_CIRCUIT.getTardisCircuits().size()));
+                DiskCircuit circuit = DiskCircuit.getTardisCircuits().get(TARDISConstants.RANDOM.nextInt(DiskCircuit.getTardisCircuits().size()));
                 // is the circuit in the advanced console?
                 TARDISCircuitChecker tcc = new TARDISCircuitChecker(plugin, id);
                 tcc.getCircuits();
@@ -212,7 +212,7 @@ public class TARDISMalfunction {
         }
     }
 
-    private void damage(DISK_CIRCUIT circuit, int uses_left, int id, Player p) {
+    private void damage(DiskCircuit circuit, int uses_left, int id, Player p) {
         TARDISCircuitDamager tcd = new TARDISCircuitDamager(plugin, circuit, uses_left, id, p);
         tcd.damage();
     }

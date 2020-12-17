@@ -18,10 +18,13 @@ package me.eccentric_nz.TARDIS.api;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISTrackerInstanceKeeper;
+import me.eccentric_nz.TARDIS.blueprints.*;
 import me.eccentric_nz.TARDIS.builders.BuildData;
 import me.eccentric_nz.TARDIS.builders.TARDISAbandoned;
+import me.eccentric_nz.TARDIS.custommodeldata.TARDISSeedModel;
 import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
+import me.eccentric_nz.TARDIS.database.resultset.*;
 import me.eccentric_nz.TARDIS.desktop.TARDISUpgradeData;
 import me.eccentric_nz.TARDIS.desktop.TARDISWallFloorRunnable;
 import me.eccentric_nz.TARDIS.enumeration.*;
@@ -30,16 +33,19 @@ import me.eccentric_nz.TARDIS.move.TARDISTeleportLocation;
 import me.eccentric_nz.TARDIS.rooms.TARDISWalls;
 import me.eccentric_nz.TARDIS.travel.TARDISPluginRespect;
 import me.eccentric_nz.TARDIS.utility.TARDISLocationGetters;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import me.eccentric_nz.TARDIS.utility.TARDISUtils;
 import me.eccentric_nz.TARDIS.utility.WeightedChoice;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -53,9 +59,9 @@ import java.util.logging.Level;
  */
 public class TARDII implements TardisAPI {
 
+    private static final WeightedChoice<Environment> weightedChoice = new WeightedChoice<Environment>().add(70, Environment.NORMAL).add(15, Environment.NETHER).add(15, Environment.THE_END);
     private final TARDISDatabaseConnection service = TARDISDatabaseConnection.getINSTANCE();
     private final Connection connection = service.getConnection();
-    private final Random random = new Random();
 
     @Override
     public HashMap<String, Integer> getTimelordMap() {
@@ -156,8 +162,6 @@ public class TARDII implements TardisAPI {
         return data;
     }
 
-    private static final WeightedChoice<Environment> weightedChoice = new WeightedChoice<Environment>().add(70, Environment.NORMAL).add(15, Environment.NETHER).add(15, Environment.THE_END);
-
     @Override
     public Location getRandomLocation(List<String> worlds, Environment environment, Parameters param) {
         if (environment == null) {
@@ -180,12 +184,12 @@ public class TARDII implements TardisAPI {
 
     @Override
     public Location getRandomLocation(List<String> worlds, Environment environment, Player p) {
-        return getRandomLocation(getWorlds(), null, new Parameters(p, FLAG.getAPIFlags()));
+        return getRandomLocation(getWorlds(), null, new Parameters(p, Flag.getAPIFlags()));
     }
 
     @Override
     public Location getRandomLocation(List<String> worlds, Player p) {
-        return getRandomLocation(getWorlds(), null, new Parameters(p, FLAG.getAPIFlags()));
+        return getRandomLocation(getWorlds(), null, new Parameters(p, Flag.getAPIFlags()));
     }
 
     @Override
@@ -223,8 +227,8 @@ public class TARDII implements TardisAPI {
         List<String> worlds = new ArrayList<>();
         Bukkit.getWorlds().forEach((w) -> {
             String name = w.getName();
-            if (TARDIS.plugin.getPlanetsConfig().getBoolean("planets." + name + ".time_travel")) {
-                if (TARDIS.plugin.getWorldManager().equals(WORLD_MANAGER.MULTIVERSE)) {
+            if (TARDIS.plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(name) + ".time_travel")) {
+                if (TARDIS.plugin.getWorldManager().equals(WorldManager.MULTIVERSE)) {
                     worlds.add(TARDIS.plugin.getMVHelper().getAlias(name));
                 } else {
                     worlds.add(name);
@@ -239,8 +243,8 @@ public class TARDII implements TardisAPI {
         List<String> worlds = new ArrayList<>();
         Bukkit.getWorlds().forEach((w) -> {
             String name = w.getName();
-            if (TARDIS.plugin.getPlanetsConfig().getBoolean("planets." + name + ".time_travel") && !w.getEnvironment().equals(Environment.NETHER) && !w.getEnvironment().equals(Environment.THE_END)) {
-                if (TARDIS.plugin.getWorldManager().equals(WORLD_MANAGER.MULTIVERSE)) {
+            if (TARDIS.plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(name) + ".time_travel") && !w.getEnvironment().equals(Environment.NETHER) && !w.getEnvironment().equals(Environment.THE_END)) {
+                if (TARDIS.plugin.getWorldManager().equals(WorldManager.MULTIVERSE)) {
                     worlds.add(TARDIS.plugin.getMVHelper().getAlias(name));
                 } else {
                     worlds.add(name);
@@ -415,6 +419,151 @@ public class TARDII implements TardisAPI {
     }
 
     @Override
+    public ItemStack getTARDISShapeItem(String item, Player player) {
+        ItemStack result;
+        if (item.equals("Save Storage Disk") || item.equals("Preset Storage Disk") || item.equals("Biome Storage Disk") || item.equals("Player Storage Disk") || item.equals("Bowl of Custard") || item.endsWith("Jelly Baby")) {
+            ShapelessRecipe recipe = TARDIS.plugin.getIncomposita().getShapelessRecipes().get(item);
+            result = recipe.getResult();
+        } else {
+            ShapedRecipe recipe = TARDIS.plugin.getFigura().getShapedRecipes().get(item);
+            if (recipe == null) {
+                return null;
+            }
+            result = recipe.getResult();
+        }
+        if (item.equals("TARDIS Invisibility Circuit")) {
+            // set the second line of lore
+            ItemMeta im = result.getItemMeta();
+            List<String> lore = im.getLore();
+            String uses = (TARDIS.plugin.getConfig().getString("circuits.uses.invisibility").equals("0") || !TARDIS.plugin.getConfig().getBoolean("circuits.damage")) ? ChatColor.YELLOW + "unlimited" : ChatColor.YELLOW + TARDIS.plugin.getConfig().getString("circuits.uses.invisibility");
+            lore.set(1, uses);
+            im.setLore(lore);
+            result.setItemMeta(im);
+        }
+        if (item.equals("Blank Storage Disk") || item.equals("Save Storage Disk") || item.equals("Preset Storage Disk") || item.equals("Biome Storage Disk") || item.equals("Player Storage Disk") || item.equals("Sonic Blaster") || item.equals("Authorised Control Disk")) {
+            ItemMeta im = result.getItemMeta();
+            im.addItemFlags(ItemFlag.values());
+            result.setItemMeta(im);
+        }
+        if (item.equals("TARDIS Key") || item.equals("Authorised Control Disk")) {
+            ItemMeta im = result.getItemMeta();
+            im.getPersistentDataContainer().set(TARDIS.plugin.getTimeLordUuidKey(), TARDIS.plugin.getPersistentDataTypeUUID(), player.getUniqueId());
+            List<String> lore = im.getLore();
+            if (lore == null) {
+                lore = new ArrayList<>();
+            }
+            String format = ChatColor.AQUA + "" + ChatColor.ITALIC;
+            String what = item.equals("key") ? "key" : "disk";
+            lore.add(format + "This " + what + " belongs to");
+            lore.add(format + player.getName());
+            im.setLore(lore);
+            result.setItemMeta(im);
+        }
+        return result;
+    }
+
+    @Override
+    public HashMap<Schematic, ShapedRecipe> getSeedRecipes() {
+        return TARDIS.plugin.getOobstructionum().getSeedRecipes();
+    }
+
+    @Override
+    public ItemStack getTARDISSeedItem(String schematic) {
+        if (Consoles.getBY_NAMES().containsKey(schematic)) {
+            ItemStack is;
+            int model = TARDISSeedModel.modelByString(schematic);
+            if (Consoles.getBY_NAMES().get(schematic).isCustom()) {
+                is = new ItemStack(Material.MUSHROOM_STEM, 1);
+            } else if (schematic.equalsIgnoreCase("DELTA") || schematic.equalsIgnoreCase("ROTOR")) {
+                is = new ItemStack(Material.MUSHROOM_STEM, 1);
+            } else {
+                is = new ItemStack(Material.RED_MUSHROOM_BLOCK, 1);
+            }
+            ItemMeta im = is.getItemMeta();
+            im.setCustomModelData(10000000 + model);
+            im.getPersistentDataContainer().set(TARDIS.plugin.getCustomBlockKey(), PersistentDataType.INTEGER, model);
+            // set display name
+            im.setDisplayName(ChatColor.GOLD + "TARDIS Seed Block");
+            List<String> lore = new ArrayList<>();
+            lore.add(schematic);
+            lore.add("Walls: ORANGE_WOOL");
+            lore.add("Floors: LIGHT_GRAY_WOOL");
+            lore.add("Chameleon: FACTORY");
+            im.setLore(lore);
+            is.setItemMeta(im);
+            return is;
+        }
+        return null;
+    }
+
+    @Override
+    public List<BlueprintType> getBlueprints() {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public ItemStack getTARDISBlueprintItem(String item, Player player) {
+        String[] split = item.split("_");
+        if (split.length < 3) {
+            return null;
+        }
+        try {
+            BlueprintType type = BlueprintType.valueOf(split[1].toUpperCase());
+            int sub = 11 + split[1].length(); // BLUEPRINT_+length()+_
+            String upper = item.toUpperCase().substring(sub);
+            String perm;
+            switch (type) {
+                case CONSOLE:
+                    BlueprintConsole console = BlueprintConsole.valueOf(upper);
+                    perm = console.getPermission();
+                    break;
+                case FEATURE:
+                    BlueprintFeature feature = BlueprintFeature.valueOf(upper);
+                    perm = feature.getPermission();
+                    break;
+                case PRESET:
+                    BlueprintPreset preset = BlueprintPreset.valueOf(upper);
+                    perm = preset.getPermission();
+                    break;
+                case ROOM:
+                    BlueprintRoom room = BlueprintRoom.valueOf(upper);
+                    perm = room.getPermission();
+                    break;
+                case SONIC:
+                    BlueprintSonic sonic = BlueprintSonic.valueOf(upper);
+                    perm = sonic.getPermission();
+                    break;
+                case TRAVEL:
+                    BlueprintTravel travel = BlueprintTravel.valueOf(upper);
+                    perm = travel.getPermission();
+                    break;
+                default: // BASE
+                    BlueprintBase base = BlueprintBase.valueOf(upper);
+                    perm = base.getPermission();
+                    break;
+            }
+            if (perm != null) {
+                ItemStack is = new ItemStack(Material.MUSIC_DISC_MELLOHI, 1);
+                ItemMeta im = is.getItemMeta();
+                im.setCustomModelData(10000001);
+                PersistentDataContainer pdc = im.getPersistentDataContainer();
+                pdc.set(TARDIS.plugin.getTimeLordUuidKey(), TARDIS.plugin.getPersistentDataTypeUUID(), player.getUniqueId());
+                pdc.set(TARDIS.plugin.getBlueprintKey(), PersistentDataType.STRING, perm);
+                im.setDisplayName("TARDIS Blueprint Disk");
+                List<String> lore = Arrays.asList(TARDISStringUtils.capitalise(item), "Valid only for", player.getName());
+                im.setLore(lore);
+                im.addItemFlags(ItemFlag.values());
+                is.setItemMeta(im);
+                return is;
+            }
+            return null;
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    @Override
     public List<String> getWallFloorBlocks() {
         List<String> blocks = new ArrayList<>();
         TARDISWalls.BLOCKS.forEach((m) -> blocks.add(m.toString()));
@@ -532,7 +681,7 @@ public class TARDII implements TardisAPI {
             if (rs.resultSet()) {
                 OfflinePlayer player = Bukkit.getOfflinePlayer(rs.getTardis().getUuid());
                 Location l = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
-                BuildData bd = new BuildData(TARDIS.plugin, player.getUniqueId().toString());
+                BuildData bd = new BuildData(player.getUniqueId().toString());
                 bd.setDirection(rsc.getDirection());
                 bd.setLocation(l);
                 bd.setMalfunction(false);
@@ -541,7 +690,7 @@ public class TARDII implements TardisAPI {
                 bd.setRebuild(true);
                 bd.setSubmarine(false);
                 bd.setTardisID(id);
-                bd.setBiome(rsc.getBiome());
+                bd.setThrottle(SpaceTimeThrottle.REBUILD);
                 TARDIS.plugin.getPresetBuilder().buildPreset(bd);
                 TARDIS.plugin.getTrackerKeeper().getInVortex().add(id);
                 HashMap<String, Object> whereh = new HashMap<>();
@@ -574,7 +723,7 @@ public class TARDII implements TardisAPI {
 
     @Override
     public void spawnAbandonedTARDIS(Location location, String type, PRESET preset, COMPASS direction) throws TARDISException {
-        if (!CONSOLES.getBY_NAMES().containsKey(type.toUpperCase(Locale.ENGLISH))) {
+        if (!Consoles.getBY_NAMES().containsKey(type.toUpperCase(Locale.ENGLISH))) {
             throw new TARDISException("Not a valid Console type");
         }
         if (!TARDIS.plugin.getConfig().getBoolean("abandon.enabled")) {
@@ -583,7 +732,7 @@ public class TARDII implements TardisAPI {
         if (!TARDIS.plugin.getConfig().getBoolean("creation.default_world")) {
             throw new TARDISException("TARDIS must be configured to create TARDISes in a default world");
         }
-        SCHEMATIC schm = CONSOLES.getBY_NAMES().get(type.toUpperCase(Locale.ENGLISH));
+        Schematic schm = Consoles.getBY_NAMES().get(type.toUpperCase(Locale.ENGLISH));
         new TARDISAbandoned(TARDIS.plugin).spawn(location, schm, preset, direction, null);
     }
 
@@ -624,12 +773,12 @@ public class TARDII implements TardisAPI {
         if (!TARDISWalls.BLOCKS.contains(f)) {
             throw new TARDISException("Not a valid wall type");
         }
-        // get current SCHEMATIC
+        // get current Schematic
         HashMap<String, Object> where = new HashMap<>();
         where.put("uuid", uuid.toString());
         ResultSetTardis rs = new ResultSetTardis(TARDIS.plugin, where, "", false, 2);
         if (rs.resultSet()) {
-            SCHEMATIC current_console = rs.getTardis().getSchematic();
+            Schematic current_console = rs.getTardis().getSchematic();
             TARDISUpgradeData tud = new TARDISUpgradeData();
             tud.setSchematic(current_console);
             tud.setPrevious(current_console);

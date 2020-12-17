@@ -17,9 +17,11 @@
 package me.eccentric_nz.TARDIS.travel;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetTravelledTo;
-import me.eccentric_nz.TARDIS.utility.TARDISFactionsChecker;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravelledTo;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISFactionsChecker;
+import me.eccentric_nz.TARDIS.utility.TARDISRedProtectChecker;
 import org.bukkit.Location;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
@@ -51,7 +53,7 @@ public class TARDISTravelRequest {
         boolean bool = true;
         if (plugin.getConfig().getBoolean("travel.per_world_perms")) {
             String perm = l.getWorld().getName();
-            if (!p.hasPermission("tardis.travel." + perm)) {
+            if (!TARDISPermission.hasPermission(p, "tardis.travel." + perm)) {
                 TARDISMessage.send(p, "TRAVEL_NO_PERM_WORLD", perm);
                 bool = false;
             }
@@ -64,7 +66,7 @@ public class TARDISTravelRequest {
                 bool = false;
             }
             // check permission
-            if (!p.hasPermission("tardis.nether")) {
+            if (!TARDISPermission.hasPermission(p, "tardis.nether")) {
                 TARDISMessage.send(p, "NO_PERM_TRAVEL", "Nether");
                 bool = false;
             }
@@ -82,7 +84,7 @@ public class TARDISTravelRequest {
                 bool = false;
             }
             // check permission
-            if (!p.hasPermission("tardis.end")) {
+            if (!TARDISPermission.hasPermission(p, "tardis.end")) {
                 TARDISMessage.send(p, "NO_PERM_TRAVEL", "End");
                 bool = false;
             }
@@ -112,6 +114,11 @@ public class TARDISTravelRequest {
             TARDISMessage.send(p, "GRIEFPREVENTION");
             bool = false;
         }
+        if (plugin.getPluginRespect().isRedProtectOnServer() && plugin.getConfig().getBoolean("preferences.respect_red_protect") && !TARDISRedProtectChecker.canBuild(to, l)) {
+            TARDISMessage.send(p, "REDPROTECT");
+            bool = false;
+        }
+
         if (plugin.getTardisArea().areaCheckLocPlayer(p, l)) {
             TARDISMessage.send(p, "TRAVEL_NO_PERM", plugin.getTrackerKeeper().getPerm().get(p.getUniqueId()));
             plugin.getTrackerKeeper().getPerm().remove(p.getUniqueId());

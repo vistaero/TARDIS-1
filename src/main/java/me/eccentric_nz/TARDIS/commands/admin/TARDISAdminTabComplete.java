@@ -19,7 +19,7 @@ package me.eccentric_nz.TARDIS.commands.admin;
 import com.google.common.collect.ImmutableList;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.commands.TARDISCompleter;
-import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
+import me.eccentric_nz.TARDIS.enumeration.Consoles;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.utility.TARDISWorldGuardFlag;
 import org.bukkit.command.Command;
@@ -27,6 +27,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
+import org.bukkit.permissions.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,12 +55,13 @@ public class TARDISAdminTabComplete extends TARDISCompleter implements TabComple
     private final ImmutableList<String> TIPS_SUBS = ImmutableList.of("400", "800", "1200", "1600");
     private final ImmutableList<String> TOWNY_SUBS = ImmutableList.of("none", "wilderness", "town", "nation");
     private final ImmutableList<String> VORTEX_SUBS = ImmutableList.of("kill", "teleport");
-    private final ImmutableList<String> LIST_SUBS = ImmutableList.of("abandoned", "portals", "save", "preset_perms");
+    private final ImmutableList<String> LIST_SUBS = ImmutableList.of("abandoned", "portals", "save", "preset_perms", "perms", "recipes", "blueprints");
     private final ImmutableList<String> FILE_SUBS = ImmutableList.of("achievements", "artron", "blocks", "chameleon_guis", "condensables", "handles", "kits", "rooms", "signs", "tag");
     private final ImmutableList<String> COMPASS_SUBS = ImmutableList.of("NORTH", "EAST", "SOUTH", "WEST");
     private final ImmutableList<String> WORLD_SUBS;
     private final ImmutableList<String> SEED_SUBS;
     private final ImmutableList<String> ENTITY_SUBS;
+    private final List<String> BLUEPRINT_SUBS = new ArrayList<>();
 
     public TARDISAdminTabComplete(TARDIS plugin) {
         this.plugin = plugin;
@@ -77,7 +79,7 @@ public class TARDISAdminTabComplete extends TARDISCompleter implements TabComple
         List<String> worlds = new ArrayList<>();
         plugin.getServer().getWorlds().forEach((w) -> worlds.add(w.getName()));
         WORLD_SUBS = ImmutableList.copyOf(worlds);
-        SEED_SUBS = ImmutableList.copyOf(CONSOLES.getBY_NAMES().keySet());
+        SEED_SUBS = ImmutableList.copyOf(Consoles.getBY_NAMES().keySet());
         List<String> tmpEntities = new ArrayList<>();
         for (EntityType e : EntityType.values()) {
             if (e.getEntityClass() != null && Creature.class.isAssignableFrom(e.getEntityClass())) {
@@ -85,6 +87,9 @@ public class TARDISAdminTabComplete extends TARDISCompleter implements TabComple
             }
         }
         ENTITY_SUBS = ImmutableList.copyOf(tmpEntities);
+        for (Permission b : plugin.getDescription().getPermissions()) {
+            BLUEPRINT_SUBS.add(b.getName());
+        }
     }
 
     @Override
@@ -154,7 +159,7 @@ public class TARDISAdminTabComplete extends TARDISCompleter implements TabComple
             if (sub.equals("use_clay")) {
                 return partial(lastArg, USE_CLAY_SUBS);
             }
-            if (sub.equals("arch") || sub.equals("delete") || sub.equals("enter") || sub.equals("purge") || sub.equals("desiege") || sub.equals("repair") || sub.equals("set_size") || sub.equals("undisguise")) {
+            if (sub.equals("arch") || sub.equals("delete") || sub.equals("enter") || sub.equals("purge") || sub.equals("desiege") || sub.equals("repair") || sub.equals("revoke") || sub.equals("set_size") || sub.equals("undisguise")) {
                 // return null to default to online player name matching
                 return null;
             } else {
@@ -167,6 +172,8 @@ public class TARDISAdminTabComplete extends TARDISCompleter implements TabComple
                 return partial(lastArg, SEED_SUBS);
             } else if (args[0].equalsIgnoreCase("disguise") || args[0].equalsIgnoreCase("handbrake")) {
                 return null;
+            } else if (args[0].equalsIgnoreCase("revoke")) {
+                return partial(lastArg, BLUEPRINT_SUBS);
             } else {
                 return partial(lastArg, BOOL_SUBS);
             }

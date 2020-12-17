@@ -22,6 +22,7 @@ import me.eccentric_nz.TARDIS.commands.TARDISCompleter;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -73,10 +74,18 @@ public class TARDISTeleportCommand extends TARDISCompleter implements CommandExe
             World world = plugin.getServer().getWorld(args[0]);
             if (world != null) {
                 Location spawn = world.getSpawnLocation();
+                if (args[0].equalsIgnoreCase("gallifrey") || args[0].equalsIgnoreCase("skaro")) {
+                    spawn.add(400.0d, 0.0d, 400.0d);
+                }
+                while (!world.getChunkAt(spawn).isLoaded()) {
+                    world.getChunkAt(spawn).load();
+                }
+                int highest = (world.getEnvironment() == Environment.NETHER) ? spawn.getBlockY() - 1 : world.getHighestBlockYAt(spawn);
                 float yaw = player.getLocation().getYaw();
                 float pitch = player.getLocation().getPitch();
                 spawn.setYaw(yaw);
                 spawn.setPitch(pitch);
+                spawn.setY(highest + 1);
                 player.teleport(spawn);
             } else {
                 TARDISMessage.send(player, "WORLD_NOT_FOUND");

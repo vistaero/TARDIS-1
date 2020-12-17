@@ -19,7 +19,7 @@ package me.eccentric_nz.TARDIS.desktop;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.builders.TARDISInteriorPostioning;
 import me.eccentric_nz.TARDIS.builders.TARDISTIPSData;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
 import org.bukkit.Material;
@@ -38,7 +38,7 @@ class TARDISDelavafier {
     private final TARDIS plugin;
     private final UUID uuid;
     private final BlockData ORANGE = Material.ORANGE_TERRACOTTA.createBlockData();
-    public static final BlockData GLASS = Material.LIGHT_BLUE_STAINED_GLASS.createBlockData();
+    private final BlockData GLASS = Material.LIGHT_BLUE_STAINED_GLASS.createBlockData();
 
     TARDISDelavafier(TARDIS plugin, UUID uuid) {
         this.plugin = plugin;

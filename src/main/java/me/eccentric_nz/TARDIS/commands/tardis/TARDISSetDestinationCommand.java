@@ -19,11 +19,13 @@ package me.eccentric_nz.TARDIS.commands.tardis;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.api.Parameters;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisID;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
+import me.eccentric_nz.TARDIS.enumeration.Flag;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -43,7 +45,7 @@ class TARDISSetDestinationCommand {
     }
 
     boolean doSetDestination(Player player, String[] args) {
-        if (player.hasPermission("tardis.save")) {
+        if (TARDISPermission.hasPermission(player, "tardis.save")) {
             ResultSetTardisID rs = new ResultSetTardisID(plugin);
             if (!rs.fromUUID(player.getUniqueId().toString())) {
                 TARDISMessage.send(player, "NO_TARDIS");
@@ -62,7 +64,7 @@ class TARDISSetDestinationCommand {
             } else {
                 int id = rs.getTardis_id();
                 TARDISCircuitChecker tcc = null;
-                if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(player, true)) {
+                if (!plugin.getDifficulty().equals(Difficulty.EASY) && !plugin.getUtils().inGracePeriod(player, true)) {
                     tcc = new TARDISCircuitChecker(plugin, id);
                     tcc.getCircuits();
                 }
@@ -92,14 +94,14 @@ class TARDISSetDestinationCommand {
                     return true;
                 }
                 // check the world is not excluded
-                if (!plugin.getPlanetsConfig().getBoolean("planets." + world + ".time_travel")) {
+                if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(world) + ".time_travel")) {
                     TARDISMessage.send(player, "NO_PB_IN_WORLD");
                     return true;
                 }
-                if (!plugin.getPluginRespect().getRespect(l, new Parameters(player, FLAG.getDefaultFlags()))) {
+                if (!plugin.getPluginRespect().getRespect(l, new Parameters(player, Flag.getDefaultFlags()))) {
                     return true;
                 }
-                if (player.hasPermission("tardis.exile") && plugin.getConfig().getBoolean("travel.exile")) {
+                if (TARDISPermission.hasPermission(player, "tardis.exile") && plugin.getConfig().getBoolean("travel.exile")) {
                     String areaPerm = plugin.getTardisArea().getExileArea(player);
                     if (plugin.getTardisArea().areaCheckInExile(areaPerm, l)) {
                         TARDISMessage.send(player, "EXILE_NO_TRAVEL");

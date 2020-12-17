@@ -20,20 +20,17 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
 import me.eccentric_nz.TARDIS.advanced.TARDISSerializeInventory;
 import me.eccentric_nz.TARDIS.api.Parameters;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
-import me.eccentric_nz.TARDIS.enumeration.PRESET;
-import me.eccentric_nz.TARDIS.enumeration.WORLD_MANAGER;
+import me.eccentric_nz.TARDIS.database.resultset.*;
+import me.eccentric_nz.TARDIS.enumeration.*;
 import me.eccentric_nz.TARDIS.flight.TARDISLand;
 import me.eccentric_nz.TARDIS.listeners.TARDISBiomeReaderListener;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import me.eccentric_nz.TARDIS.travel.*;
-import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
-import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
-import me.eccentric_nz.TARDIS.utility.TARDISWorldBorderChecker;
+import me.eccentric_nz.TARDIS.utility.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -43,12 +40,9 @@ import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -67,17 +61,38 @@ public class TARDISTravelCommands implements CommandExecutor {
     private final List<String> BIOME_SUBS = new ArrayList<>();
     private final List<String> mustUseAdvanced = Arrays.asList("area", "biome", "dest");
     private final List<String> costs = Arrays.asList("random", "random_circuit", "travel", "comehere", "hide", "rebuild", "autonomous", "backdoor");
-    FileConfiguration spigot = YamlConfiguration.loadConfiguration(new File("spigot.yml"));
-    private final long timeout;
 
     public TARDISTravelCommands(TARDIS plugin) {
         this.plugin = plugin;
         for (Biome bi : Biome.values()) {
-            if (!bi.equals(Biome.NETHER) && !bi.equals(Biome.THE_END) && !bi.equals(Biome.THE_VOID)) {
+            if (!TARDISConstants.NETHER_BIOMES.contains(bi) && !bi.equals(Biome.THE_END) && !bi.equals(Biome.THE_VOID)) {
                 BIOME_SUBS.add(bi.toString());
             }
         }
-        timeout = (spigot != null) ? (spigot.getLong("settings.timeout-time") * 1000) - 2000 : 58000;
+    }
+
+    private static boolean isNumber(String str) {
+        if (str == null) {
+            return false;
+        }
+        int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        int i = 0;
+        if (str.charAt(0) == '-') {
+            if (length == 1) {
+                return false;
+            }
+            i = 1;
+        }
+        for (; i < length; i++) {
+            char c = str.charAt(i);
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -93,7 +108,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                 TARDISMessage.send(sender, "CMD_PLAYER");
                 return true;
             }
-            if (player.hasPermission("tardis.timetravel")) {
+            if (TARDISPermission.hasPermission(player, "tardis.timetravel")) {
                 if (args.length < 1) {
                     new TARDISCommandHelper(plugin).getCommand("tardistravel", sender);
                     return true;
@@ -168,10 +183,10 @@ public class TARDISTravelCommands implements CommandExecutor {
                     setlocs.put("direction", rsh.getDirection().toString());
                     setlocs.put("submarine", (rsh.isSubmarine()) ? 1 : 0);
                     Location l = new Location(rsh.getWorld(), rsh.getX(), rsh.getY(), rsh.getZ());
-                    Biome biome = l.getBlock().getBiome();
-                    plugin.getQueryFactory().updateLocations(setlocs, biome.toString(), id);
+                    TARDISBiome biome = TARDISStaticUtils.getBiomeAt(l);
+                    plugin.getQueryFactory().updateLocations(setlocs, biome.getKey().toString(), id);
                     // rebuild the exterior
-                    BuildData bd = new BuildData(plugin, player.getUniqueId().toString());
+                    BuildData bd = new BuildData(player.getUniqueId().toString());
                     bd.setDirection(rsh.getDirection());
                     bd.setLocation(l);
                     bd.setMalfunction(false);
@@ -180,7 +195,8 @@ public class TARDISTravelCommands implements CommandExecutor {
                     bd.setRebuild(true);
                     bd.setSubmarine(rsh.isSubmarine());
                     bd.setTardisID(id);
-                    bd.setBiome(biome);
+                    bd.setTardisBiome(biome);
+                    bd.setThrottle(SpaceTimeThrottle.REBUILD);
                     if (!rsh.getPreset().isEmpty()) {
                         // set the chameleon preset
                         HashMap<String, Object> wherep = new HashMap<>();
@@ -221,7 +237,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                     TARDISMessage.send(player, "NOT_ENOUGH_ENERGY");
                     return true;
                 }
-                if (player.hasPermission("tardis.exile") && plugin.getConfig().getBoolean("travel.exile")) {
+                if (TARDISPermission.hasPermission(player, "tardis.exile") && plugin.getConfig().getBoolean("travel.exile")) {
                     // get the exile area
                     String permArea = plugin.getTardisArea().getExileArea(player);
                     TARDISMessage.send(player, "EXILE", permArea);
@@ -291,7 +307,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                 set.put("submarine", (rsb.isSubmarine()) ? 1 : 0);
                                 which = "Fast Return to " + ChatColor.GREEN + "(" + rsb.getWorld().getName() + ":" + rsb.getX() + ":" + rsb.getY() + ":" + rsb.getZ() + ")" + ChatColor.RESET;
                             } else if (args[0].equalsIgnoreCase("cave")) {
-                                if (!player.hasPermission("tardis.timetravel.cave")) {
+                                if (!TARDISPermission.hasPermission(player, "tardis.timetravel.cave")) {
                                     TARDISMessage.send(player, "TRAVEL_NO_PERM_CAVE");
                                     return true;
                                 }
@@ -302,7 +318,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     return true;
                                 }
                                 // check respect
-                                if (!plugin.getPluginRespect().getRespect(cave, new Parameters(player, FLAG.getDefaultFlags()))) {
+                                if (!plugin.getPluginRespect().getRespect(cave, new Parameters(player, Flag.getDefaultFlags()))) {
                                     if (plugin.getConfig().getBoolean("travel.no_destination_malfunctions")) {
                                         plugin.getTrackerKeeper().getMalfunction().put(id, true);
                                     } else {
@@ -320,7 +336,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     TARDISMessage.send(player, "TRAVEL_NO_VILLAGE");
                                     return true;
                                 }
-                                if (!player.hasPermission("tardis.timetravel.village")) {
+                                if (!TARDISPermission.hasPermission(player, "tardis.timetravel.village")) {
                                     TARDISMessage.send(player, "TRAVEL_NO_PERM_VILLAGE");
                                     return true;
                                 }
@@ -331,7 +347,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     return true;
                                 }
                                 // check respect
-                                if (!plugin.getPluginRespect().getRespect(village, new Parameters(player, FLAG.getDefaultFlags()))) {
+                                if (!plugin.getPluginRespect().getRespect(village, new Parameters(player, Flag.getDefaultFlags()))) {
                                     if (plugin.getConfig().getBoolean("travel.no_destination_malfunctions")) {
                                         plugin.getTrackerKeeper().getMalfunction().put(id, true);
                                     } else {
@@ -363,8 +379,8 @@ public class TARDISTravelCommands implements CommandExecutor {
                                 new TARDISLand(plugin, id, player).exitVortex();
                             }
                             return true;
-                        } else if (player.hasPermission("tardis.timetravel.player")) {
-                            if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(player, false)) {
+                        } else if (TARDISPermission.hasPermission(player, "tardis.timetravel.player")) {
+                            if (!plugin.getDifficulty().equals(Difficulty.EASY) && !plugin.getUtils().inGracePeriod(player, false)) {
                                 TARDISMessage.send(player, "ADV_PLAYER");
                                 return true;
                             }
@@ -399,7 +415,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                         }
                     }
                     if (args.length == 2 && (args[1].equals("?") || args[1].equalsIgnoreCase("tpa"))) {
-                        if (!player.hasPermission("tardis.timetravel.player")) {
+                        if (!TARDISPermission.hasPermission(player, "tardis.timetravel.player")) {
                             TARDISMessage.send(player, "NO_PERM_PLAYER");
                             return true;
                         }
@@ -435,13 +451,13 @@ public class TARDISTravelCommands implements CommandExecutor {
                     }
                     if (args[0].equalsIgnoreCase("biome")) {
                         // we're thinking this is a biome search
-                        if (!player.hasPermission("tardis.timetravel.biome")) {
+                        if (!TARDISPermission.hasPermission(player, "tardis.timetravel.biome")) {
                             TARDISMessage.send(player, "TRAVEL_NO_PERM_BIOME");
                             return true;
                         }
                         String upper = args[1].toUpperCase(Locale.ENGLISH);
-                        if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && mustUseAdvanced.contains(args[0].toLowerCase(Locale.ENGLISH)) && !plugin.getUtils().inGracePeriod(player, false) && !upper.equals("LIST")) {
-                            if (plugin.getDifficulty().equals(DIFFICULTY.MEDIUM)) {
+                        if (!plugin.getDifficulty().equals(Difficulty.EASY) && mustUseAdvanced.contains(args[0].toLowerCase(Locale.ENGLISH)) && !plugin.getUtils().inGracePeriod(player, false) && !upper.equals("LIST")) {
+                            if (plugin.getDifficulty().equals(Difficulty.MEDIUM)) {
                                 // check they have a biome disk in storage
                                 boolean hasBiomeDisk = false;
                                 UUID uuid = player.getUniqueId();
@@ -523,12 +539,13 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     x = rsc.getX() + 128;
                                     z = rsc.getZ() + 128;
                                 }
-                                TARDISBiomeFinder biomeFinder = new TARDISBiomeFinder(plugin, player, x, z, biome, w);
-                                int bfTaskId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, biomeFinder, 1L, 1L);
-                                biomeFinder.setTaskid(bfTaskId);
-                                TARDISBiomePoll biomePoll = new TARDISBiomePoll(plugin, biomeFinder, System.currentTimeMillis() + timeout, player, id, rsc.getDirection());
-                                int pollId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, biomePoll, 20L, 20L);
-                                biomePoll.setTaskid(pollId);
+                                new TARDISBiomeFinder(plugin).run(w, biome, player, id, rsc.getDirection());
+                                TARDISBiomeFinderOld biomeFinder = new TARDISBiomeFinderOld(plugin, player, x, z, biome, w);
+//                                int bfTaskId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, biomeFinder, 1L, 1L);
+//                                biomeFinder.setTaskid(bfTaskId);
+//                                TARDISBiomePoll biomePoll = new TARDISBiomePoll(plugin, biomeFinder, System.currentTimeMillis() + timeout, player, id, rsc.getDirection());
+//                                int pollId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, biomePoll, 20L, 20L);
+//                                biomePoll.setTaskid(pollId);
                             } catch (IllegalArgumentException iae) {
                                 TARDISMessage.send(player, "BIOME_NOT_VALID");
                                 return true;
@@ -538,7 +555,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                     }
                     if (args.length == 2 && args[0].equalsIgnoreCase("dest")) {
                         // we're thinking this is a saved destination name
-                        if (player.hasPermission("tardis.save")) {
+                        if (TARDISPermission.hasPermission(player, "tardis.save")) {
                             HashMap<String, Object> whered = new HashMap<>();
                             whered.put("dest_name", args[1]);
                             whered.put("tardis_id", id);
@@ -554,7 +571,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     return true;
                                 }
                                 Location save_dest = new Location(w, rsd.getX(), rsd.getY(), rsd.getZ());
-                                if (!plugin.getPluginRespect().getRespect(save_dest, new Parameters(player, FLAG.getDefaultFlags()))) {
+                                if (!plugin.getPluginRespect().getRespect(save_dest, new Parameters(player, Flag.getDefaultFlags()))) {
                                     if (plugin.getConfig().getBoolean("travel.no_destination_malfunctions")) {
                                         plugin.getTrackerKeeper().getMalfunction().put(id, true);
                                     } else {
@@ -644,11 +661,11 @@ public class TARDISTravelCommands implements CommandExecutor {
                             TARDISMessage.send(player, "AREA_NOT_FOUND", ChatColor.GREEN + "/tardis list areas" + ChatColor.RESET);
                             return true;
                         }
-                        if ((!player.hasPermission("tardis.area." + args[1]) && !player.hasPermission("tardis.area.*")) || (!player.isPermissionSet("tardis.area." + args[1]) && !player.isPermissionSet("tardis.area.*"))) {
+                        if ((!TARDISPermission.hasPermission(player, "tardis.area." + args[1]) && !TARDISPermission.hasPermission(player, "tardis.area.*")) || (!player.isPermissionSet("tardis.area." + args[1]) && !player.isPermissionSet("tardis.area.*"))) {
                             TARDISMessage.send(player, "TRAVEL_NO_AREA_PERM", args[1]);
                             return true;
                         }
-                        if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && mustUseAdvanced.contains(args[0].toLowerCase(Locale.ENGLISH)) && !plugin.getUtils().inGracePeriod(player, false)) {
+                        if (!plugin.getDifficulty().equals(Difficulty.EASY) && mustUseAdvanced.contains(args[0].toLowerCase(Locale.ENGLISH)) && !plugin.getUtils().inGracePeriod(player, false)) {
                             TARDISMessage.send(player, "ADV_AREA");
                             return true;
                         }
@@ -688,7 +705,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                         }
                         return true;
                     }
-                    if (player.hasPermission("tardis.timetravel.location")) {
+                    if (TARDISPermission.hasPermission(player, "tardis.timetravel.location")) {
                         switch (args.length) {
                             case 2:
                                 if (args[0].equalsIgnoreCase("random")) {
@@ -699,7 +716,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                         return true;
                                     }
                                     // check world is enabled for travel
-                                    if (!plugin.getPlanetsConfig().getBoolean("planets." + world.getName() + ".time_travel")) {
+                                    if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(world.getName()) + ".time_travel")) {
                                         TARDISMessage.send(player, "NO_WORLD_TRAVEL");
                                         return true;
                                     }
@@ -710,7 +727,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                     wherec.put("tardis_id", id);
                                     ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, wherec);
                                     if (rsc.resultSet()) {
-                                        Parameters parameters = new Parameters(player, FLAG.getNoMessageFlags());
+                                        Parameters parameters = new Parameters(player, Flag.getNoMessageFlags());
                                         parameters.setCompass(rsc.getDirection());
                                         Location l = plugin.getTardisAPI().getRandomLocation(worlds, world.getEnvironment(), parameters);
                                         if (l != null) {
@@ -745,7 +762,7 @@ public class TARDISTravelCommands implements CommandExecutor {
                                         TARDISMessage.send(player, "CURRENT_NOT_FOUND");
                                         return true;
                                     }
-                                    if (!plugin.getPlanetsConfig().getBoolean("planets." + rsc.getWorld().getName() + ".time_travel")) {
+                                    if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(rsc.getWorld().getName()) + ".time_travel")) {
                                         TARDISMessage.send(player, "NO_WORLD_TRAVEL");
                                         return true;
                                     }
@@ -869,30 +886,6 @@ public class TARDISTravelCommands implements CommandExecutor {
         return w_str;
     }
 
-    private static boolean isNumber(String str) {
-        if (str == null) {
-            return false;
-        }
-        int length = str.length();
-        if (length == 0) {
-            return false;
-        }
-        int i = 0;
-        if (str.charAt(0) == '-') {
-            if (length == 1) {
-                return false;
-            }
-            i = 1;
-        }
-        for (; i < length; i++) {
-            char c = str.charAt(i);
-            if (c < '0' || c > '9') {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private Location getCoordinateLocation(String[] args, Player player, int id) {
         // coords
         String w_str = args[0];
@@ -920,7 +913,7 @@ public class TARDISTravelCommands implements CommandExecutor {
             }
             w = rsc.getWorld();
         } else {
-            if (plugin.getWorldManager().equals(WORLD_MANAGER.MULTIVERSE)) {
+            if (plugin.getWorldManager().equals(WorldManager.MULTIVERSE)) {
                 w = plugin.getMVHelper().getWorld(w_str);
             } else {
                 w = plugin.getServer().getWorld(w_str);
@@ -930,7 +923,7 @@ public class TARDISTravelCommands implements CommandExecutor {
             TARDISMessage.send(player, "WORLD_NOT_FOUND");
             return null;
         }
-        if (!plugin.getPlanetsConfig().getBoolean("planets." + w.getName() + ".time_travel")) {
+        if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(w.getName()) + ".time_travel")) {
             TARDISMessage.send(player, "NO_WORLD_TRAVEL");
             return null;
         }
@@ -1051,7 +1044,7 @@ public class TARDISTravelCommands implements CommandExecutor {
             TARDISMessage.send(player, "TRAVEL_IN_AREA", ChatColor.AQUA + "/tardistravel area [area name]");
             return 1;
         }
-        if (!plugin.getPluginRespect().getRespect(location, new Parameters(player, FLAG.getDefaultFlags()))) {
+        if (!plugin.getPluginRespect().getRespect(location, new Parameters(player, Flag.getDefaultFlags()))) {
             return 1;
         }
         HashMap<String, Object> wherecl = new HashMap<>();

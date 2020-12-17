@@ -18,8 +18,8 @@ package me.eccentric_nz.TARDIS.builders;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.database.ResultSetBlocks;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetBlocks;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.ReplacedBlock;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
@@ -55,10 +55,10 @@ public class TARDISMaterialisePoliceBox implements Runnable {
     private ItemMeta im;
     private Material dye;
 
-    public TARDISMaterialisePoliceBox(TARDIS plugin, BuildData bd, int loops, PRESET preset) {
+    public TARDISMaterialisePoliceBox(TARDIS plugin, BuildData bd, PRESET preset) {
         this.plugin = plugin;
         this.bd = bd;
-        this.loops = loops;
+        loops = this.bd.getThrottle().getLoops();
         this.preset = preset;
         i = 0;
     }
@@ -106,7 +106,21 @@ public class TARDISMaterialisePoliceBox implements Runnable {
                     is = new ItemStack(dye, 1);
                     if (bd.isOutside()) {
                         if (!bd.useMinecartSounds()) {
-                            String sound = (preset.equals(PRESET.JUNK_MODE)) ? "junk_land" : "tardis_land";
+                            String sound;
+                            if (preset.equals(PRESET.JUNK_MODE)) {
+                                sound = "junk_land";
+                            } else {
+                                switch (bd.getThrottle()) {
+                                    case WARP:
+                                    case RAPID:
+                                    case FASTER:
+                                        sound = "tardis_land_" + bd.getThrottle().toString().toLowerCase();
+                                        break;
+                                    default: // NORMAL
+                                        sound = "tardis_land";
+                                        break;
+                                }
+                            }
                             TARDISSounds.playTARDISSound(bd.getLocation(), sound);
                         } else {
                             world.playSound(bd.getLocation(), Sound.ENTITY_MINECART_INSIDE, 1.0F, 0.0F);
@@ -119,7 +133,9 @@ public class TARDISMaterialisePoliceBox implements Runnable {
                     im.setDisplayName(bd.getPlayer().getName() + "'s Police Box");
                 }
                 is.setItemMeta(im);
-                frame.setItem(is);
+                frame.setItem(is, false);
+                frame.setFixed(true);
+                frame.setVisible(false);
             } else {
                 // remove trackers
                 plugin.getTrackerKeeper().getMaterialising().removeAll(Collections.singleton(bd.getTardisID()));

@@ -22,24 +22,24 @@ import me.eccentric_nz.TARDIS.advanced.TARDISCircuitDamager;
 import me.eccentric_nz.TARDIS.api.Parameters;
 import me.eccentric_nz.TARDIS.artron.TARDISArtronIndicator;
 import me.eccentric_nz.TARDIS.artron.TARDISLampToggler;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.BiomeSetter;
 import me.eccentric_nz.TARDIS.builders.BuildData;
 import me.eccentric_nz.TARDIS.commands.handles.TARDISHandlesTeleportCommand;
 import me.eccentric_nz.TARDIS.control.TARDISPowerButton;
-import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Program;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
+import me.eccentric_nz.TARDIS.database.resultset.*;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
 import me.eccentric_nz.TARDIS.enumeration.*;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.move.TARDISDoorCloser;
 import me.eccentric_nz.TARDIS.move.TARDISDoorOpener;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import me.eccentric_nz.TARDIS.siegemode.TARDISSiegeMode;
 import me.eccentric_nz.TARDIS.travel.TARDISRandomiserCircuit;
 import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
-import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
-import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
-import me.eccentric_nz.TARDIS.utility.TARDISSounds;
-import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
+import me.eccentric_nz.TARDIS.utility.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -333,7 +333,7 @@ public class TARDISHandlesProcessor {
                                                     TARDISMessage.handlesSend(player, "AREA_NOT_FOUND", ChatColor.GREEN + "/tardis list areas" + ChatColor.RESET);
                                                     continue;
                                                 }
-                                                if ((!player.hasPermission("tardis.area." + first) && !player.hasPermission("tardis.area.*")) || (!player.isPermissionSet("tardis.area." + first) && !player.isPermissionSet("tardis.area.*"))) {
+                                                if ((!TARDISPermission.hasPermission(player, "tardis.area." + first) && !TARDISPermission.hasPermission(player, "tardis.area.*")) || (!player.isPermissionSet("tardis.area." + first) && !player.isPermissionSet("tardis.area.*"))) {
                                                     TARDISMessage.handlesSend(player, "TRAVEL_NO_AREA_PERM", first);
                                                     continue;
                                                 }
@@ -347,11 +347,11 @@ public class TARDISHandlesProcessor {
                                                 break;
                                             case BIOME_DISK:
                                                 // find a biome location
-                                                if (!player.hasPermission("tardis.timetravel.biome")) {
+                                                if (!TARDISPermission.hasPermission(player, "tardis.timetravel.biome")) {
                                                     TARDISMessage.handlesSend(player, "TRAVEL_NO_PERM_BIOME");
                                                     continue;
                                                 }
-                                                if (current.getBlock().getBiome().toString().equals(first)) {
+                                                if (TARDISStaticUtils.getBiomeAt(current).name().equals(first)) {
                                                     continue;
                                                 }
                                                 Biome biome;
@@ -359,8 +359,8 @@ public class TARDISHandlesProcessor {
                                                     biome = Biome.valueOf(first);
                                                 } catch (IllegalArgumentException iae) {
                                                     // may have a pre-1.9 biome disk do old biome lookup...
-                                                    if (TARDISOldBiomeLookup.OLD_BIOME_LOOKUP.containsKey(first)) {
-                                                        biome = TARDISOldBiomeLookup.OLD_BIOME_LOOKUP.get(first);
+                                                    if (TardisOldBiomeLookup.OLD_BIOME_LOOKUP.containsKey(first)) {
+                                                        biome = TardisOldBiomeLookup.OLD_BIOME_LOOKUP.get(first);
                                                     } else {
                                                         TARDISMessage.handlesSend(player, "BIOME_NOT_VALID");
                                                         continue;
@@ -372,7 +372,7 @@ public class TARDISHandlesProcessor {
                                                     TARDISMessage.handlesSend(player, "BIOME_NOT_FOUND");
                                                     continue;
                                                 } else {
-                                                    if (!plugin.getPluginRespect().getRespect(nsob, new Parameters(player, FLAG.getDefaultFlags()))) {
+                                                    if (!plugin.getPluginRespect().getRespect(nsob, new Parameters(player, Flag.getDefaultFlags()))) {
                                                         continue;
                                                     }
                                                     World bw = nsob.getWorld();
@@ -395,7 +395,7 @@ public class TARDISHandlesProcessor {
                                                 break;
                                             case PLAYER_DISK:
                                                 // get the player's location
-                                                if (player.hasPermission("tardis.timetravel.player")) {
+                                                if (TARDISPermission.hasPermission(player, "tardis.timetravel.player")) {
                                                     if (player.getName().equalsIgnoreCase(first)) {
                                                         TARDISMessage.handlesSend(player, "TRAVEL_NO_SELF");
                                                         continue;
@@ -418,10 +418,10 @@ public class TARDISHandlesProcessor {
                                                         TARDISMessage.handlesSend(player, "PLAYER_IN_AREA", ChatColor.AQUA + "/tardistravel area [area name]");
                                                         continue;
                                                     }
-                                                    if (!plugin.getPluginRespect().getRespect(player_loc, new Parameters(player, FLAG.getDefaultFlags()))) {
+                                                    if (!plugin.getPluginRespect().getRespect(player_loc, new Parameters(player, Flag.getDefaultFlags()))) {
                                                         continue;
                                                     }
-                                                    if (!plugin.getPlanetsConfig().getBoolean("planets." + player_loc.getWorld().getName() + ".time_travel")) {
+                                                    if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(player_loc.getWorld().getName()) + ".time_travel")) {
                                                         TARDISMessage.handlesSend(player, "NO_WORLD_TRAVEL");
                                                         continue;
                                                     }
@@ -439,7 +439,7 @@ public class TARDISHandlesProcessor {
                                                 }
                                                 break;
                                             case SAVE_DISK:
-                                                if (player.hasPermission("tardis.save")) {
+                                                if (TARDISPermission.hasPermission(player, "tardis.save")) {
                                                     int sx = TARDISNumberParsers.parseInt(lore.get(2));
                                                     int sy = TARDISNumberParsers.parseInt(lore.get(3));
                                                     int sz = TARDISNumberParsers.parseInt(lore.get(4));
@@ -459,17 +459,17 @@ public class TARDISHandlesProcessor {
                                         if (goto_loc != null) {
                                             plugin.getTrackerKeeper().getHasDestination().put(id, travel);
                                             plugin.getTrackerKeeper().getRescue().remove(id);
-                                            if (plugin.getConfig().getBoolean("circuits.damage") && !plugin.getDifficulty().equals(DIFFICULTY.EASY) && plugin.getConfig().getInt("circuits.uses.memory") > 0 && !plugin.getTrackerKeeper().getHasNotClickedHandbrake().contains(id)) {
+                                            if (plugin.getConfig().getBoolean("circuits.damage") && !plugin.getDifficulty().equals(Difficulty.EASY) && plugin.getConfig().getInt("circuits.uses.memory") > 0 && !plugin.getTrackerKeeper().getHasNotClickedHandbrake().contains(id)) {
                                                 plugin.getTrackerKeeper().getHasNotClickedHandbrake().add(id);
                                                 TARDISCircuitChecker tcc = new TARDISCircuitChecker(plugin, id);
                                                 tcc.getCircuits();
                                                 // decrement uses
                                                 int uses_left = tcc.getMemoryUses();
-                                                new TARDISCircuitDamager(plugin, DISK_CIRCUIT.MEMORY, uses_left, id, player).damage();
+                                                new TARDISCircuitDamager(plugin, DiskCircuit.MEMORY, uses_left, id, player).damage();
                                             }
                                             if (!plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                                 // destroy police box
-                                                DestroyData dd = new DestroyData(plugin, uuid.toString());
+                                                DestroyData dd = new DestroyData();
                                                 dd.setDirection(direction);
                                                 dd.setLocation(current);
                                                 dd.setPlayer(player);
@@ -477,7 +477,9 @@ public class TARDISHandlesProcessor {
                                                 dd.setOutside(false);
                                                 dd.setSubmarine(rsc.isSubmarine());
                                                 dd.setTardisID(id);
-                                                dd.setBiome(rsc.getBiome());
+                                                TARDISBiome biome = TARDISBiome.get(rsc.getBiomeKey());
+                                                dd.setTardisBiome(biome);
+                                                dd.setThrottle(SpaceTimeThrottle.NORMAL);
                                                 // set handbrake off
                                                 HashMap<String, Object> set = new HashMap<>();
                                                 set.put("handbrake_on", 0);
@@ -493,11 +495,11 @@ public class TARDISHandlesProcessor {
                                                     plugin.getPresetDestroyer().removeBlockProtection(id);
                                                     set.put("hidden", 0);
                                                     // restore biome
-                                                    BiomeSetter.restoreBiome(current, rsc.getBiome());
+                                                    BiomeSetter.restoreBiome(current, biome);
                                                 }
                                                 plugin.getQueryFactory().doUpdate("tardis", set, tid);
                                             }
-                                            BuildData bd = new BuildData(plugin, uuid.toString());
+                                            BuildData bd = new BuildData(uuid.toString());
                                             bd.setDirection(nextDirection);
                                             bd.setLocation(goto_loc);
                                             bd.setMalfunction(false);
@@ -506,6 +508,7 @@ public class TARDISHandlesProcessor {
                                             bd.setOutside(false);
                                             bd.setSubmarine(sub);
                                             bd.setTardisID(id);
+                                            bd.setThrottle(SpaceTimeThrottle.NORMAL);
                                             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                                                 // rebuild police box - needs to be a delay
                                                 plugin.getPresetBuilder().buildPreset(bd);
@@ -657,7 +660,7 @@ public class TARDISHandlesProcessor {
         ResultSetAreas rsa = new ResultSetAreas(plugin, wherea, false, false);
         if (rsa.resultSet()) {
             String area = rsa.getArea().getAreaName();
-            if (!player.hasPermission("tardis.area." + area) || !player.isPermissionSet("tardis.area." + area)) {
+            if (!TARDISPermission.hasPermission(player, "tardis.area." + area) || !player.isPermissionSet("tardis.area." + area)) {
                 return null;
             }
             l = plugin.getTardisArea().getNextSpot(area);

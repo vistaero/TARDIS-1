@@ -17,12 +17,14 @@
 package me.eccentric_nz.TARDIS.commands.remote;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisPreset;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisPreset;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -73,7 +75,7 @@ class TARDISRemoteHideCommand {
             return true;
         }
         UUID uuid = olp.getUniqueId();
-        DestroyData dd = new DestroyData(plugin, uuid.toString());
+        DestroyData dd = new DestroyData();
         dd.setDirection(rsc.getDirection());
         dd.setLocation(l);
         dd.setPlayer(olp);
@@ -81,7 +83,8 @@ class TARDISRemoteHideCommand {
         dd.setOutside(false);
         dd.setSubmarine(rsc.isSubmarine());
         dd.setTardisID(id);
-        dd.setBiome(rsc.getBiome());
+        dd.setTardisBiome(TARDISBiome.get(rsc.getBiomeKey()));
+        dd.setThrottle(SpaceTimeThrottle.REBUILD);
         plugin.getPresetDestroyer().destroyPreset(dd);
         TARDISMessage.send(sender, "TARDIS_HIDDEN", "/tardisremote [player] rebuild");
         // set hidden to true

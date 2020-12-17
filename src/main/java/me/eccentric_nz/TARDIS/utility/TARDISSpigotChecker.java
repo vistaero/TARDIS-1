@@ -46,15 +46,19 @@ public class TARDISSpigotChecker implements Runnable {
                 // couldn't get Spigot info
                 return;
             }
-            JsonObject refs = spigotBuild.get("refs").getAsJsonObject();
-            if (refs.has("Spigot")) {
-                String spigot = refs.get("Spigot").getAsString().substring(0, 7);
-                String[] split = spigotVersion.split("-"); // something like 'git-Spigot-2f5d615-d07a78b'
-                if (spigot.equals(split[2])) {
-                    // if new build number is same
-                    return;
+            int name = spigotBuild.getAsJsonPrimitive("name").getAsInt();
+            // 2855 is the latest 1.16.2 build (as of 11-08-2020)
+            if (name > 2855) {
+                JsonObject refs = spigotBuild.get("refs").getAsJsonObject();
+                if (refs.has("Spigot")) {
+                    String spigot = refs.get("Spigot").getAsString().substring(0, 7);
+                    String[] split = spigotVersion.split("-"); // something like 'git-Spigot-2f5d615-d07a78b'
+                    if (spigot.equals(split[2])) {
+                        // if new build number is same
+                        return;
+                    }
+                    plugin.getConsole().sendMessage(plugin.getPluginName() + ChatColor.RED + "There is a new Spigot build! " + ChatColor.AQUA + "You should update so TARDIS doesn't bug out :)");
                 }
-                plugin.getConsole().sendMessage(plugin.getPluginName() + ChatColor.RED + "There is a new Spigot build! " + ChatColor.AQUA + "You should update so TARDIS doesn't bug out :)");
             }
         }
     }

@@ -19,15 +19,17 @@ package me.eccentric_nz.TARDIS.commands.tardis;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.api.Parameters;
-import me.eccentric_nz.TARDIS.database.ResultSetHomeLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetHomeLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisID;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
+import me.eccentric_nz.TARDIS.enumeration.Flag;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,7 +50,7 @@ class TARDISHomeCommand {
     }
 
     boolean setHome(Player player, String[] args) {
-        if (player.hasPermission("tardis.timetravel")) {
+        if (TARDISPermission.hasPermission(player, "tardis.timetravel")) {
             ResultSetTardisID rs = new ResultSetTardisID(plugin);
             if (!rs.fromUUID(player.getUniqueId().toString())) {
                 TARDISMessage.send(player, "NOT_A_TIMELORD");
@@ -85,7 +87,7 @@ class TARDISHomeCommand {
                     TARDISMessage.send(player, "AREA_NO_HOME", ChatColor.AQUA + "/tardistravel area [area name]");
                     return true;
                 }
-                if (!plugin.getPluginRespect().getRespect(eyeLocation, new Parameters(player, FLAG.getDefaultFlags()))) {
+                if (!plugin.getPluginRespect().getRespect(eyeLocation, new Parameters(player, Flag.getDefaultFlags()))) {
                     return true;
                 }
                 Material m = player.getTargetBlock(plugin.getGeneralKeeper().getTransparent(), 50).getType();
@@ -94,12 +96,12 @@ class TARDISHomeCommand {
                     eyeLocation.setY(yplusone + 1);
                 }
                 // check the world is not excluded
-                if (!plugin.getPlanetsConfig().getBoolean("planets." + world + ".time_travel")) {
+                if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(world) + ".time_travel")) {
                     TARDISMessage.send(player, "NO_WORLD_TRAVEL");
                     return true;
                 }
                 TARDISCircuitChecker tcc = null;
-                if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(player, false)) {
+                if (!plugin.getDifficulty().equals(Difficulty.EASY) && !plugin.getUtils().inGracePeriod(player, false)) {
                     tcc = new TARDISCircuitChecker(plugin, id);
                     tcc.getCircuits();
                 }

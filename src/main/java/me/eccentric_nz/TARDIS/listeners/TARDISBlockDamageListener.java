@@ -17,16 +17,18 @@
 package me.eccentric_nz.TARDIS.listeners;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetBlocks;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetBlocks;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.ReplacedBlock;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.hads.TARDISHostileAction;
-import me.eccentric_nz.TARDIS.utility.TARDISMaterials;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISMaterials;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -60,47 +62,49 @@ public class TARDISBlockDamageListener implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onPoliceBoxDamage(BlockDamageEvent event) {
-        Player p = event.getPlayer();
         Block b = event.getBlock();
         String l = b.getLocation().toString();
-        HashMap<String, Object> where = new HashMap<>();
-        where.put("location", l);
-        ResultSetBlocks rsb = new ResultSetBlocks(plugin, where, false);
-        if (rsb.resultSet()) {
-            ReplacedBlock rb = rsb.getReplacedBlock();
-            int id = rb.getTardis_id();
-            if (p.hasPermission("tardis.sonic.admin")) {
-                String[] split = plugin.getRecipesConfig().getString("shaped.Sonic Screwdriver.result").split(":");
-                Material sonic = Material.valueOf(split[0]);
-                ItemStack is = event.getItemInHand();
-                if (is != null && is.getType().equals(sonic)) {
-                    // unhide TARDIS
-                    unhide(id, p);
+        if (plugin.getGeneralKeeper().getProtectBlockMap().containsKey(l)) {
+            HashMap<String, Object> where = new HashMap<>();
+            where.put("location", l);
+            ResultSetBlocks rsb = new ResultSetBlocks(plugin, where, false);
+            if (rsb.resultSet()) {
+                Player p = event.getPlayer();
+                ReplacedBlock rb = rsb.getReplacedBlock();
+                int id = rb.getTardis_id();
+                if (TARDISPermission.hasPermission(p, "tardis.sonic.admin")) {
+                    String[] split = plugin.getRecipesConfig().getString("shaped.Sonic Screwdriver.result").split(":");
+                    Material sonic = Material.valueOf(split[0]);
+                    ItemStack is = event.getItemInHand();
+                    if (is != null && is.getType().equals(sonic)) {
+                        // unhide TARDIS
+                        unhide(id, p);
+                    }
                 }
+                boolean m = false;
+                boolean isDoor = false;
+                int damage = plugin.getTrackerKeeper().getDamage().getOrDefault(id, 0);
+                if (damage <= plugin.getConfig().getInt("preferences.hads_damage") && plugin.getConfig().getBoolean("allow.hads") && !plugin.getTrackerKeeper().getInVortex().contains(id) && isOwnerOnline(id) && !plugin.getTrackerKeeper().getDispersedTARDII().contains(id)) {
+                    if (TARDISMaterials.doors.contains(b.getType())) {
+                        if (isOwner(id, p.getUniqueId().toString())) {
+                            isDoor = true;
+                        }
+                    }
+                    if (!isDoor && rb.getPolice_box() == 1) {
+                        plugin.getTrackerKeeper().getDamage().put(id, damage + 1);
+                        if (damage == plugin.getConfig().getInt("preferences.hads_damage")) {
+                            new TARDISHostileAction(plugin).processAction(id, p);
+                            m = true;
+                        }
+                        if (!m) {
+                            TARDISMessage.send(p, "HADS_WARNING", String.format("%d", (plugin.getConfig().getInt("preferences.hads_damage") - damage)));
+                        }
+                    }
+                } else {
+                    TARDISMessage.send(p, "TARDIS_BREAK");
+                }
+                event.setCancelled(true);
             }
-            boolean m = false;
-            boolean isDoor = false;
-            int damage = plugin.getTrackerKeeper().getDamage().getOrDefault(id, 0);
-            if (damage <= plugin.getConfig().getInt("preferences.hads_damage") && plugin.getConfig().getBoolean("allow.hads") && !plugin.getTrackerKeeper().getInVortex().contains(id) && isOwnerOnline(id) && !plugin.getTrackerKeeper().getDispersedTARDII().contains(id)) {
-                if (TARDISMaterials.doors.contains(b.getType())) {
-                    if (isOwner(id, p.getUniqueId().toString())) {
-                        isDoor = true;
-                    }
-                }
-                if (!isDoor && rb.getPolice_box() == 1) {
-                    plugin.getTrackerKeeper().getDamage().put(id, damage + 1);
-                    if (damage == plugin.getConfig().getInt("preferences.hads_damage")) {
-                        new TARDISHostileAction(plugin).processAction(id, p);
-                        m = true;
-                    }
-                    if (!m) {
-                        TARDISMessage.send(p, "HADS_WARNING", String.format("%d", (plugin.getConfig().getInt("preferences.hads_damage") - damage)));
-                    }
-                }
-            } else {
-                TARDISMessage.send(p, "TARDIS_BREAK");
-            }
-            event.setCancelled(true);
         }
     }
 
@@ -146,7 +150,7 @@ public class TARDISBlockDamageListener implements Listener {
                 TARDISMessage.send(player, "CURRENT_NOT_FOUND");
             }
             Location l = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
-            BuildData bd = new BuildData(plugin, player.getUniqueId().toString());
+            BuildData bd = new BuildData(player.getUniqueId().toString());
             bd.setDirection(rsc.getDirection());
             bd.setLocation(l);
             bd.setMalfunction(false);
@@ -155,6 +159,7 @@ public class TARDISBlockDamageListener implements Listener {
             bd.setRebuild(true);
             bd.setSubmarine(rsc.isSubmarine());
             bd.setTardisID(id);
+            bd.setThrottle(SpaceTimeThrottle.REBUILD);
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), 5L);
             // set hidden to false
             HashMap<String, Object> whereh = new HashMap<>();

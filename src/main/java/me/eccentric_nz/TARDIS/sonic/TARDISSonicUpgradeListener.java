@@ -17,6 +17,7 @@
 package me.eccentric_nz.TARDIS.sonic;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -104,7 +105,7 @@ public class TARDISSonicUpgradeListener implements Listener {
                     p = (Player) human;
                 }
                 // make sure the player has permission
-                if (p == null || !p.hasPermission("tardis.sonic." + upgrades.get(upgrade))) {
+                if (p == null || !TARDISPermission.hasPermission(p, "tardis.sonic." + upgrades.get(upgrade))) {
                     ci.setResult(null);
                     return;
                 }
@@ -158,6 +159,8 @@ public class TARDISSonicUpgradeListener implements Listener {
                 ci.setResult(null);
                 TARDISMessage.send(event.getView().getPlayer(), "REMOTE_KEY");
             }
+        } else if (recipe instanceof SmithingRecipe) {
+            TARDIS.plugin.debug("SmithingRecipe");
         }
     }
 }

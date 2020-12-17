@@ -19,7 +19,7 @@ package me.eccentric_nz.TARDIS.chemistry.lab;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
 import me.eccentric_nz.TARDIS.api.Parameters;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
+import me.eccentric_nz.TARDIS.enumeration.Flag;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
@@ -35,18 +35,13 @@ import org.bukkit.event.block.BlockFertilizeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SuperFertisliserListener implements Listener {
 
     private final TARDIS plugin;
-
-    public SuperFertisliserListener(TARDIS plugin) {
-        this.plugin = plugin;
-    }
-
     private final HashMap<Material, TreeType> TREE_LOOKUP = new HashMap<Material, TreeType>() {
         {
             put(Material.OAK_SAPLING, TreeType.TREE);
@@ -58,9 +53,26 @@ public class SuperFertisliserListener implements Listener {
             put(Material.CHORUS_FLOWER, TreeType.CHORUS_PLANT);
             put(Material.RED_MUSHROOM, TreeType.RED_MUSHROOM);
             put(Material.BROWN_MUSHROOM, TreeType.BROWN_MUSHROOM);
+            put(Material.CRIMSON_FUNGUS, TreeType.CRIMSON_FUNGUS);
+            put(Material.WARPED_FUNGUS, TreeType.WARPED_FUNGUS);
         }
     };
-    private final List<Material> TREES = Arrays.asList(Material.OAK_SAPLING, Material.DARK_OAK_SAPLING, Material.ACACIA_SAPLING, Material.JUNGLE_SAPLING, Material.SPRUCE_SAPLING, Material.BIRCH_SAPLING, Material.CHORUS_FLOWER, Material.RED_MUSHROOM, Material.BROWN_MUSHROOM);
+    private final Set<Material> TREES = new HashSet<>();
+
+    public SuperFertisliserListener(TARDIS plugin) {
+        this.plugin = plugin;
+        TREES.add(Material.OAK_SAPLING);
+        TREES.add(Material.DARK_OAK_SAPLING);
+        TREES.add(Material.ACACIA_SAPLING);
+        TREES.add(Material.JUNGLE_SAPLING);
+        TREES.add(Material.SPRUCE_SAPLING);
+        TREES.add(Material.BIRCH_SAPLING);
+        TREES.add(Material.CHORUS_FLOWER);
+        TREES.add(Material.RED_MUSHROOM);
+        TREES.add(Material.BROWN_MUSHROOM);
+        TREES.add(Material.CRIMSON_FUNGUS);
+        TREES.add(Material.WARPED_FUNGUS);
+    }
 
     @EventHandler(ignoreCancelled = true)
     public void onSuperFertilise(BlockFertilizeEvent event) {
@@ -70,7 +82,7 @@ public class SuperFertisliserListener implements Listener {
             event.setCancelled(true);
             Block block = event.getBlock();
             boolean removeItem = false;
-            if (plugin.getPluginRespect().getRespect(block.getLocation(), new Parameters(player, FLAG.getNoMessageFlags()))) {
+            if (plugin.getPluginRespect().getRespect(block.getLocation(), new Parameters(player, Flag.getNoMessageFlags()))) {
                 switch (block.getType()) {
                     case PUMPKIN_STEM:
                     case MELON_STEM:

@@ -17,11 +17,14 @@
 package me.eccentric_nz.TARDIS.commands;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISSeedModel;
-import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
-import me.eccentric_nz.TARDIS.enumeration.RECIPE_ITEM;
+import me.eccentric_nz.TARDIS.enumeration.Consoles;
+import me.eccentric_nz.TARDIS.enumeration.RecipeCategory;
+import me.eccentric_nz.TARDIS.enumeration.RecipeItem;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.messaging.TARDISRecipeLister;
+import me.eccentric_nz.TARDIS.recipes.TARDISRecipeCategoryInventory;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -114,11 +117,22 @@ public class TARDISRecipeCommands implements CommandExecutor {
         recipeItems.put("vortex", "Vortex Manipulator");
         recipeItems.put("wand", "TARDIS Schematic Wand");
         recipeItems.put("watch", "Fob Watch");
+        // sonic upgrades
+        recipeItems.put("a-upgrade", "Admin Upgrade");
+        recipeItems.put("b-upgrade", "Bio-scanner Upgrade");
+        recipeItems.put("d-upgrade", "Diamond Upgrade");
+        recipeItems.put("e-upgrade", "Emerald Upgrade");
+        recipeItems.put("i-upgrade", "Ignite Upgrade");
+        recipeItems.put("k-upgrade", "Knockback Upgrade");
+        recipeItems.put("p-upgrade", "Painter Upgrade");
+        recipeItems.put("pu-upgrade", "Pickup Arrows Upgrade");
+        recipeItems.put("r-upgrade", "Redstone Upgrade");
         // DELUXE, ELEVENTH, TWELFTH, ARS & REDSTONE schematics designed by Lord_Rahl and killeratnight at mcnovus.net
         t.put("ARS", Material.QUARTZ_BLOCK); // ARS
         t.put("BIGGER", Material.GOLD_BLOCK); // bigger
         t.put("BUDGET", Material.IRON_BLOCK); // budget
         t.put("CORAL", Material.NETHER_WART_BLOCK); // coral schematic designed by vistaero
+        t.put("DELTA", Material.CRYING_OBSIDIAN); // delta
         t.put("DELUXE", Material.DIAMOND_BLOCK); // deluxe
         t.put("ELEVENTH", Material.EMERALD_BLOCK); // eleventh
         t.put("ENDER", Material.PURPUR_BLOCK); // ender schematic designed by ToppanaFIN (player at thatsnotacreeper.com)
@@ -150,7 +164,7 @@ public class TARDISRecipeCommands implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("tardisrecipe")) {
-            if (!sender.hasPermission("tardis.help")) {
+            if (!TARDISPermission.hasPermission(sender, "tardis.help")) {
                 TARDISMessage.send(sender, "NO_PERMS");
                 return true;
             }
@@ -162,7 +176,15 @@ public class TARDISRecipeCommands implements CommandExecutor {
                 TARDISMessage.send(sender, "CMD_PLAYER");
                 return true;
             }
-            if (args.length == 0 || !recipeItems.containsKey(args[0].toLowerCase(Locale.ENGLISH))) {
+            if (args.length == 0) {
+                // open recipe GUI
+                ItemStack[] emenu = new TARDISRecipeCategoryInventory().getMenu();
+                Inventory categories = plugin.getServer().createInventory(player, 27, ChatColor.DARK_RED + "Recipe Categories");
+                categories.setContents(emenu);
+                player.openInventory(categories);
+                return true;
+            }
+            if (!recipeItems.containsKey(args[0].toLowerCase(Locale.ENGLISH))) {
                 new TARDISRecipeLister(plugin, sender).list();
                 return true;
             }
@@ -207,6 +229,15 @@ public class TARDISRecipeCommands implements CommandExecutor {
                 case "preset-disk":
                 case "save-disk":
                 case "wand":
+                case "a-upgrade":
+                case "b-upgrade":
+                case "d-upgrade":
+                case "e-upgrade":
+                case "i-upgrade":
+                case "k-upgrade":
+                case "p-upgrade":
+                case "pu-upgrade":
+                case "r-upgrade":
                     showShapelessRecipe(player, recipeItems.get(which));
                     return true;
                 default:
@@ -237,7 +268,7 @@ public class TARDISRecipeCommands implements CommandExecutor {
                 if (item.getType().equals(Material.GLOWSTONE_DUST)) {
                     String dn = getDisplayName(str, glowstoneCount);
                     im.setDisplayName(dn);
-                    im.setCustomModelData(RECIPE_ITEM.getByName(dn).getCustomModelData());
+                    im.setCustomModelData(RecipeItem.getByName(dn).getCustomModelData());
                     glowstoneCount++;
                 }
                 if (str.equals("TARDIS Remote Key") && item.getType().equals(Material.GOLD_NUGGET)) {
@@ -267,8 +298,8 @@ public class TARDISRecipeCommands implements CommandExecutor {
         ItemStack result = recipe.getResult();
         ItemMeta im = result.getItemMeta();
         im.setDisplayName(str);
-        RECIPE_ITEM recipeItem = RECIPE_ITEM.getByName(str);
-        if (recipeItem != RECIPE_ITEM.NOT_FOUND) {
+        RecipeItem recipeItem = RecipeItem.getByName(str);
+        if (recipeItem != RecipeItem.NOT_FOUND) {
             im.setCustomModelData(recipeItem.getCustomModelData());
         }
         if (str.equals("TARDIS Invisibility Circuit")) {
@@ -300,12 +331,16 @@ public class TARDISRecipeCommands implements CommandExecutor {
             if (ingredients.get(i).getType().equals(Material.GLOWSTONE_DUST)) {
                 String dn = getDisplayName(str, glowstoneCount);
                 im.setDisplayName(dn);
-                im.setCustomModelData(RECIPE_ITEM.getByName(dn).getCustomModelData());
+                im.setCustomModelData(RecipeItem.getByName(dn).getCustomModelData());
                 glowstoneCount++;
             }
             if (ingredients.get(i).getType().equals(Material.MUSIC_DISC_STRAD)) {
                 im.setDisplayName("Blank Storage Disk");
                 im.setCustomModelData(10000001);
+            }
+            if (ingredients.get(i).getType().equals(Material.BLAZE_ROD)) {
+                im.setDisplayName("Sonic Screwdriver");
+                im.setCustomModelData(10000010);
             }
             ingredients.get(i).setItemMeta(im);
             inv.setItem(i * 9, ingredients.get(i));
@@ -316,9 +351,13 @@ public class TARDISRecipeCommands implements CommandExecutor {
         if (str.equals("Blank Storage Disk") || str.equals("Save Storage Disk") || str.equals("Preset Storage Disk") || str.equals("Biome Storage Disk") || str.equals("Player Storage Disk") || str.equals("Authorised Control Disk") || str.equals("Sonic Blaster")) {
             im.addItemFlags(ItemFlag.values());
         }
-        RECIPE_ITEM recipeItem = RECIPE_ITEM.getByName(str);
-        if (recipeItem != RECIPE_ITEM.NOT_FOUND) {
+        RecipeItem recipeItem = RecipeItem.getByName(str);
+        if (recipeItem != RecipeItem.NOT_FOUND) {
             im.setCustomModelData(recipeItem.getCustomModelData());
+            if (recipeItem.getCategory().equals(RecipeCategory.SONIC_UPGRADES)) {
+                im.setDisplayName("Sonic Screwdriver");
+                im.setLore(Arrays.asList("Upgrades:", str));
+            }
         }
         result.setAmount(1);
         result.setItemMeta(im);
@@ -351,8 +390,11 @@ public class TARDISRecipeCommands implements CommandExecutor {
         ItemStack tardis;
         // should be mushroom block
         int model;
-        if (CONSOLES.getBY_NAMES().get(type.toUpperCase()).isCustom()) {
+        if (Consoles.getBY_NAMES().get(type.toUpperCase()).isCustom()) {
             model = 45;
+            tardis = new ItemStack(Material.MUSHROOM_STEM, 1);
+        } else if (type.equalsIgnoreCase("DELTA")) {
+            model = 43;
             tardis = new ItemStack(Material.MUSHROOM_STEM, 1);
         } else if (type.equalsIgnoreCase("ROTOR")) {
             model = 44;
@@ -403,6 +445,24 @@ public class TARDISRecipeCommands implements CommandExecutor {
                 return "Emerald Environment Circuit"; // 1972
             case "Rift Manipulator":
                 return "Rift Circuit"; // 1983
+            case "Admin Upgrade":
+                return "Server Admin Circuit";
+            case "Bio-scanner Upgrade":
+                return "Bio-scanner Circuit";
+            case "Redstone Upgrade":
+                return "Redstone Activator Circuit";
+            case "Diamond Upgrade":
+                return "Diamond Disruptor Circuit";
+            case "Emerald Upgrade":
+                return "Emerald Environment Circuit";
+            case "Painter Upgrade":
+                return "Painter Circuit";
+            case "Ignite Upgrade":
+                return "Ignite Circuit";
+            case "Pickup Arrows Upgrade":
+                return "Pickup Arrows Circuit";
+            case "Knockback Upgrade":
+                return "Knockback Circuit";
             default:  //TARDIS Stattenheim Circuit"
                 if (quartzCount == 0) {
                     return "TARDIS Locator Circuit"; // 1965

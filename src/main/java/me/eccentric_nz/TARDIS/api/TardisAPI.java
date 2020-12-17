@@ -16,16 +16,18 @@
  */
 package me.eccentric_nz.TARDIS.api;
 
+import me.eccentric_nz.TARDIS.blueprints.BlueprintType;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
 import me.eccentric_nz.TARDIS.travel.TARDISPluginRespect;
-import me.eccentric_nz.TARDIS.utility.TARDISBlockSetters;
 import me.eccentric_nz.TARDIS.utility.TARDISLocationGetters;
 import me.eccentric_nz.TARDIS.utility.TARDISUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
@@ -327,6 +329,46 @@ public interface TardisAPI {
      * @return a HashMap&lt;String, ShapelessRecipe&gt; containing the TARDIS shapeless recipes
      */
     HashMap<String, ShapelessRecipe> getShapelessRecipes();
+
+    /**
+     * Get a TARDIS item
+     *
+     * @param item   the TARDIS item to get
+     * @param player the player who will be receiving the item
+     * @return an ItemStack of the TARDIS item ot null if an invalid item was specified
+     */
+    public ItemStack getTARDISShapeItem(String item, Player player);
+
+    /**
+     * Get the TARDIS seed recipes.
+     *
+     * @return a HashMap&lt;Schematic, ShapedRecipe&gt; containing the TARDIS seed recipes
+     */
+    HashMap<Schematic, ShapedRecipe> getSeedRecipes();
+
+    /**
+     * Get a TARDIS Seed ItemStack
+     *
+     * @param schematic the console type to get
+     * @return a TARDIS seed block item or null if an invalid schematic is specified
+     */
+    ItemStack getTARDISSeedItem(String schematic);
+
+    /**
+     * Get the TARDIS blueprints.
+     *
+     * @return a list of TARDIS blueprints
+     */
+    List<BlueprintType> getBlueprints();
+
+    /**
+     * Get a TARDIS Blueprint Disk
+     *
+     * @param item   the blueprint disk to get
+     * @param player the player who will be receiving the item
+     * @return a TARDIS Blueprint Disk item or null if an invalid schematic is specified
+     */
+    ItemStack getTARDISBlueprintItem(String item, Player player);
 
     /**
      * Get the TARDIS wall and floor block names.

@@ -74,7 +74,9 @@ public class TARDISConfiguration {
         booleanOptions.put("arch.enabled", true);
         booleanOptions.put("arch.switch_inventory", true);
         booleanOptions.put("archive.enabled", true);
+        booleanOptions.put("blueprints.enabled", false);
         booleanOptions.put("circuits.damage", false);
+        booleanOptions.put("conversions.archive_wall_data", false);
         booleanOptions.put("conversions.ars_materials", false);
         booleanOptions.put("conversions.condenser_materials", false);
         booleanOptions.put("conversions.player_prefs_materials", false);
@@ -108,6 +110,7 @@ public class TARDISConfiguration {
         booleanOptions.put("preferences.render_entities", false);
         booleanOptions.put("preferences.respect_factions", true);
         booleanOptions.put("preferences.respect_grief_prevention", true);
+        booleanOptions.put("preferences.respect_red_protect", true);
         booleanOptions.put("preferences.respect_worldborder", true);
         booleanOptions.put("preferences.spawn_random_monsters", true);
         booleanOptions.put("preferences.strike_lightning", true);
@@ -186,7 +189,6 @@ public class TARDISConfiguration {
         stringOptions.put("creation.use_clay", "WOOL");
         stringOptions.put("police_box.default_preset", "FACTORY");
         stringOptions.put("police_box.sign_colour", "WHITE");
-        stringOptions.put("police_box.tardis_lamp", "REDSTONE_LAMP");
         stringOptions.put("preferences.default_key", "eleventh");
         stringOptions.put("preferences.default_sonic", "eleventh");
         stringOptions.put("preferences.difficulty", "hard");
@@ -233,7 +235,7 @@ public class TARDISConfiguration {
         // boolean values
         for (Map.Entry<String, Boolean> entry : booleanOptions.entrySet()) {
             if (!config.contains(entry.getKey())) {
-                plugin.debug("missing entry: " + entry.getKey());
+                plugin.debug("Missing entry: " + entry.getKey());
                 plugin.getConfig().set(entry.getKey(), entry.getValue());
                 i++;
             }
@@ -241,7 +243,7 @@ public class TARDISConfiguration {
         // int values
         for (Map.Entry<String, Integer> entry : integerOptions.entrySet()) {
             if (!config.contains(entry.getKey())) {
-                plugin.debug("missing entry: " + entry.getKey());
+                plugin.debug("Missing entry: " + entry.getKey());
                 plugin.getConfig().set(entry.getKey(), entry.getValue());
                 i++;
             }
@@ -249,7 +251,7 @@ public class TARDISConfiguration {
         // string values
         for (Map.Entry<String, String> entry : stringOptions.entrySet()) {
             if (!config.contains(entry.getKey())) {
-                plugin.debug("missing entry: " + entry.getKey());
+                plugin.debug("Missing entry: " + entry.getKey());
                 plugin.getConfig().set(entry.getKey(), entry.getValue());
                 i++;
             }

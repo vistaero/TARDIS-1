@@ -17,9 +17,10 @@
 package me.eccentric_nz.TARDIS.junk;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisID;
-import me.eccentric_nz.TARDIS.enumeration.WORLD_MANAGER;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisID;
+import me.eccentric_nz.TARDIS.enumeration.WorldManager;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.command.CommandSender;
 
@@ -38,7 +39,7 @@ class TARDISJunkFind {
 
     public boolean find(CommandSender sender) {
         // get current location
-        if (!sender.hasPermission("tardis.junk")) {
+        if (!TARDISPermission.hasPermission(sender, "tardis.junk")) {
             TARDISMessage.send(sender, "JUNK_NO_PERM");
             return true;
         }
@@ -51,7 +52,7 @@ class TARDISJunkFind {
             ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, wherec);
             if (rsc.resultSet()) {
                 String world = rsc.getWorld().getName();
-                if (plugin.getWorldManager().equals(WORLD_MANAGER.MULTIVERSE)) {
+                if (plugin.getWorldManager().equals(WorldManager.MULTIVERSE)) {
                     world = plugin.getMVHelper().getAlias(rsc.getWorld());
                 }
                 TARDISMessage.send(sender, "TARDIS_FIND", world + " at x: " + rsc.getX() + " y: " + rsc.getY() + " z: " + rsc.getZ());

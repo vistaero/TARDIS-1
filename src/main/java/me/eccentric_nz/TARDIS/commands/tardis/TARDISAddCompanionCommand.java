@@ -18,10 +18,11 @@ package me.eccentric_nz.TARDIS.commands.tardis;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.achievement.TARDISAchievementFactory;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.companionGUI.TARDISCompanionAddInventory;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
-import me.eccentric_nz.TARDIS.enumeration.ADVANCEMENT;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.enumeration.Advancement;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
 import org.bukkit.ChatColor;
@@ -46,7 +47,7 @@ class TARDISAddCompanionCommand {
     }
 
     boolean doAddGUI(Player player) {
-        if (player.hasPermission("tardis.add")) {
+        if (TARDISPermission.hasPermission(player, "tardis.add")) {
             ItemStack[] items = new TARDISCompanionAddInventory(plugin, player).getPlayers();
             Inventory presetinv = plugin.getServer().createInventory(player, 54, ChatColor.DARK_RED + "Add Companion");
             presetinv.setContents(items);
@@ -58,7 +59,7 @@ class TARDISAddCompanionCommand {
     }
 
     boolean doAdd(Player player, String[] args) {
-        if (player.hasPermission("tardis.add")) {
+        if (TARDISPermission.hasPermission(player, "tardis.add")) {
             HashMap<String, Object> where = new HashMap<>();
             where.put("uuid", player.getUniqueId().toString());
             ResultSetTardis rs = new ResultSetTardis(plugin, where, "", false, 0);
@@ -80,7 +81,7 @@ class TARDISAddCompanionCommand {
                 TARDISMessage.send(player, "TOO_FEW_ARGS");
                 return false;
             }
-            if (!args[1].matches("[A-Za-z0-9_]{2,16}")) {
+            if (!args[1].matches("[A-Za-z0-9_*]{2,16}")) {
                 TARDISMessage.send(player, "PLAYER_NOT_VALID");
             } else {
                 boolean addAll = (args[1].equalsIgnoreCase("everyone") || args[1].equalsIgnoreCase("all"));
@@ -104,7 +105,7 @@ class TARDISAddCompanionCommand {
                         }
                         // are we doing an achievement?
                         if (plugin.getAchievementConfig().getBoolean("friends.enabled")) {
-                            TARDISAchievementFactory taf = new TARDISAchievementFactory(plugin, player, ADVANCEMENT.FRIENDS, 1);
+                            TARDISAchievementFactory taf = new TARDISAchievementFactory(plugin, player, Advancement.FRIENDS, 1);
                             taf.doAchievement(1);
                         }
                     } else {

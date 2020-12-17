@@ -18,18 +18,20 @@ package me.eccentric_nz.TARDIS.advanced;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.TARDISEmergencyRelocation;
-import me.eccentric_nz.TARDIS.database.ResultSetAreas;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetAreas;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.enumeration.*;
 import me.eccentric_nz.TARDIS.flight.TARDISLand;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.travel.TARDISRandomiserCircuit;
 import me.eccentric_nz.TARDIS.travel.TARDISRescue;
 import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
-import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
+import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -59,7 +61,7 @@ public class TARDISConsoleCloseListener implements Listener {
 
     public TARDISConsoleCloseListener(TARDIS plugin) {
         this.plugin = plugin;
-        for (DISK_CIRCUIT dc : DISK_CIRCUIT.values()) {
+        for (DiskCircuit dc : DiskCircuit.values()) {
             if (!onlythese.contains(dc.getMaterial())) {
                 onlythese.add(dc.getMaterial());
             }
@@ -92,7 +94,7 @@ public class TARDISConsoleCloseListener implements Listener {
                 Inventory inv = event.getInventory();
                 // remember what was placed in the console
                 saveCurrentConsole(inv, p.getUniqueId().toString());
-                if (!plugin.getDifficulty().equals(DIFFICULTY.EASY)) {
+                if (!plugin.getDifficulty().equals(Difficulty.EASY)) {
                     // check circuits
                     TARDISCircuitChecker tcc = new TARDISCircuitChecker(plugin, id);
                     tcc.getCircuits();
@@ -141,7 +143,7 @@ public class TARDISConsoleCloseListener implements Listener {
                                                 TARDISMessage.send(p, "AREA_NOT_FOUND", ChatColor.GREEN + "/tardis list areas" + ChatColor.RESET);
                                                 continue;
                                             }
-                                            if ((!p.hasPermission("tardis.area." + first) && !p.hasPermission("tardis.area.*")) || (!p.isPermissionSet("tardis.area." + first) && !p.isPermissionSet("tardis.area.*"))) {
+                                            if ((!TARDISPermission.hasPermission(p, "tardis.area." + first) && !TARDISPermission.hasPermission(p, "tardis.area.*")) || (!p.isPermissionSet("tardis.area." + first) && !p.isPermissionSet("tardis.area.*"))) {
                                                 TARDISMessage.send(p, "TRAVEL_NO_AREA_PERM", first);
                                                 continue;
                                             }
@@ -160,11 +162,11 @@ public class TARDISConsoleCloseListener implements Listener {
                                             break;
                                         case MUSIC_DISC_CAT: // biome
                                             // find a biome location
-                                            if (!p.hasPermission("tardis.timetravel.biome")) {
+                                            if (!TARDISPermission.hasPermission(p, "tardis.timetravel.biome")) {
                                                 TARDISMessage.send(p, "TRAVEL_NO_PERM_BIOME");
                                                 continue;
                                             }
-                                            if (current.getBlock().getBiome().toString().equals(first)) {
+                                            if (TARDISStaticUtils.getBiomeAt(current).name().equals(first)) {
                                                 continue;
                                             }
                                             Biome biome;
@@ -172,8 +174,8 @@ public class TARDISConsoleCloseListener implements Listener {
                                                 biome = Biome.valueOf(first);
                                             } catch (IllegalArgumentException iae) {
                                                 // may have a pre-1.9 biome disk do old biome lookup...
-                                                if (TARDISOldBiomeLookup.OLD_BIOME_LOOKUP.containsKey(first)) {
-                                                    biome = TARDISOldBiomeLookup.OLD_BIOME_LOOKUP.get(first);
+                                                if (TardisOldBiomeLookup.OLD_BIOME_LOOKUP.containsKey(first)) {
+                                                    biome = TardisOldBiomeLookup.OLD_BIOME_LOOKUP.get(first);
                                                 } else {
                                                     TARDISMessage.send(p, "BIOME_NOT_VALID");
                                                     continue;
@@ -185,7 +187,7 @@ public class TARDISConsoleCloseListener implements Listener {
                                                 TARDISMessage.send(p, "BIOME_NOT_FOUND");
                                                 continue;
                                             } else {
-                                                if (!plugin.getPluginRespect().getRespect(nsob, new Parameters(p, FLAG.getDefaultFlags()))) {
+                                                if (!plugin.getPluginRespect().getRespect(nsob, new Parameters(p, Flag.getDefaultFlags()))) {
                                                     continue;
                                                 }
                                                 World bw = nsob.getWorld();
@@ -213,7 +215,7 @@ public class TARDISConsoleCloseListener implements Listener {
                                             break;
                                         case MUSIC_DISC_WAIT: // player
                                             // get the player's location
-                                            if (p.hasPermission("tardis.timetravel.player")) {
+                                            if (TARDISPermission.hasPermission(p, "tardis.timetravel.player")) {
                                                 if (p.getName().equalsIgnoreCase(first)) {
                                                     TARDISMessage.send(p, "TRAVEL_NO_SELF");
                                                     continue;
@@ -245,7 +247,7 @@ public class TARDISConsoleCloseListener implements Listener {
                                             }
                                             break;
                                         case MUSIC_DISC_CHIRP: // save
-                                            if (p.hasPermission("tardis.save")) {
+                                            if (TARDISPermission.hasPermission(p, "tardis.save")) {
                                                 String world = lore.get(1);
                                                 int x = TARDISNumberParsers.parseInt(lore.get(2));
                                                 int y = TARDISNumberParsers.parseInt(lore.get(3));
@@ -293,13 +295,13 @@ public class TARDISConsoleCloseListener implements Listener {
                                     if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                         new TARDISLand(plugin, id, p).exitVortex();
                                     }
-                                    if (plugin.getConfig().getBoolean("circuits.damage") && !plugin.getDifficulty().equals(DIFFICULTY.EASY) && plugin.getConfig().getInt("circuits.uses.memory") > 0 && !plugin.getTrackerKeeper().getHasNotClickedHandbrake().contains(id)) {
+                                    if (plugin.getConfig().getBoolean("circuits.damage") && !plugin.getDifficulty().equals(Difficulty.EASY) && plugin.getConfig().getInt("circuits.uses.memory") > 0 && !plugin.getTrackerKeeper().getHasNotClickedHandbrake().contains(id)) {
                                         plugin.getTrackerKeeper().getHasNotClickedHandbrake().add(id);
                                         TARDISCircuitChecker tcc = new TARDISCircuitChecker(plugin, id);
                                         tcc.getCircuits();
                                         // decrement uses
                                         int uses_left = tcc.getMemoryUses();
-                                        new TARDISCircuitDamager(plugin, DISK_CIRCUIT.MEMORY, uses_left, id, p).damage();
+                                        new TARDISCircuitDamager(plugin, DiskCircuit.MEMORY, uses_left, id, p).damage();
                                     }
                                 } else {
                                     TARDISMessage.send(p, "ADV_BLANK");
@@ -329,12 +331,12 @@ public class TARDISConsoleCloseListener implements Listener {
                                 if (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                                     new TARDISLand(plugin, id, p).exitVortex();
                                 }
-                                if (plugin.getConfig().getBoolean("circuits.damage") && !plugin.getDifficulty().equals(DIFFICULTY.EASY) && plugin.getConfig().getInt("circuits.uses.randomiser") > 0) {
+                                if (plugin.getConfig().getBoolean("circuits.damage") && !plugin.getDifficulty().equals(Difficulty.EASY) && plugin.getConfig().getInt("circuits.uses.randomiser") > 0) {
                                     TARDISCircuitChecker tcc = new TARDISCircuitChecker(plugin, id);
                                     tcc.getCircuits();
                                     // decrement uses
                                     int uses_left = tcc.getRandomiserUses();
-                                    new TARDISCircuitDamager(plugin, DISK_CIRCUIT.RANDOMISER, uses_left, id, p).damage();
+                                    new TARDISCircuitDamager(plugin, DiskCircuit.RANDOMISER, uses_left, id, p).damage();
                                 }
                             } else {
                                 TARDISMessage.send(p, "PROTECTED");

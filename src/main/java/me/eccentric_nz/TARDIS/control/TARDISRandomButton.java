@@ -17,16 +17,18 @@
 package me.eccentric_nz.TARDIS.control;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.TARDISEmergencyRelocation;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetRepeaters;
-import me.eccentric_nz.TARDIS.database.ResultSetTravelledTo;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetRepeaters;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravelledTo;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.WORLD_MANAGER;
+import me.eccentric_nz.TARDIS.enumeration.WorldManager;
 import me.eccentric_nz.TARDIS.flight.TARDISLand;
-import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -73,7 +75,7 @@ public class TARDISRandomButton {
         }
         COMPASS dir = rscl.getDirection();
         Location cl = new Location(rscl.getWorld(), rscl.getX(), rscl.getY(), rscl.getZ());
-        if (player.hasPermission("tardis.exile") && plugin.getConfig().getBoolean("travel.exile")) {
+        if (TARDISPermission.hasPermission(player, "tardis.exile") && plugin.getConfig().getBoolean("travel.exile")) {
             // get the exile area
             String permArea = plugin.getTardisArea().getExileArea(player);
             TARDISMessage.send(player, "EXILE", permArea);
@@ -103,7 +105,7 @@ public class TARDISRandomButton {
                 if (repeaters[0] == 1) { // first position
                     environment = "THIS";
                     // check TARDIS travel is allowed in this world
-                    if (!plugin.getPlanetsConfig().getBoolean("planets." + rscl.getWorld().getName() + ".time_travel")) {
+                    if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(rscl.getWorld().getName()) + ".time_travel")) {
                         TARDISMessage.send(player, "NO_WORLD_TRAVEL");
                         return;
                     }
@@ -115,7 +117,7 @@ public class TARDISRandomButton {
                     environment = "NORMAL";
                     if (!plugin.getConfig().getBoolean("travel.nether")) {  // nether travel enabled
                         TARDISMessage.send(player, "ANCIENT", "Nether");
-                    } else if (!player.hasPermission("tardis.nether")) {    // nether permission
+                    } else if (!TARDISPermission.hasPermission(player, "tardis.nether")) {    // nether permission
                         TARDISMessage.send(player, "NO_PERM_TRAVEL", "Nether");
                     } else if (plugin.getConfig().getBoolean("travel.allow_nether_after_visit") && !new ResultSetTravelledTo(plugin).resultSet(player.getUniqueId().toString(), "NETHER")) { // check if they need to visit nether first
                         TARDISMessage.send(player, "TRAVEL_NOT_VISITED", "Nether");
@@ -129,7 +131,7 @@ public class TARDISRandomButton {
                     environment = "NORMAL";
                     if (!plugin.getConfig().getBoolean("travel.the_end")) {  // end travel enabled
                         TARDISMessage.send(player, "ANCIENT", "End");
-                    } else if (!player.hasPermission("tardis.end")) {    // end permission
+                    } else if (!TARDISPermission.hasPermission(player, "tardis.end")) {    // end permission
                         TARDISMessage.send(player, "NO_PERM_TRAVEL", "End");
                     } else if (plugin.getConfig().getBoolean("travel.allow_end_after_visit") && !new ResultSetTravelledTo(plugin).resultSet(player.getUniqueId().toString(), "THE_END")) { // check if they need to visit the end first
                         TARDISMessage.send(player, "TRAVEL_NOT_VISITED", "End");
@@ -144,7 +146,7 @@ public class TARDISRandomButton {
                 Location rand = tt.randomDestination(player, repeaters[1], repeaters[2], repeaters[3], dir, environment, rscl.getWorld(), false, cl);
                 if (rand != null) {
                     // double check TARDIS travel is allowed in this world
-                    if (!plugin.getPlanetsConfig().getBoolean("planets." + rand.getWorld().getName() + ".time_travel")) {
+                    if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(rand.getWorld().getName()) + ".time_travel")) {
                         TARDISMessage.send(player, "NO_WORLD_TRAVEL");
                         return;
                     }
@@ -156,7 +158,7 @@ public class TARDISRandomButton {
                     set.put("submarine", (plugin.getTrackerKeeper().getSubmarine().contains(id)) ? 1 : 0);
                     plugin.getTrackerKeeper().getSubmarine().remove(Integer.valueOf(id));
                     String worldname;
-                    if (plugin.getWorldManager().equals(WORLD_MANAGER.MULTIVERSE)) {
+                    if (plugin.getWorldManager().equals(WorldManager.MULTIVERSE)) {
                         worldname = plugin.getMVHelper().getAlias(rand.getWorld());
                     } else {
                         worldname = rand.getWorld().getName();

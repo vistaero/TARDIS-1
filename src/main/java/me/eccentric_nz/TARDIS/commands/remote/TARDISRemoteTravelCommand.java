@@ -19,17 +19,18 @@ package me.eccentric_nz.TARDIS.commands.remote;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.builders.BiomeSetter;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetNextLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetNextLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import me.eccentric_nz.TARDIS.utility.TARDISSounds;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Biome;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 
@@ -65,7 +66,7 @@ class TARDISRemoteTravelCommand {
                 l = new Location(rscl.getWorld(), rscl.getX(), rscl.getY(), rscl.getZ());
             }
             COMPASS cd = rscl.getDirection();
-            Biome biome = rscl.getBiome();
+            TARDISBiome biome = (l == null) ? TARDISBiome.PLAINS : TARDISBiome.get(rscl.getBiomeKey());
             boolean sub = rscl.isSubmarine();
             HashMap<String, Object> wherenl = new HashMap<>();
             wherenl.put("tardis_id", id);
@@ -84,7 +85,7 @@ class TARDISRemoteTravelCommand {
             HashMap<String, Object> set = new HashMap<>();
             if (!plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
                 plugin.getTrackerKeeper().getInVortex().add(id);
-                DestroyData dd = new DestroyData(plugin, player.getUniqueId().toString());
+                DestroyData dd = new DestroyData();
                 dd.setDirection(cd);
                 dd.setLocation(l);
                 dd.setPlayer(player);
@@ -92,7 +93,8 @@ class TARDISRemoteTravelCommand {
                 dd.setOutside(false);
                 dd.setSubmarine(sub);
                 dd.setTardisID(id);
-                dd.setBiome(biome);
+                dd.setTardisBiome(biome);
+                dd.setThrottle(SpaceTimeThrottle.NORMAL);
                 if (!hidden && !plugin.getTrackerKeeper().getReset().contains(resetw)) {
                     plugin.getTrackerKeeper().getDematerialising().add(id);
                     plugin.getPresetDestroyer().destroyPreset(dd);
@@ -105,7 +107,7 @@ class TARDISRemoteTravelCommand {
                 }
             }
             long delay = (plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) ? 1L : 500L;
-            BuildData bd = new BuildData(plugin, player.getUniqueId().toString());
+            BuildData bd = new BuildData(player.getUniqueId().toString());
             bd.setDirection(sd);
             bd.setLocation(exit);
             bd.setMalfunction(false);
@@ -114,6 +116,7 @@ class TARDISRemoteTravelCommand {
             bd.setRebuild(false);
             bd.setSubmarine(is_next_sub);
             bd.setTardisID(id);
+            bd.setThrottle(SpaceTimeThrottle.NORMAL);
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                 plugin.getPresetBuilder().buildPreset(bd);
                 TARDISSounds.playTARDISSound(bd.getLocation(), "tardis_land");

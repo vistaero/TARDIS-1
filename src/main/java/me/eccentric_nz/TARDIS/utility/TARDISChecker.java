@@ -17,7 +17,7 @@
 package me.eccentric_nz.TARDIS.utility;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.enumeration.ADVANCEMENT;
+import me.eccentric_nz.TARDIS.enumeration.Advancement;
 import org.bukkit.ChatColor;
 
 import java.io.*;
@@ -45,10 +45,10 @@ public class TARDISChecker {
             plugin.getConsole().sendMessage(plugin.getPluginName() + plugin.getLanguage().getString("ADVANCEMENT_DIRECTORIES"));
             tardisDir.mkdirs();
         }
-        for (ADVANCEMENT advancement : ADVANCEMENT.values()) {
+        for (Advancement advancement : Advancement.values()) {
             String json = advancement.getConfigName() + ".json";
             File jfile = new File(dataPacksRoot, json);
-            if (!jfile.exists()) {
+            if (!jfile.exists() || (advancement == Advancement.DEFENDER && jfile.lastModified() < 1593067877851L)) {
                 plugin.getConsole().sendMessage(plugin.getPluginName() + ChatColor.RED + String.format(plugin.getLanguage().getString("ADVANCEMENT_NOT_FOUND"), json));
                 plugin.getConsole().sendMessage(plugin.getPluginName() + String.format(plugin.getLanguage().getString("ADVANCEMENT_COPYING"), json));
                 copy(json, jfile);
@@ -63,10 +63,90 @@ public class TARDISChecker {
         }
     }
 
-    private void copy(String filename, File file) {
+    public static boolean hasDimension(String dimension) {
+        boolean exists = true;
+        File container = TARDIS.plugin.getServer().getWorldContainer();
+        String s_world = TARDIS.plugin.getServer().getWorlds().get(0).getName();
+        String dataPacksRoot = container.getAbsolutePath() + File.separator + s_world + File.separator + "datapacks" + File.separator;
+        // check if directories exist
+        String dimensionRoot = dataPacksRoot + dimension + File.separator + "data" + File.separator + "tardis" + File.separator;
+        File dimensionDir = new File(dimensionRoot + "dimension");
+        File dimensionTypeDir = new File(dimensionRoot + "dimension_type");
+        File worldGenDir = new File(dimensionRoot + "worldgen");
+        File biomeDir = new File(dimensionRoot + "worldgen" + File.separator + "biome");
+        File featureDir = new File(dimensionRoot + "worldgen" + File.separator + "configured_feature");
+        if (!dimensionDir.exists()) {
+            dimensionDir.mkdirs();
+        }
+        if (!dimensionTypeDir.exists()) {
+            dimensionTypeDir.mkdirs();
+        }
+        if (!worldGenDir.exists()) {
+            worldGenDir.mkdirs();
+        }
+        if (!biomeDir.exists()) {
+            biomeDir.mkdirs();
+        }
+        if (!featureDir.exists()) {
+            featureDir.mkdirs();
+        }
+        // copy files to directory
+        File dimFile = new File(dimensionDir, dimension + ".json");
+        if (!dimFile.exists()) {
+            exists = false;
+            TARDISChecker.copy(dimension + "_d.json", dimFile);
+        }
+        File dimTypeFile = new File(dimensionTypeDir, dimension + ".json");
+        if (!dimTypeFile.exists()) {
+            exists = false;
+            TARDISChecker.copy(dimension + "_dt.json", dimTypeFile);
+        }
+        switch (dimension) {
+            case "skaro":
+                File tree = new File(featureDir, "skaro_tree.json");
+                File desert = new File(biomeDir, "skaro_desert.json");
+                File hills = new File(biomeDir, "skaro_hills.json");
+                File lakes = new File(biomeDir, "skaro_lakes.json");
+                if (!tree.exists()) {
+                    exists = false;
+                    TARDISChecker.copy("skaro_tree.json", tree);
+                    TARDISChecker.copy("skaro_desert.json", desert);
+                    TARDISChecker.copy("skaro_hills.json", hills);
+                    TARDISChecker.copy("skaro_lakes.json", lakes);
+                }
+                break;
+            case "gallifrey":
+                File plant = new File(featureDir, "gallifrey_tree.json");
+                File grass = new File(featureDir, "gallifrey_grass.json");
+                File badlands = new File(biomeDir, "gallifrey_badlands.json");
+                File plateau = new File(biomeDir, "gallifrey_plateau.json");
+                File eroded = new File(biomeDir, "gallifrey_eroded.json");
+                if (!plant.exists()) {
+                    exists = false;
+                    TARDISChecker.copy("gallifrey_tree.json", plant);
+                    TARDISChecker.copy("gallifrey_grass.json", grass);
+                    TARDISChecker.copy("gallifrey_badlands.json", badlands);
+                    TARDISChecker.copy("gallifrey_plateau.json", plateau);
+                    TARDISChecker.copy("gallifrey_eroded.json", eroded);
+                }
+                break;
+            default:
+                // nothing to do
+                break;
+        }
+        String dataPacksMeta = dataPacksRoot + dimension;
+        File mcmeta = new File(dataPacksMeta, "pack.mcmeta");
+        if (!mcmeta.exists()) {
+            exists = false;
+            copy("pack_" + dimension + ".mcmeta", mcmeta);
+        }
+        return exists;
+    }
+
+    public static void copy(String filename, File file) {
         InputStream in = null;
         try {
-            in = plugin.getResource(filename);
+            in = TARDIS.plugin.getResource(filename);
             OutputStream out = new FileOutputStream(file);
             byte[] buf = new byte[1024];
             int len;

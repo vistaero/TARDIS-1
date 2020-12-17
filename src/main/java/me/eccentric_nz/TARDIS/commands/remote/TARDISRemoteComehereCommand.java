@@ -24,21 +24,23 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
 import me.eccentric_nz.TARDIS.builders.BiomeSetter;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
-import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
+import me.eccentric_nz.TARDIS.enumeration.Flag;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
+import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import nl.rutgerkok.blocklocker.BlockLockerAPIv2;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -64,7 +66,7 @@ class TARDISRemoteComehereCommand {
             TARDISMessage.send(player, "NO_WORLD_TRAVEL");
             return true;
         }
-        if (!plugin.getPluginRespect().getRespect(eyeLocation, new Parameters(player, FLAG.getDefaultFlags()))) {
+        if (!plugin.getPluginRespect().getRespect(eyeLocation, new Parameters(player, Flag.getDefaultFlags()))) {
             return true;
         }
         if (!plugin.getTardisArea().areaCheckInExisting(eyeLocation)) {
@@ -78,7 +80,7 @@ class TARDISRemoteComehereCommand {
         }
         // check the world is not excluded
         String world = eyeLocation.getWorld().getName();
-        if (!plugin.getPlanetsConfig().getBoolean("planets." + world + ".time_travel")) {
+        if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(world) + ".time_travel")) {
             TARDISMessage.send(player, "NO_PB_IN_WORLD");
             return true;
         }
@@ -115,7 +117,6 @@ class TARDISRemoteComehereCommand {
         }
         COMPASS d = rsc.getDirection();
         COMPASS player_d = COMPASS.valueOf(TARDISStaticUtils.getPlayersDirection(player, false));
-        Biome biome = rsc.getBiome();
         TARDISTimeTravel tt = new TARDISTimeTravel(plugin);
         int count;
         boolean sub = false;
@@ -161,6 +162,7 @@ class TARDISRemoteComehereCommand {
             return true;
         }
         Location oldSave = null;
+        TARDISBiome biome = TARDISBiome.get(rsc.getBiomeKey());
         HashMap<String, Object> bid = new HashMap<>();
         bid.put("tardis_id", id);
         HashMap<String, Object> bset = new HashMap<>();
@@ -207,7 +209,7 @@ class TARDISRemoteComehereCommand {
         plugin.getTrackerKeeper().getInVortex().add(id);
         boolean hid = hidden;
         if (!plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
-            DestroyData dd = new DestroyData(plugin, player.getUniqueId().toString());
+            DestroyData dd = new DestroyData();
             dd.setDirection(d);
             dd.setLocation(oldSave);
             dd.setPlayer(player);
@@ -215,7 +217,8 @@ class TARDISRemoteComehereCommand {
             dd.setOutside(true);
             dd.setSubmarine(rsc.isSubmarine());
             dd.setTardisID(id);
-            dd.setBiome(biome);
+            dd.setTardisBiome(biome);
+            dd.setThrottle(SpaceTimeThrottle.NORMAL);
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                 if (!hid) {
                     plugin.getTrackerKeeper().getDematerialising().add(id);
@@ -225,7 +228,7 @@ class TARDISRemoteComehereCommand {
                 }
             }, delay);
         }
-        BuildData bd = new BuildData(plugin, player.getUniqueId().toString());
+        BuildData bd = new BuildData(player.getUniqueId().toString());
         bd.setDirection(player_d);
         bd.setLocation(eyeLocation);
         bd.setMalfunction(false);
@@ -234,6 +237,7 @@ class TARDISRemoteComehereCommand {
         bd.setRebuild(false);
         bd.setSubmarine(sub);
         bd.setTardisID(id);
+        bd.setThrottle(SpaceTimeThrottle.NORMAL);
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), delay * 2);
         plugin.getTrackerKeeper().getHasDestination().remove(id);
         plugin.getTrackerKeeper().getRescue().remove(id);

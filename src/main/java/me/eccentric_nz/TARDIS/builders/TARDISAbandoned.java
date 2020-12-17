@@ -18,15 +18,14 @@ package me.eccentric_nz.TARDIS.builders;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.event.TARDISCreationEvent;
-import me.eccentric_nz.TARDIS.enumeration.ADAPTION;
-import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.PRESET;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
+import me.eccentric_nz.TARDIS.enumeration.*;
 import me.eccentric_nz.TARDIS.utility.TARDISSounds;
+import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -44,7 +43,7 @@ public class TARDISAbandoned {
         this.plugin = plugin;
     }
 
-    public void spawn(Location l, SCHEMATIC schm, PRESET preset, COMPASS d, Player player) {
+    public void spawn(Location l, Schematic schm, PRESET preset, COMPASS d, Player player) {
         Chunk chunk = l.getChunk();
         // get this chunk's co-ords
         String cw = plugin.getConfig().getString("creation.default_world_name");
@@ -52,7 +51,6 @@ public class TARDISAbandoned {
         int cx = chunk.getX();
         int cz = chunk.getZ();
         // save data to database (tardis table)
-        String biome = l.getBlock().getBiome().toString();
         String chun = cw + ":" + cx + ":" + cz;
         HashMap<String, Object> set = new HashMap<>();
         set.put("uuid", UUID.randomUUID().toString());
@@ -72,9 +70,9 @@ public class TARDISAbandoned {
         setlocs.put("y", l.getBlockY());
         setlocs.put("z", l.getBlockZ());
         setlocs.put("direction", d.toString());
-        plugin.getQueryFactory().insertLocations(setlocs, biome, lastInsertId);
+        plugin.getQueryFactory().insertLocations(setlocs, TARDISStaticUtils.getBiomeAt(l).getKey().toString(), lastInsertId);
         // turn the block stack into a TARDIS
-        BuildData bd = new BuildData(plugin, null);
+        BuildData bd = new BuildData(null);
         bd.setDirection(d);
         bd.setLocation(l);
         bd.setMalfunction(false);
@@ -83,6 +81,7 @@ public class TARDISAbandoned {
         bd.setSubmarine(l.getBlock().getType().equals(Material.WATER));
         bd.setTardisID(lastInsertId);
         bd.setPlayer(player);
+        bd.setThrottle(SpaceTimeThrottle.REBUILD);
         plugin.getPM().callEvent(new TARDISCreationEvent(null, lastInsertId, l));
         TARDISBuildAbandoned builder = new TARDISBuildAbandoned(plugin, schm, chunkworld, lastInsertId, player);
         int task = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, builder, 1L, 3L);
@@ -90,9 +89,16 @@ public class TARDISAbandoned {
         // delay building exterior
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             plugin.getTrackerKeeper().getMaterialising().add(bd.getTardisID());
-            TARDISMaterialisePreset runnable = new TARDISMaterialisePreset(plugin, bd, preset, Material.BLUE_WOOL.createBlockData(), ADAPTION.OFF, 3);
-            int taskID = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, runnable, 10L, 20L);
-            runnable.setTask(taskID);
+            if (preset.isColoured()) {
+                TARDISMaterialisePoliceBox runnable = new TARDISMaterialisePoliceBox(plugin, bd, preset);
+                int taskID = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, runnable, 10L, 20L);
+                runnable.setTask(taskID);
+            } else {
+                BlockData data = (preset.equals(PRESET.FACTORY)) ? Material.LIGHT_GRAY_TERRACOTTA.createBlockData() : Material.BLUE_WOOL.createBlockData();
+                TARDISMaterialisePreset runnable = new TARDISMaterialisePreset(plugin, bd, preset, data, Adaption.OFF);
+                int taskID = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, runnable, 10L, 20L);
+                runnable.setTask(taskID);
+            }
             TARDISSounds.playTARDISSound(bd.getLocation(), "tardis_land_fast");
         }, schm.getConsoleSize().getDelay());
     }

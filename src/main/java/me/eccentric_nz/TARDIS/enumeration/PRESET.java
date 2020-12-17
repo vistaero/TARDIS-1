@@ -96,7 +96,6 @@ public enum PRESET {
     BOAT(Material.BARRIER, "BOAT", "", false, false),
     // coloured police boxes
     POLICE_BOX_BLUE(Material.BLUE_CONCRETE_POWDER, 0, "", "", false, true, "Blue Police Box"),
-    POLICE_BOX_BLUE_OPEN(Material.BARRIER, -1, "", "", false, true, "Open Blue Police Box"),
     POLICE_BOX_WHITE(Material.WHITE_CONCRETE_POWDER, 1, "", "", false, false, "White Police Box"),
     POLICE_BOX_ORANGE(Material.ORANGE_CONCRETE_POWDER, 2, "", "", false, false, "Orange Police Box"),
     POLICE_BOX_MAGENTA(Material.MAGENTA_CONCRETE_POWDER, 3, "", "", false, false, "Magenta Police Box"),
@@ -113,6 +112,14 @@ public enum PRESET {
     POLICE_BOX_RED(Material.RED_CONCRETE_POWDER, 14, "", "", false, false, "Red Police Box"),
     POLICE_BOX_BLACK(Material.BLACK_CONCRETE_POWDER, 15, "", "", false, false, "Black Police Box");
 
+    private final static Map<Material, PRESET> BY_MATERIAL = Maps.newHashMap();
+
+    static {
+        for (PRESET preset : values()) {
+            BY_MATERIAL.put(preset.getCraftMaterial(), preset);
+        }
+    }
+
     Material craftMaterial;
     Material guiDisplay;
     int slot;
@@ -120,7 +127,6 @@ public enum PRESET {
     String secondLine;
     boolean door;
     boolean portal;
-    private final static Map<Material, PRESET> BY_MATERIAL = Maps.newHashMap();
     String displayName;
 
     PRESET(Material craftMaterial, String firstLine, String secondLine, boolean door, boolean portal) {
@@ -167,6 +173,10 @@ public enum PRESET {
         displayName = ((this.firstLine.contains("_")) ? TARDISStringUtils.capitalise(this.firstLine) : TARDISStringUtils.titleCase(this.firstLine)) + (!this.secondLine.isEmpty() ? " " + TARDISStringUtils.titleCase(secondLine) : "");
     }
 
+    public static PRESET getPreset(Material mat) {
+        return BY_MATERIAL.get(mat);
+    }
+
     public Material getCraftMaterial() {
         return craftMaterial;
     }
@@ -187,10 +197,6 @@ public enum PRESET {
         return secondLine;
     }
 
-    public static PRESET getPreset(Material mat) {
-        return BY_MATERIAL.get(mat);
-    }
-
     public boolean hasDoor() {
         return door;
     }
@@ -203,16 +209,9 @@ public enum PRESET {
         return displayName;
     }
 
-    static {
-        for (PRESET preset : values()) {
-            BY_MATERIAL.put(preset.getCraftMaterial(), preset);
-        }
-    }
-
     public boolean isColoured() {
         switch (this) {
             case POLICE_BOX_BLUE:
-            case POLICE_BOX_BLUE_OPEN:
             case POLICE_BOX_WHITE:
             case POLICE_BOX_ORANGE:
             case POLICE_BOX_MAGENTA:

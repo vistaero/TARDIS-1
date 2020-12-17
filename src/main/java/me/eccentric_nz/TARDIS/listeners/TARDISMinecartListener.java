@@ -17,12 +17,15 @@
 package me.eccentric_nz.TARDIS.listeners;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetDoors;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetDoors;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
-import me.eccentric_nz.TARDIS.utility.*;
+import me.eccentric_nz.TARDIS.utility.TARDISMultiInvChecker;
+import me.eccentric_nz.TARDIS.utility.TARDISMultiverseInventoriesChecker;
+import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
+import me.eccentric_nz.TARDIS.utility.TARDISPerWorldInventoryChecker;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -58,12 +61,6 @@ public class TARDISMinecartListener implements Listener {
         Vehicle vehicle = event.getVehicle();
         if (vehicle instanceof Minecart && vehicle instanceof InventoryHolder) {
             Block block = event.getBlock();
-//            plugin.debug("event block: " + block.getType().toString());
-//            Block minecartBlock = event.getVehicle().getLocation().getBlock();
-//            for (BlockFace face : plugin.getGeneralKeeper().getFaces()) {
-//                Block bb = minecartBlock.getRelative(face);
-//                plugin.debug(face.toString() + ": " + bb.getType().toString());
-//            }
             Material material = block.getType();
             if (Tag.DOORS.isTagged(material) || Tag.FENCES.isTagged(material)) {
                 String[] data = null;
@@ -79,11 +76,13 @@ public class TARDISMinecartListener implements Listener {
                 switch (material) {
                     case ACACIA_DOOR: // is it a TARDIS door?
                     case BIRCH_DOOR:
+                    case CRIMSON_DOOR:
                     case DARK_OAK_DOOR:
                     case IRON_DOOR:
                     case JUNGLE_DOOR:
                     case OAK_DOOR:
                     case SPRUCE_DOOR:
+                    case WARPED_DOOR:
                         HashMap<String, Object> where = new HashMap<>();
                         where.put("door_location", db_loc);
                         where.put("door_type", 0);

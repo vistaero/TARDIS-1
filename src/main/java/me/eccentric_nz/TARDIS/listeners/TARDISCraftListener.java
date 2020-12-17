@@ -17,9 +17,10 @@
 package me.eccentric_nz.TARDIS.listeners;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
-import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.enumeration.Consoles;
+import me.eccentric_nz.TARDIS.enumeration.DiskCircuit;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -72,6 +73,7 @@ public class TARDISCraftListener implements Listener {
         t.put(Material.PURPUR_BLOCK, "ENDER"); // ender schematic designed by ToppanaFIN (player at thatsnotacreeper.com)
         t.put(Material.QUARTZ_BLOCK, "ARS"); // ARS
         t.put(Material.REDSTONE_BLOCK, "REDSTONE"); // redstone
+        t.put(Material.CRYING_OBSIDIAN, "DELTA"); // delta
         t.put(Material.HONEYCOMB_BLOCK, "ROTOR"); // rotor
         t.put(Material.SANDSTONE_STAIRS, "PYRAMID"); // pyramid schematic designed by airomis (player at thatsnotacreeper.com)
         t.put(Material.WHITE_TERRACOTTA, "WAR"); // war doctor
@@ -110,10 +112,10 @@ public class TARDISCraftListener implements Listener {
     }
 
     private boolean checkPerms(Player p, Material m) {
-        SCHEMATIC schm = CONSOLES.getBY_MATERIALS().get(m.toString());
+        Schematic schm = Consoles.getBY_MATERIALS().get(m.toString());
         if (schm != null) {
             String perm = schm.getPermission();
-            return (perm.equals("budget")) || p.hasPermission("tardis." + perm);
+            return (perm.equals("budget")) || TARDISPermission.hasPermission(p, "tardis." + perm);
         } else {
             return false;
         }
@@ -137,7 +139,7 @@ public class TARDISCraftListener implements Listener {
                     is.setItemMeta(im);
                     ci.setResult(is);
                 } else if (is.getType().equals(Material.GLOWSTONE_DUST)) {
-                    if (DISK_CIRCUIT.getCircuitNames().contains(dn)) {
+                    if (DiskCircuit.getCircuitNames().contains(dn)) {
                         // which circuit is it?
                         String[] split = dn.split(" ");
                         String which = split[1].toLowerCase(Locale.ENGLISH);

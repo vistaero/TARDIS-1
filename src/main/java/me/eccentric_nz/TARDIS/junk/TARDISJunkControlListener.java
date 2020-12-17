@@ -19,19 +19,17 @@ package me.eccentric_nz.TARDIS.junk;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
 import me.eccentric_nz.TARDIS.api.Parameters;
-import me.eccentric_nz.TARDIS.database.ResultSetControls;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisPreset;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetControls;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisPreset;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
-import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
-import me.eccentric_nz.TARDIS.enumeration.PRESET;
-import me.eccentric_nz.TARDIS.enumeration.WORLD_MANAGER;
+import me.eccentric_nz.TARDIS.enumeration.*;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
 import org.bukkit.*;
-import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.type.Comparator;
@@ -92,7 +90,7 @@ public class TARDISJunkControlListener implements Listener {
                     ResultSetTardisPreset rs = new ResultSetTardisPreset(plugin);
                     if (rs.fromID(id) && rs.getPreset().equals(PRESET.JUNK)) {
                         Player player = event.getPlayer();
-                        if (!player.hasPermission("tardis.junk")) {
+                        if (!TARDISPermission.hasPermission(player, "tardis.junk")) {
                             TARDISMessage.send(player, "JUNK_NO_PERM");
                             return;
                         }
@@ -101,13 +99,11 @@ public class TARDISJunkControlListener implements Listener {
                         if (plugin.getGeneralKeeper().getJunkDestination() != null) {
                             // get the current location
                             Location junkloc = null;
-                            Biome biome = null;
                             HashMap<String, Object> wherecl = new HashMap<>();
                             wherecl.put("tardis_id", id);
                             ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, wherecl);
                             if (rsc.resultSet()) {
                                 junkloc = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
-                                biome = rsc.getBiome();
                             }
                             if (junkloc == null) {
                                 TARDISMessage.send(player, "JUNK_NOT_FOUND");
@@ -117,7 +113,7 @@ public class TARDISJunkControlListener implements Listener {
                             lever.setPowered(!lever.isPowered());
                             block.setBlockData(lever);
                             // destroy junk TARDIS
-                            DestroyData dd = new DestroyData(plugin, "00000000-aaaa-bbbb-cccc-000000000000");
+                            DestroyData dd = new DestroyData();
                             dd.setPlayer(player);
                             dd.setDirection(COMPASS.SOUTH);
                             dd.setLocation(junkloc);
@@ -125,7 +121,8 @@ public class TARDISJunkControlListener implements Listener {
                             dd.setOutside(false);
                             dd.setSubmarine(rsc.isSubmarine());
                             dd.setTardisID(id);
-                            dd.setBiome(biome);
+                            dd.setTardisBiome(TARDISBiome.get(rsc.getBiomeKey()));
+                            dd.setThrottle(SpaceTimeThrottle.JUNK);
                             plugin.getPresetDestroyer().destroyPreset(dd);
                             // fly my pretties
                             plugin.getGeneralKeeper().setJunkTravelling(true);
@@ -146,7 +143,7 @@ public class TARDISJunkControlListener implements Listener {
                     ResultSetTardisPreset rs = new ResultSetTardisPreset(plugin);
                     if (rs.fromID(id) && rs.getPreset().equals(PRESET.JUNK)) {
                         Player player = event.getPlayer();
-                        if (!player.hasPermission("tardis.junk")) {
+                        if (!TARDISPermission.hasPermission(player, "tardis.junk")) {
                             TARDISMessage.send(player, "JUNK_NO_PERM");
                             return;
                         }
@@ -164,7 +161,7 @@ public class TARDISJunkControlListener implements Listener {
                     ResultSetTardisPreset rs = new ResultSetTardisPreset(plugin);
                     if (rs.fromID(id) && rs.getPreset().equals(PRESET.JUNK)) {
                         Player player = event.getPlayer();
-                        if (!player.hasPermission("tardis.junk")) {
+                        if (!TARDISPermission.hasPermission(player, "tardis.junk")) {
                             TARDISMessage.send(player, "JUNK_NO_PERM");
                             return;
                         }
@@ -182,7 +179,7 @@ public class TARDISJunkControlListener implements Listener {
                     ResultSetTardisPreset rs = new ResultSetTardisPreset(plugin);
                     if (rs.fromID(id) && rs.getPreset().equals(PRESET.JUNK)) {
                         Player player = event.getPlayer();
-                        if (!player.hasPermission("tardis.junk")) {
+                        if (!TARDISPermission.hasPermission(player, "tardis.junk")) {
                             TARDISMessage.send(player, "JUNK_NO_PERM");
                             return;
                         }
@@ -214,7 +211,7 @@ public class TARDISJunkControlListener implements Listener {
                 return;
             }
             World w;
-            if (plugin.getWorldManager().equals(WORLD_MANAGER.MULTIVERSE)) {
+            if (plugin.getWorldManager().equals(WorldManager.MULTIVERSE)) {
                 w = plugin.getMVHelper().getWorld(line1);
             } else {
                 w = plugin.getServer().getWorld(line1);
@@ -229,7 +226,7 @@ public class TARDISJunkControlListener implements Listener {
             int y = TARDISStaticLocationGetters.getHighestYin3x3(w, x, z);
             Location d = new Location(w, x, y, z);
             // check destination
-            if (plugin.getPluginRespect().getRespect(d, new Parameters(p, FLAG.getNoMessageFlags()))) {
+            if (plugin.getPluginRespect().getRespect(d, new Parameters(p, Flag.getNoMessageFlags()))) {
                 while (!chunk.isLoaded()) {
                     chunk.load();
                 }

@@ -17,7 +17,9 @@
 package me.eccentric_nz.TARDIS.planets;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.enumeration.WORLD_MANAGER;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.enumeration.WorldManager;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -40,8 +42,8 @@ public class TARDISGameModeSwitcher implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onGameModeWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
-        String world = player.getWorld().getName();
-        if (plugin.getWorldManager().equals(WORLD_MANAGER.NONE) && !player.hasPermission("tardis.gamemode.bypass")) {
+        String world = TARDISStringUtils.worldName(player.getWorld().getName());
+        if (plugin.getWorldManager().equals(WorldManager.NONE) && !TARDISPermission.hasPermission(player, "tardis.gamemode.bypass")) {
             // TARDIS is managing worlds so switch player GameMode if necessary
             try {
                 GameMode gm = GameMode.valueOf(plugin.getPlanetsConfig().getString("planets." + world + ".gamemode"));
@@ -55,8 +57,8 @@ public class TARDISGameModeSwitcher implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onGameModeJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        String world = player.getWorld().getName();
-        if (plugin.getWorldManager().equals(WORLD_MANAGER.NONE) && !player.hasPermission("tardis.gamemode.bypass")) {
+        String world = TARDISStringUtils.worldName(player.getWorld().getName());
+        if (plugin.getWorldManager().equals(WorldManager.NONE) && !TARDISPermission.hasPermission(player, "tardis.gamemode.bypass")) {
             try {
                 GameMode gm = GameMode.valueOf(plugin.getPlanetsConfig().getString("planets." + world + ".gamemode"));
                 player.setGameMode(gm);

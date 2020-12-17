@@ -111,6 +111,15 @@ public class TARDISPlanetsUpdater {
             planets_config.set("planets.TARDIS_Zero_Room.gamerules.announceAdvancements", false);
             save++;
         }
+        if (!planets_config.contains("planets.Skaro.gamerules.doTraderSpawning")) {
+            planets_config.set("planets.Gallifrey.gamerules.doTraderSpawning", false);
+            planets_config.set("planets.Gallifrey.gamerules.doPatrolSpawning", false);
+            planets_config.set("planets.Siluria.gamerules.doTraderSpawning", false);
+            planets_config.set("planets.Siluria.gamerules.doPatrolSpawning", false);
+            planets_config.set("planets.Skaro.gamerules.doTraderSpawning", false);
+            planets_config.set("planets.Skaro.gamerules.doPatrolSpawning", false);
+            save++;
+        }
         if (!planets_config.contains("planets.Skaro.generator")) {
             for (String w : planets_config.getConfigurationSection("planets").getKeys(false)) {
                 if (w.startsWith("TARDIS_") || w.equals(plugin.getConfig().getString("creation.default_world_name"))) {
@@ -149,6 +158,12 @@ public class TARDISPlanetsUpdater {
         if (!planets_config.contains("planets.Gallifrey.enabled")) {
             planets_config.set("planets.Gallifrey.enabled", false);
             planets_config.set("planets.Gallifrey.resource_pack", "https://www.dropbox.com/s/i7bpjju9jrgclq7/Gallifrey.zip?dl=1");
+            save++;
+        }
+        if (!planets_config.contains("planets.Skaro.spawn_other_mobs")) {
+            planets_config.set("planets.Skaro.spawn_other_mobs", true);
+            planets_config.set("planets.Siluria.spawn_other_mobs", true);
+            planets_config.set("planets.Gallifrey.spawn_other_mobs", true);
             save++;
         }
         if (planets_config.contains("planets.Gallifrey.resource_pack") && planets_config.getString("planets.Gallifrey.resource_pack").equalsIgnoreCase("default")) {

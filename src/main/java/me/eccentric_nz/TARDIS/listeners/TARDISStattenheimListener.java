@@ -26,22 +26,19 @@ import me.eccentric_nz.TARDIS.api.Parameters;
 import me.eccentric_nz.TARDIS.artron.TARDISBeaconToggler;
 import me.eccentric_nz.TARDIS.artron.TARDISLampToggler;
 import me.eccentric_nz.TARDIS.artron.TARDISPoliceBoxLampToggler;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.BiomeSetter;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
+import me.eccentric_nz.TARDIS.database.resultset.*;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
-import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
-import me.eccentric_nz.TARDIS.enumeration.PRESET;
+import me.eccentric_nz.TARDIS.enumeration.*;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
 import me.eccentric_nz.TARDIS.utility.TARDISMaterials;
-import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import nl.rutgerkok.blocklocker.BlockLockerAPIv2;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -125,16 +122,16 @@ public class TARDISStattenheimListener implements Listener {
                     if (b.getState() instanceof InventoryHolder || Tag.DOORS.isTagged(m)) {
                         return;
                     }
-                    if (player.hasPermission("tardis.timetravel")) {
+                    if (TARDISPermission.hasPermission(player, "tardis.timetravel")) {
                         Location remoteLocation = b.getLocation();
                         if (!plugin.getConfig().getBoolean("travel.include_default_world") && plugin.getConfig().getBoolean("creation.default_world") && remoteLocation.getWorld().getName().equals(plugin.getConfig().getString("creation.default_world_name"))) {
                             TARDISMessage.send(player, "NO_WORLD_TRAVEL");
                             return;
                         }
-                        if (!plugin.getPluginRespect().getRespect(remoteLocation, new Parameters(player, FLAG.getDefaultFlags()))) {
+                        if (!plugin.getPluginRespect().getRespect(remoteLocation, new Parameters(player, Flag.getDefaultFlags()))) {
                             return;
                         }
-                        if (player.hasPermission("tardis.exile") && plugin.getConfig().getBoolean("travel.exile")) {
+                        if (TARDISPermission.hasPermission(player, "tardis.exile") && plugin.getConfig().getBoolean("travel.exile")) {
                             String areaPerm = plugin.getTardisArea().getExileArea(player);
                             if (plugin.getTardisArea().areaCheckInExile(areaPerm, remoteLocation)) {
                                 TARDISMessage.send(player, "EXILE_NO_TRAVEL");
@@ -151,7 +148,7 @@ public class TARDISStattenheimListener implements Listener {
                         }
                         // check the world is not excluded
                         String world = remoteLocation.getWorld().getName();
-                        if (!plugin.getPlanetsConfig().getBoolean("planets." + world + ".time_travel")) {
+                        if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(world) + ".time_travel")) {
                             TARDISMessage.send(player, "NO_PB_IN_WORLD");
                             return;
                         }
@@ -160,7 +157,7 @@ public class TARDISStattenheimListener implements Listener {
                             return;
                         }
                         TARDISCircuitChecker tcc = null;
-                        if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(player, true)) {
+                        if (!plugin.getDifficulty().equals(Difficulty.EASY) && !plugin.getUtils().inGracePeriod(player, true)) {
                             tcc = new TARDISCircuitChecker(plugin, id);
                             tcc.getCircuits();
                         }
@@ -190,6 +187,7 @@ public class TARDISStattenheimListener implements Listener {
                         if (!rsc.resultSet()) {
                             hidden = true;
                         }
+                        TARDISBiome biome = TARDISBiome.get(rsc.getBiomeKey());
                         COMPASS d = rsc.getDirection();
                         COMPASS player_d = COMPASS.valueOf(TARDISStaticUtils.getPlayersDirection(player, false));
                         TARDISTimeTravel tt = new TARDISTimeTravel(plugin);
@@ -235,7 +233,8 @@ public class TARDISStattenheimListener implements Listener {
                             TARDISMessage.send(player, "WOULD_GRIEF_BLOCKS");
                             return;
                         }
-                        int ch = plugin.getArtronConfig().getInt("comehere");
+                        SpaceTimeThrottle spaceTimeThrottle = new ResultSetThrottle(plugin).getSpeed(uuid.toString());
+                        int ch = Math.round(plugin.getArtronConfig().getInt("comehere") * spaceTimeThrottle.getArtronMultiplier());
                         if (level < ch) {
                             TARDISMessage.send(player, "NOT_ENOUGH_ENERGY");
                             return;
@@ -282,14 +281,14 @@ public class TARDISStattenheimListener implements Listener {
                             tid.put("tardis_id", id);
                             plugin.getQueryFactory().doUpdate("tardis", set, tid);
                             // restore biome
-                            BiomeSetter.restoreBiome(oldSave, rsc.getBiome());
+                            BiomeSetter.restoreBiome(oldSave, biome);
                         }
                         TARDISMessage.send(player, "TARDIS_COMING");
                         long delay = 10L;
                         plugin.getTrackerKeeper().getInVortex().add(id);
                         boolean hid = hidden;
                         if (!plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
-                            DestroyData dd = new DestroyData(plugin, uuid.toString());
+                            DestroyData dd = new DestroyData();
                             dd.setDirection(d);
                             dd.setLocation(oldSave);
                             dd.setPlayer(player);
@@ -297,7 +296,8 @@ public class TARDISStattenheimListener implements Listener {
                             dd.setOutside(true);
                             dd.setSubmarine(rsc.isSubmarine());
                             dd.setTardisID(id);
-                            dd.setBiome(rsc.getBiome());
+                            dd.setTardisBiome(biome);
+                            dd.setThrottle(spaceTimeThrottle);
                             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                                 if (!hid) {
                                     plugin.getTrackerKeeper().getDematerialising().add(id);
@@ -307,7 +307,7 @@ public class TARDISStattenheimListener implements Listener {
                                 }
                             }, delay);
                         }
-                        BuildData bd = new BuildData(plugin, uuid.toString());
+                        BuildData bd = new BuildData(uuid.toString());
                         bd.setDirection(player_d);
                         bd.setLocation(remoteLocation);
                         bd.setMalfunction(false);
@@ -316,6 +316,7 @@ public class TARDISStattenheimListener implements Listener {
                         bd.setRebuild(false);
                         bd.setSubmarine(sub);
                         bd.setTardisID(id);
+                        bd.setThrottle(spaceTimeThrottle);
                         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), delay * 2);
                         // remove energy from TARDIS
                         HashMap<String, Object> wheret = new HashMap<>();

@@ -19,18 +19,19 @@ package me.eccentric_nz.TARDIS.commands.tardis;
 import com.google.gson.JsonObject;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.TARDISInteriorPostioning;
 import me.eccentric_nz.TARDIS.builders.TARDISTIPSData;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Archive;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.ConsoleSize;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.schematic.*;
 import me.eccentric_nz.TARDIS.schematic.TARDISSchematicBuilder.ArchiveData;
-import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import org.bukkit.entity.Player;
 
@@ -53,7 +54,7 @@ class TARDISArchiveCommand {
     }
 
     boolean zip(Player player, String[] args) {
-        if (!player.hasPermission("tardis.archive")) {
+        if (!TARDISPermission.hasPermission(player, "tardis.archive")) {
             TARDISMessage.send(player, "NO_PERMS");
             return true;
         }
@@ -130,7 +131,7 @@ class TARDISArchiveCommand {
                 ResultSetTardis rs = new ResultSetTardis(plugin, where, "", false, 2);
                 if (rs.resultSet()) {
                     Tardis tardis = rs.getTardis();
-                    SCHEMATIC current = tardis.getSchematic();
+                    Schematic current = tardis.getSchematic();
                     // get the schematic start location, width, length and height
                     JsonObject obj = null;
                     if (current.getPermission().equals("archive")) {

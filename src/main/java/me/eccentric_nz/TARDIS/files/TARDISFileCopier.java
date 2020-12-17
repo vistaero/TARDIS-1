@@ -18,7 +18,7 @@ package me.eccentric_nz.TARDIS.files;
 
 import me.eccentric_nz.TARDIS.ARS.TARDISARS;
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
+import me.eccentric_nz.TARDIS.enumeration.Consoles;
 
 import java.io.*;
 import java.util.Locale;
@@ -38,74 +38,7 @@ public class TARDISFileCopier {
     }
 
     /**
-     * Copies files for use by the TARDIS builder classes.
-     */
-    public void copyFiles() {
-        // make directories if they don't exist
-        File schematicDir = new File(plugin.getDataFolder() + File.separator + "schematics");
-        if (!schematicDir.exists()) {
-            boolean result = schematicDir.mkdir();
-            if (result) {
-                schematicDir.setWritable(true);
-                schematicDir.setExecutable(true);
-                plugin.getConsole().sendMessage(plugin.getPluginName() + "Created schematics directory.");
-            }
-        }
-        File userDir = new File(plugin.getDataFolder() + File.separator + "user_schematics");
-        if (!userDir.exists()) {
-            boolean useResult = userDir.mkdir();
-            if (useResult) {
-                userDir.setWritable(true);
-                userDir.setExecutable(true);
-                plugin.getConsole().sendMessage(plugin.getPluginName() + "Created user_schematics directory.");
-            }
-        }
-        // DELUXE, ELEVENTH, TWELFTH, ARS & REDSTONE schematics designed by Lord_Rahl and killeratnight at mcnovus.net
-        // THIRTEENTH schematic designed by Razihel
-        // The CORAL schematic designed by vistaero
-        // The PYRAMID schematic designed by airomis (player at thatsnotacreeper.com)
-        // The ENDER schematic designed by ToppanaFIN (player at thatsnotacreeper.com)
-        // The MASTER's schematic designed by ShadowAssociate
-        // load schematic files - copy the default files if they don't exist
-        String basepath = plugin.getDataFolder() + File.separator + "schematics" + File.separator;
-        String userbasepath = plugin.getDataFolder() + File.separator + "user_schematics" + File.separator;
-        CONSOLES.getBY_NAMES().values().forEach((ts) -> {
-            if (!ts.isCustom()) {
-                String str = basepath + ts.getPermission() + ".tschm";
-                copy(str, plugin.getResource(ts.getPermission() + ".tschm"), true);
-            }
-        });
-        // copy default room files as well
-        for (TARDISARS ta : TARDISARS.values()) {
-            if (ta.getOffset() != 0) {
-                String str = basepath + ta.toString().toLowerCase(Locale.ENGLISH) + ".tschm";
-                copy(str, plugin.getResource(ta.toString().toLowerCase(Locale.ENGLISH) + ".tschm"), true);
-            }
-        }
-        String zeronstr = basepath + "zero.tschm";
-        copy(zeronstr, plugin.getResource("zero.tschm"), true);
-        String junknstr = basepath + "junk.tschm";
-        copy(junknstr, plugin.getResource("junk.tschm"), true);
-        String tmpnstr = userbasepath + "template.tschm";
-        copy(tmpnstr, plugin.getResource("template.tschm"), true);
-        String gallifreynstr = basepath + "gallifrey.tschm";
-        copy(gallifreynstr, plugin.getResource("gallifrey.tschm"), true);
-        String skaronstr = basepath + "dalek_large.tschm";
-        copy(skaronstr, plugin.getResource("dalek_large.tschm"), true);
-        String daleknstr = basepath + "dalek_small.tschm";
-        copy(daleknstr, plugin.getResource("dalek_small.tschm"), true);
-        String sillnstr = basepath + "siluria_large.tschm";
-        copy(sillnstr, plugin.getResource("siluria_large.tschm"), true);
-        String silcnstr = basepath + "siluria_cross.tschm";
-        copy(silcnstr, plugin.getResource("siluria_cross.tschm"), true);
-        String silnsnstr = basepath + "siluria_north_south.tschm";
-        copy(silnsnstr, plugin.getResource("siluria_north_south.tschm"), true);
-        String silewnstr = basepath + "siluria_east_west.tschm";
-        copy(silewnstr, plugin.getResource("siluria_east_west.tschm"), true);
-    }
-
-    /**
-     * Copies the schematic file to the TARDIS plugin directory if it is not present.
+     * Copies a file to the TARDIS plugin directory if it is not present.
      *
      * @param filepath  the path to the file to write to
      * @param in        the input file to read from
@@ -148,7 +81,74 @@ public class TARDISFileCopier {
     }
 
     /**
-     * Copies the schematic file to the TARDIS plugin directory if it is not present.
+     * Copies files for use by the TARDIS builder classes.
+     */
+    public void copyFiles() {
+        // make directories if they don't exist
+        File schematicDir = new File(plugin.getDataFolder() + File.separator + "schematics");
+        if (!schematicDir.exists()) {
+            boolean result = schematicDir.mkdir();
+            if (result) {
+                schematicDir.setWritable(true);
+                schematicDir.setExecutable(true);
+                plugin.getConsole().sendMessage(plugin.getPluginName() + "Created schematics directory.");
+            }
+        }
+        File userDir = new File(plugin.getDataFolder() + File.separator + "user_schematics");
+        if (!userDir.exists()) {
+            boolean useResult = userDir.mkdir();
+            if (useResult) {
+                userDir.setWritable(true);
+                userDir.setExecutable(true);
+                plugin.getConsole().sendMessage(plugin.getPluginName() + "Created user_schematics directory.");
+            }
+        }
+        // DELUXE, ELEVENTH, TWELFTH, ARS & REDSTONE schematics designed by Lord_Rahl and killeratnight at mcnovus.net
+        // THIRTEENTH schematic designed by Razihel
+        // The CORAL schematic designed by vistaero
+        // The PYRAMID schematic designed by airomis (player at thatsnotacreeper.com)
+        // The ENDER schematic designed by ToppanaFIN (player at thatsnotacreeper.com)
+        // The MASTER's schematic designed by ShadowAssociate
+        // load schematic files - copy the default files if they don't exist
+        String basepath = plugin.getDataFolder() + File.separator + "schematics" + File.separator;
+        String userbasepath = plugin.getDataFolder() + File.separator + "user_schematics" + File.separator;
+        Consoles.getBY_NAMES().values().forEach((ts) -> {
+            if (!ts.isCustom()) {
+                String str = basepath + ts.getPermission() + ".tschm";
+                copy(str, plugin.getResource(ts.getPermission() + ".tschm"), true);
+            }
+        });
+        // copy default room files as well
+        for (TARDISARS ta : TARDISARS.values()) {
+            if (ta.getOffset() != 0) {
+                String str = basepath + ta.toString().toLowerCase(Locale.ENGLISH) + ".tschm";
+                copy(str, plugin.getResource(ta.toString().toLowerCase(Locale.ENGLISH) + ".tschm"), true);
+            }
+        }
+        String zeronstr = basepath + "zero.tschm";
+        copy(zeronstr, plugin.getResource("zero.tschm"), true);
+        String junknstr = basepath + "junk.tschm";
+        copy(junknstr, plugin.getResource("junk.tschm"), true);
+        String tmpnstr = userbasepath + "template.tschm";
+        copy(tmpnstr, plugin.getResource("template.tschm"), true);
+        String gallifreynstr = basepath + "gallifrey.tschm";
+        copy(gallifreynstr, plugin.getResource("gallifrey.tschm"), true);
+        String skaronstr = basepath + "dalek_large.tschm";
+        copy(skaronstr, plugin.getResource("dalek_large.tschm"), true);
+        String daleknstr = basepath + "dalek_small.tschm";
+        copy(daleknstr, plugin.getResource("dalek_small.tschm"), true);
+        String sillnstr = basepath + "siluria_large.tschm";
+        copy(sillnstr, plugin.getResource("siluria_large.tschm"), true);
+        String silcnstr = basepath + "siluria_cross.tschm";
+        copy(silcnstr, plugin.getResource("siluria_cross.tschm"), true);
+        String silnsnstr = basepath + "siluria_north_south.tschm";
+        copy(silnsnstr, plugin.getResource("siluria_north_south.tschm"), true);
+        String silewnstr = basepath + "siluria_east_west.tschm";
+        copy(silewnstr, plugin.getResource("siluria_east_west.tschm"), true);
+    }
+
+    /**
+     * Copies a file to the TARDIS plugin directory if it is not present.
      *
      * @param filename the name of the file to copy
      * @return a File

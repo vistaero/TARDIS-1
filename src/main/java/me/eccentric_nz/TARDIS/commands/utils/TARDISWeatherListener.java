@@ -17,10 +17,11 @@
 package me.eccentric_nz.TARDIS.commands.utils;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.control.TARDISAtmosphericExcitation;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.listeners.TARDISMenuListener;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
@@ -89,7 +90,7 @@ public class TARDISWeatherListener extends TARDISMenuListener implements Listene
                             switch (slot) {
                                 case 0:
                                     // clear / sun
-                                    if (player.hasPermission("tardis.weather.clear")) {
+                                    if (TARDISPermission.hasPermission(player, "tardis.weather.clear")) {
                                         TARDISWeather.setClear(rsc.getWorld());
                                         TARDISMessage.send(player, "WEATHER_SET", "clear");
                                     } else {
@@ -99,7 +100,7 @@ public class TARDISWeatherListener extends TARDISMenuListener implements Listene
                                     break;
                                 case 1:
                                     // rain
-                                    if (player.hasPermission("tardis.weather.rain")) {
+                                    if (TARDISPermission.hasPermission(player, "tardis.weather.rain")) {
                                         TARDISWeather.setRain(rsc.getWorld());
                                         TARDISMessage.send(player, "WEATHER_SET", "rain");
                                     } else {
@@ -109,7 +110,7 @@ public class TARDISWeatherListener extends TARDISMenuListener implements Listene
                                     break;
                                 case 2:
                                     // thunderstorm
-                                    if (player.hasPermission("tardis.weather.thunder")) {
+                                    if (TARDISPermission.hasPermission(player, "tardis.weather.thunder")) {
                                         TARDISWeather.setThunder(rsc.getWorld());
                                         TARDISMessage.send(player, "WEATHER_SET", "thunder");
                                     } else {

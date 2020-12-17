@@ -18,23 +18,27 @@ package me.eccentric_nz.TARDIS.commands.tardis;
 
 import me.eccentric_nz.TARDIS.ARS.TARDISARSMethods;
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.builders.TARDISTimeRotor;
 import me.eccentric_nz.TARDIS.chatGUI.TARDISUpdateChatGUI;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISMushroomBlockData;
-import me.eccentric_nz.TARDIS.database.ResultSetARS;
-import me.eccentric_nz.TARDIS.database.ResultSetFarming;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetARS;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetFarming;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Farm;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
-import me.eccentric_nz.TARDIS.enumeration.UPDATEABLE;
+import me.eccentric_nz.TARDIS.enumeration.Updateable;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.messaging.TARDISUpdateLister;
 import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.block.data.type.Door.Hinge;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -52,7 +56,7 @@ class TARDISUpdateCommand {
     }
 
     boolean startUpdate(Player player, String[] args) {
-        if (player.hasPermission("tardis.update")) {
+        if (TARDISPermission.hasPermission(player, "tardis.update")) {
             if (args.length == 1) {
                 return new TARDISUpdateChatGUI(plugin).showInterface(player, args);
             } else if (args.length < 2) {
@@ -69,22 +73,22 @@ class TARDISUpdateCommand {
             Tardis tardis = rs.getTardis();
             int ownerid = tardis.getTardis_id();
             String tardis_block = TARDISStringUtils.toScoredUppercase(args[1]);
-            UPDATEABLE updateable;
+            Updateable updateable;
             try {
-                updateable = UPDATEABLE.valueOf(tardis_block);
+                updateable = Updateable.valueOf(tardis_block);
             } catch (IllegalArgumentException e) {
                 new TARDISUpdateLister(player).list();
                 return true;
             }
-            if (updateable.equals(UPDATEABLE.SIEGE) && !plugin.getConfig().getBoolean("siege.enabled")) {
+            if (updateable.equals(Updateable.SIEGE) && !plugin.getConfig().getBoolean("siege.enabled")) {
                 TARDISMessage.send(player, "SIEGE_DISABLED");
                 return true;
             }
-            if (updateable.equals(UPDATEABLE.BEACON) && !tardis.isPowered_on()) {
+            if (updateable.equals(Updateable.BEACON) && !tardis.isPowered_on()) {
                 TARDISMessage.send(player, "UPDATE_BEACON");
                 return true;
             }
-            if (updateable.equals(UPDATEABLE.HINGE)) {
+            if (updateable.equals(Updateable.HINGE)) {
                 Block block = player.getTargetBlock(plugin.getGeneralKeeper().getTransparent(), 10);
                 if (block.getType().equals(Material.IRON_DOOR)) {
                     Door door = (Door) block.getBlockData();
@@ -103,17 +107,17 @@ class TARDISUpdateCommand {
                 }
                 return true;
             }
-            if (updateable.equals(UPDATEABLE.VAULT)) {
+            if (updateable.equals(Updateable.VAULT)) {
                 return new TARDISVaultCommand(plugin).addDropChest(player);
             }
-            if (updateable.equals(UPDATEABLE.FUEL) || updateable.equals(UPDATEABLE.SMELT)) {
+            if (updateable.equals(Updateable.FUEL) || updateable.equals(Updateable.SMELT)) {
                 return new TARDISSmelterCommand(plugin).addDropChest(player, updateable);
             }
-            if (updateable.equals(UPDATEABLE.ADVANCED) && !player.hasPermission("tardis.advanced")) {
+            if (updateable.equals(Updateable.ADVANCED) && !TARDISPermission.hasPermission(player, "tardis.advanced")) {
                 TARDISMessage.send(player, "NO_PERM_ADV");
                 return true;
             }
-            if (updateable.equals(UPDATEABLE.STORAGE)) {
+            if (updateable.equals(Updateable.STORAGE)) {
                 // update note block if it's not MUSHROOM_STEM
                 Block block = player.getTargetBlock(plugin.getGeneralKeeper().getTransparent(), 10);
                 if (block.getType().equals(Material.NOTE_BLOCK)) {
@@ -121,28 +125,28 @@ class TARDISUpdateCommand {
                     block.setBlockData(mushroom, true);
                 }
             }
-            if (updateable.equals(UPDATEABLE.FORCEFIELD) && !player.hasPermission("tardis.forcefield")) {
+            if (updateable.equals(Updateable.FORCEFIELD) && !TARDISPermission.hasPermission(player, "tardis.forcefield")) {
                 TARDISMessage.send(player, "NO_PERM_FF");
                 return true;
             }
-            if (updateable.equals(UPDATEABLE.STORAGE) && !player.hasPermission("tardis.storage")) {
+            if (updateable.equals(Updateable.STORAGE) && !TARDISPermission.hasPermission(player, "tardis.storage")) {
                 TARDISMessage.send(player, "NO_PERM_DISK");
                 return true;
             }
-            if (updateable.equals(UPDATEABLE.BACKDOOR) && !player.hasPermission("tardis.backdoor")) {
+            if (updateable.equals(Updateable.BACKDOOR) && !TARDISPermission.hasPermission(player, "tardis.backdoor")) {
                 TARDISMessage.send(player, "NO_PERM_BACKDOOR");
                 return true;
             }
-            if (updateable.equals(UPDATEABLE.TEMPORAL) && !player.hasPermission("tardis.temporal")) {
+            if (updateable.equals(Updateable.TEMPORAL) && !TARDISPermission.hasPermission(player, "tardis.temporal")) {
                 TARDISMessage.send(player, "NO_PERM_TEMPORAL");
                 return true;
             }
-            if ((updateable.equals(UPDATEABLE.FARM) || updateable.equals(UPDATEABLE.STABLE) || updateable.equals(UPDATEABLE.VILLAGE) || updateable.equals(UPDATEABLE.STALL)) && !player.hasPermission("tardis.farm")) {
+            if ((updateable.equals(Updateable.FARM) || updateable.equals(Updateable.STABLE) || updateable.equals(Updateable.VILLAGE) || updateable.equals(Updateable.STALL)) && !TARDISPermission.hasPermission(player, "tardis.farm")) {
                 TARDISMessage.send(player, "UPDATE_NO_PERM", tardis_block);
                 return true;
             }
             // must grow a room first
-            if (updateable.equals(UPDATEABLE.FARM) || updateable.equals(UPDATEABLE.STABLE) || updateable.equals(UPDATEABLE.STALL) || updateable.equals(UPDATEABLE.VILLAGE)) {
+            if (updateable.equals(Updateable.FARM) || updateable.equals(Updateable.STABLE) || updateable.equals(Updateable.STALL) || updateable.equals(Updateable.VILLAGE)) {
                 // check ARS for room type
                 boolean hasFarm = false;
                 boolean hasStable = false;
@@ -176,36 +180,36 @@ class TARDISUpdateCommand {
                 ResultSetFarming rsf = new ResultSetFarming(plugin, ownerid);
                 if (rsf.resultSet()) {
                     Farm farming = rsf.getFarming();
-                    if (updateable.equals(UPDATEABLE.FARM) && farming.getFarm().isEmpty() && !hasFarm) {
+                    if (updateable.equals(Updateable.FARM) && farming.getFarm().isEmpty() && !hasFarm) {
                         TARDISMessage.send(player, "UPDATE_FARM");
                         return true;
                     }
-                    if (updateable.equals(UPDATEABLE.STABLE) && farming.getStable().isEmpty() && !hasStable) {
+                    if (updateable.equals(Updateable.STABLE) && farming.getStable().isEmpty() && !hasStable) {
                         TARDISMessage.send(player, "UPDATE_STABLE");
                         return true;
                     }
-                    if (updateable.equals(UPDATEABLE.STALL) && farming.getStall().isEmpty() && !hasStall) {
+                    if (updateable.equals(Updateable.STALL) && farming.getStall().isEmpty() && !hasStall) {
                         TARDISMessage.send(player, "UPDATE_STALL");
                         return true;
                     }
-                    if (updateable.equals(UPDATEABLE.VILLAGE) && farming.getVillage().isEmpty() && !hasVillage) {
+                    if (updateable.equals(Updateable.VILLAGE) && farming.getVillage().isEmpty() && !hasVillage) {
                         TARDISMessage.send(player, "UPDATE_VILLAGE");
                         return true;
                     }
                 }
             }
-            if (updateable.equals(UPDATEABLE.RAIL) || updateable.equals(UPDATEABLE.ZERO)) {
-                if (updateable.equals(UPDATEABLE.RAIL) && tardis.getRail().isEmpty()) {
+            if (updateable.equals(Updateable.RAIL) || updateable.equals(Updateable.ZERO)) {
+                if (updateable.equals(Updateable.RAIL) && tardis.getRail().isEmpty()) {
                     TARDISMessage.send(player, "UPDATE_RAIL");
                     return true;
                 }
-                if (updateable.equals(UPDATEABLE.ZERO) && tardis.getZero().isEmpty()) {
+                if (updateable.equals(Updateable.ZERO) && tardis.getZero().isEmpty()) {
                     TARDISMessage.send(player, "UPDATE_ZERO");
                     return true;
                 }
             }
-            if (updateable.equals(UPDATEABLE.ARS)) {
-                if (!player.hasPermission("tardis.architectural")) {
+            if (updateable.equals(Updateable.ARS)) {
+                if (!TARDISPermission.hasPermission(player, "tardis.architectural")) {
                     TARDISMessage.send(player, "NO_PERM_ARS");
                     return true;
                 }
@@ -214,13 +218,13 @@ class TARDISUpdateCommand {
                     return true;
                 }
             }
-            if (updateable.equals(UPDATEABLE.WEATHER)) {
-                if (!player.hasPermission("tardis.weather.clear") && !player.hasPermission("tardis.weather.rain") && !player.hasPermission("tardis.weather.thunder")) {
+            if (updateable.equals(Updateable.WEATHER)) {
+                if (!TARDISPermission.hasPermission(player, "tardis.weather.clear") && !TARDISPermission.hasPermission(player, "tardis.weather.rain") && !TARDISPermission.hasPermission(player, "tardis.weather.thunder")) {
                     TARDISMessage.send(player, "NO_PERMS");
                     return true;
                 }
             }
-            if (!updateable.equals(UPDATEABLE.BACKDOOR)) {
+            if (!updateable.equals(Updateable.BACKDOOR)) {
                 HashMap<String, Object> wheret = new HashMap<>();
                 wheret.put("uuid", player.getUniqueId().toString());
                 ResultSetTravellers rst = new ResultSetTravellers(plugin, wheret, false);
@@ -234,9 +238,26 @@ class TARDISUpdateCommand {
                     return false;
                 }
             }
+            if (updateable.equals(Updateable.ROTOR) && args.length == 3 && args[2].equalsIgnoreCase("unlock")) {
+                // get Time Rotor frame location
+                ItemFrame itemFrame = TARDISTimeRotor.getItemFrame(tardis.getRotor());
+                if (itemFrame != null) {
+                    TARDISTimeRotor.unlockRotor(itemFrame);
+                    // also need to remove the item frame protection
+                    plugin.getGeneralKeeper().getTimeRotors().remove(itemFrame.getUniqueId());
+                    // and block protection
+                    Block block = itemFrame.getLocation().getBlock();
+                    String location = block.getLocation().toString();
+                    plugin.getGeneralKeeper().getProtectBlockMap().remove(location);
+                    String under = block.getRelative(BlockFace.DOWN).getLocation().toString();
+                    plugin.getGeneralKeeper().getProtectBlockMap().remove(under);
+                    TARDISMessage.send(player, "ROTOR_UNFIXED");
+                }
+                return true;
+            }
             plugin.getTrackerKeeper().getPlayers().put(player.getUniqueId(), tardis_block);
             TARDISMessage.send(player, "UPDATE_CLICK", tardis_block);
-            if (updateable.equals(UPDATEABLE.DIRECTION)) {
+            if (updateable.equals(Updateable.DIRECTION)) {
                 TARDISMessage.send(player, "HOOK_REMIND");
             }
             return true;

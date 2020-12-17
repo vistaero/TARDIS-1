@@ -21,6 +21,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,10 +33,12 @@ public class TARDISUpdateChecker implements Runnable {
 
     private final TARDIS plugin;
     private final JsonParser jp;
+    private final CommandSender sender;
 
-    public TARDISUpdateChecker(TARDIS plugin) {
+    public TARDISUpdateChecker(TARDIS plugin, CommandSender sender) {
         this.plugin = plugin;
         jp = new JsonParser();
+        this.sender = sender;
     }
 
     @Override
@@ -62,7 +66,16 @@ public class TARDISUpdateChecker implements Runnable {
         plugin.setUpdateFound(true);
         plugin.setBuildNumber(buildNumber);
         plugin.setUpdateNumber(newBuildNumber);
-        plugin.getConsole().sendMessage(plugin.getPluginName() + String.format(TARDISMessage.JENKINS_UPDATE_READY, buildNumber, newBuildNumber));
+        if (sender == null) {
+            plugin.getConsole().sendMessage(plugin.getPluginName() + String.format(TARDISMessage.JENKINS_UPDATE_READY, buildNumber, newBuildNumber));
+            plugin.getConsole().sendMessage(plugin.getPluginName() + TARDISMessage.UPDATE_COMMAND);
+        } else {
+            if (buildNumber == newBuildNumber) {
+                sender.sendMessage(plugin.getPluginName() + "You are running the latest version!");
+            } else {
+                sender.sendMessage(plugin.getPluginName() + "You are " + (newBuildNumber - buildNumber) + " builds behind! Type " + ChatColor.AQUA + "/tadmin update_plugins" + ChatColor.RESET + " to update!");
+            }
+        }
     }
 
     /**
@@ -74,11 +87,11 @@ public class TARDISUpdateChecker implements Runnable {
             URL url = new URL("http://tardisjenkins.duckdns.org:8080/job/TARDIS/lastSuccessfulBuild/api/json");
             // Create a connection
             URLConnection request = url.openConnection();
+            request.setRequestProperty("User-Agent", "TARDISPlugin");
             request.connect();
             // Convert to a JSON object
             JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
-            JsonObject rootobj = root.getAsJsonObject();
-            return rootobj;
+            return root.getAsJsonObject();
         } catch (Exception ex) {
             plugin.debug("Failed to check for a snapshot update on TARDIS Jenkins.");
         }

@@ -18,15 +18,18 @@ package me.eccentric_nz.TARDIS.destroyers;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.event.TARDISDestructionEvent;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.BiomeSetter;
 import me.eccentric_nz.TARDIS.builders.TARDISInteriorPostioning;
 import me.eccentric_nz.TARDIS.builders.TARDISTIPSData;
-import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
+import me.eccentric_nz.TARDIS.database.resultset.*;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
-import me.eccentric_nz.TARDIS.enumeration.WORLD_MANAGER;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
+import me.eccentric_nz.TARDIS.enumeration.WorldManager;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
 import org.bukkit.Location;
@@ -53,6 +56,21 @@ public class TARDISExterminator {
         this.plugin = plugin;
     }
 
+    public static boolean deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) { //some JVMs return null for empty dirs
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    deleteFolder(f);
+                } else if (!f.delete()) {
+                    TARDIS.plugin.debug("Could not delete file");
+                }
+            }
+        }
+        folder.delete();
+        return true;
+    }
+
     boolean exterminate(int id) {
         HashMap<String, Object> where = new HashMap<>();
         where.put("tardis_id", id);
@@ -66,7 +84,7 @@ public class TARDISExterminator {
                 UUID uuid = tardis.getUuid();
                 int tips = tardis.getTIPS();
                 boolean hasZero = (!tardis.getZero().isEmpty());
-                SCHEMATIC schm = tardis.getSchematic();
+                Schematic schm = tardis.getSchematic();
                 HashMap<String, Object> wherecl = new HashMap<>();
                 wherecl.put("tardis_id", id);
                 ResultSetCurrentLocation rsc = new ResultSetCurrentLocation(plugin, wherecl);
@@ -74,7 +92,7 @@ public class TARDISExterminator {
                     return false;
                 }
                 Location bb_loc = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
-                DestroyData dd = new DestroyData(plugin, uuid.toString());
+                DestroyData dd = new DestroyData();
                 dd.setDirection(rsc.getDirection());
                 dd.setLocation(bb_loc);
                 dd.setPlayer(plugin.getServer().getOfflinePlayer(uuid));
@@ -82,7 +100,8 @@ public class TARDISExterminator {
                 dd.setOutside(false);
                 dd.setSubmarine(rsc.isSubmarine());
                 dd.setTardisID(id);
-                dd.setBiome(rsc.getBiome());
+                dd.setTardisBiome(TARDISBiome.get(rsc.getBiomeKey()));
+                dd.setThrottle(SpaceTimeThrottle.REBUILD);
                 if (!hid) {
                     plugin.getPresetDestroyer().destroyPreset(dd);
                 }
@@ -126,7 +145,7 @@ public class TARDISExterminator {
         Location sign_loc = block.getLocation();
         HashMap<String, Object> where = new HashMap<>();
         ResultSetTardis rs;
-        if (player.hasPermission("tardis.delete")) {
+        if (TARDISPermission.hasPermission(player, "tardis.delete")) {
             Block blockbehind = null;
             Directional sign = (Directional) block.getBlockData();
             if (sign.getFacing().equals(BlockFace.WEST)) {
@@ -171,9 +190,9 @@ public class TARDISExterminator {
             String chunkLoc = tardis.getChunk();
             int tips = tardis.getTIPS();
             boolean hasZero = (!tardis.getZero().isEmpty());
-            SCHEMATIC schm = tardis.getSchematic();
+            Schematic schm = tardis.getSchematic();
             // need to check that a player is not currently in the TARDIS
-            if (player.hasPermission("tardis.delete")) {
+            if (TARDISPermission.hasPermission(player, "tardis.delete")) {
                 HashMap<String, Object> travid = new HashMap<>();
                 travid.put("tardis_id", id);
                 ResultSetTravellers rst = new ResultSetTravellers(plugin, travid, false);
@@ -210,7 +229,7 @@ public class TARDISExterminator {
             int signy = -2;
             if (sign_loc.getBlockX() == bb_loc.getBlockX() + signx && sign_loc.getBlockY() + signy == bb_loc.getBlockY() && sign_loc.getBlockZ() == bb_loc.getBlockZ() + signz) {
                 // if the sign was on the TARDIS destroy the TARDIS!
-                DestroyData dd = new DestroyData(plugin, player.getUniqueId().toString());
+                DestroyData dd = new DestroyData();
                 dd.setDirection(d);
                 dd.setLocation(bb_loc);
                 dd.setPlayer(player);
@@ -218,14 +237,16 @@ public class TARDISExterminator {
                 dd.setOutside(false);
                 dd.setSubmarine(rsc.isSubmarine());
                 dd.setTardisID(id);
-                dd.setBiome(rsc.getBiome());
+                TARDISBiome tardisBiome = TARDISBiome.get(rsc.getBiomeKey());
+                dd.setTardisBiome(tardisBiome);
+                dd.setThrottle(SpaceTimeThrottle.REBUILD);
                 plugin.getPM().callEvent(new TARDISDestructionEvent(player, bb_loc, owner));
                 if (!tardis.isHidden()) {
                     // remove Police Box
                     plugin.getPresetDestroyer().destroyPreset(dd);
                 } else {
                     // restore biome
-                    BiomeSetter.restoreBiome(bb_loc, rsc.getBiome());
+                    BiomeSetter.restoreBiome(bb_loc, tardisBiome);
                 }
                 World cw = TARDISStaticLocationGetters.getWorld(chunkLoc);
                 if (cw == null) {
@@ -241,12 +262,11 @@ public class TARDISExterminator {
                     cleanDatabase(id);
                     TARDISMessage.send(player, "TARDIS_EXTERMINATED");
                 }, 40L);
-                return false;
             } else {
                 // cancel the event because it's not the player's TARDIS
                 TARDISMessage.send(player, "NOT_OWNER");
-                return false;
             }
+            return false;
         } else {
             TARDISMessage.send(player, "NO_GRIEF");
             return false;
@@ -318,14 +338,14 @@ public class TARDISExterminator {
                 TARDISMessage.send(p, "WORLD_RESET");
                 p.teleport(spawn);
             });
-            if (plugin.getWorldManager().equals(WORLD_MANAGER.MULTIVERSE)) {
+            if (plugin.getWorldManager().equals(WorldManager.MULTIVERSE)) {
                 plugin.getServer().dispatchCommand(plugin.getConsole(), "mv remove " + name);
             }
-            if (plugin.getWorldManager().equals(WORLD_MANAGER.MULTIWORLD)) {
+            if (plugin.getWorldManager().equals(WorldManager.MULTIWORLD)) {
                 plugin.getServer().dispatchCommand(plugin.getConsole(), "mw unload " + name);
                 plugin.getServer().dispatchCommand(plugin.getConsole(), "mw delete " + name);
             }
-            if (plugin.getWorldManager().equals(WORLD_MANAGER.MYWORLDS)) {
+            if (plugin.getWorldManager().equals(WorldManager.MYWORLDS)) {
                 plugin.getServer().dispatchCommand(plugin.getConsole(), "myworlds unload " + name);
             }
             if (plugin.getPM().isPluginEnabled("WorldBorder")) {
@@ -338,21 +358,6 @@ public class TARDISExterminator {
                 plugin.debug("Could not delete world <" + name + ">");
             }
         }
-    }
-
-    public static boolean deleteFolder(File folder) {
-        File[] files = folder.listFiles();
-        if (files != null) { //some JVMs return null for empty dirs
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    deleteFolder(f);
-                } else if (!f.delete()) {
-                    TARDIS.plugin.debug("Could not delete file");
-                }
-            }
-        }
-        folder.delete();
-        return true;
     }
 
     private void removeZeroRoom(int slot, boolean hasZero) {

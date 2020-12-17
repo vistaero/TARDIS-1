@@ -22,25 +22,29 @@ import com.griefcraft.model.Protection;
 import me.crafter.mc.lockettepro.LocketteProAPI;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.BiomeSetter;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetThrottle;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
-import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
+import me.eccentric_nz.TARDIS.enumeration.Flag;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
+import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import nl.rutgerkok.blocklocker.BlockLockerAPIv2;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -61,7 +65,7 @@ class TARDISComehereCommand {
     }
 
     boolean doComeHere(Player player) {
-        if (player.hasPermission("tardis.timetravel")) {
+        if (TARDISPermission.hasPermission(player, "tardis.timetravel")) {
             // check they are a timelord
             UUID uuid = player.getUniqueId();
             HashMap<String, Object> where = new HashMap<>();
@@ -71,7 +75,7 @@ class TARDISComehereCommand {
                 TARDISMessage.send(player, "NOT_A_TIMELORD");
                 return true;
             }
-            if (plugin.getDifficulty().equals(DIFFICULTY.EASY) || plugin.getUtils().inGracePeriod(player, true)) {
+            if (plugin.getDifficulty().equals(Difficulty.EASY) || plugin.getUtils().inGracePeriod(player, true)) {
                 Tardis tardis = rs.getTardis();
                 int id = tardis.getTardis_id();
                 if (plugin.getConfig().getBoolean("allow.power_down") && !tardis.isPowered_on()) {
@@ -86,10 +90,10 @@ class TARDISComehereCommand {
                     TARDISMessage.send(player, "NO_WORLD_TRAVEL");
                     return true;
                 }
-                if (!plugin.getPluginRespect().getRespect(eyeLocation, new Parameters(player, FLAG.getDefaultFlags()))) {
+                if (!plugin.getPluginRespect().getRespect(eyeLocation, new Parameters(player, Flag.getDefaultFlags()))) {
                     return true;
                 }
-                if (player.hasPermission("tardis.exile") && plugin.getConfig().getBoolean("travel.exile")) {
+                if (TARDISPermission.hasPermission(player, "tardis.exile") && plugin.getConfig().getBoolean("travel.exile")) {
                     String areaPerm = plugin.getTardisArea().getExileArea(player);
                     if (plugin.getTardisArea().areaCheckInExile(areaPerm, eyeLocation)) {
                         TARDISMessage.send(player, "EXILE_NO_TRAVEL");
@@ -111,7 +115,7 @@ class TARDISComehereCommand {
                 }
                 // check the world is not excluded
                 String world = eyeLocation.getWorld().getName();
-                if (!plugin.getPlanetsConfig().getBoolean("planets." + world + ".time_travel")) {
+                if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(world) + ".time_travel")) {
                     TARDISMessage.send(player, "NO_PB_IN_WORLD");
                     return true;
                 }
@@ -137,7 +141,7 @@ class TARDISComehereCommand {
                 }
                 COMPASS d = rsc.getDirection();
                 COMPASS player_d = COMPASS.valueOf(TARDISStaticUtils.getPlayersDirection(player, false));
-                Biome biome = rsc.getBiome();
+                TARDISBiome biome = TARDISBiome.get(rsc.getBiomeKey());
                 TARDISTimeTravel tt = new TARDISTimeTravel(plugin);
                 int count;
                 boolean sub = false;
@@ -182,7 +186,9 @@ class TARDISComehereCommand {
                     TARDISMessage.send(player, "WOULD_GRIEF_BLOCKS");
                     return true;
                 }
-                int ch = plugin.getArtronConfig().getInt("comehere");
+                // get space time throttle
+                SpaceTimeThrottle spaceTimeThrottle = new ResultSetThrottle(plugin).getSpeed(uuid.toString());
+                int ch = Math.round(plugin.getArtronConfig().getInt("comehere") * spaceTimeThrottle.getArtronMultiplier());
                 if (level < ch) {
                     TARDISMessage.send(player, "NOT_ENOUGH_ENERGY");
                     return true;
@@ -235,7 +241,7 @@ class TARDISComehereCommand {
                 plugin.getTrackerKeeper().getInVortex().add(id);
                 boolean hid = hidden;
                 if (!plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
-                    DestroyData dd = new DestroyData(plugin, uuid.toString());
+                    DestroyData dd = new DestroyData();
                     dd.setDirection(d);
                     dd.setLocation(oldSave);
                     dd.setPlayer(player);
@@ -243,7 +249,8 @@ class TARDISComehereCommand {
                     dd.setOutside(true);
                     dd.setSubmarine(rsc.isSubmarine());
                     dd.setTardisID(id);
-                    dd.setBiome(biome);
+                    dd.setTardisBiome(biome);
+                    dd.setThrottle(spaceTimeThrottle);
                     plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                         if (!hid) {
                             plugin.getTrackerKeeper().getDematerialising().add(id);
@@ -253,7 +260,7 @@ class TARDISComehereCommand {
                         }
                     }, delay);
                 }
-                BuildData bd = new BuildData(plugin, uuid.toString());
+                BuildData bd = new BuildData(uuid.toString());
                 bd.setDirection(player_d);
                 bd.setLocation(eyeLocation);
                 bd.setMalfunction(false);
@@ -262,6 +269,7 @@ class TARDISComehereCommand {
                 bd.setRebuild(false);
                 bd.setSubmarine(sub);
                 bd.setTardisID(id);
+                bd.setThrottle(spaceTimeThrottle);
                 plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), delay * 2);
                 // remove energy from TARDIS
                 HashMap<String, Object> wheret = new HashMap<>();
@@ -269,11 +277,10 @@ class TARDISComehereCommand {
                 plugin.getQueryFactory().alterEnergyLevel("tardis", -ch, wheret, player);
                 plugin.getTrackerKeeper().getHasDestination().remove(id);
                 plugin.getTrackerKeeper().getRescue().remove(id);
-                return true;
             } else {
                 TARDISMessage.send(player, "DIFF_HARD_REMOTE", ChatColor.AQUA + "/tardisrecipe remote" + ChatColor.RESET);
-                return true;
             }
+            return true;
         } else {
             TARDISMessage.send(player, "NO_PERMS");
             return false;

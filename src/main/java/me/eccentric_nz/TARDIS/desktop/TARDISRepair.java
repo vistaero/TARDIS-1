@@ -22,16 +22,16 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
 import me.eccentric_nz.TARDIS.builders.TARDISInteriorPostioning;
 import me.eccentric_nz.TARDIS.builders.TARDISTIPSData;
-import me.eccentric_nz.TARDIS.database.ResultSetCondenser;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCondenser;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
-import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
+import me.eccentric_nz.TARDIS.enumeration.Consoles;
+import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.rooms.TARDISCondenserData;
 import me.eccentric_nz.TARDIS.schematic.ArchiveUpdate;
 import me.eccentric_nz.TARDIS.schematic.ResultSetArchive;
 import me.eccentric_nz.TARDIS.schematic.TARDISSchematicGZip;
-import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -65,15 +65,15 @@ public class TARDISRepair {
         if (rs.resultSet()) {
             Tardis tardis = rs.getTardis();
             String perm = tardis.getSchematic().getPermission();
-            boolean master = tud.getPrevious().getPermission().equals("master");
-            if (master) {
+            boolean hasLava = tud.getPrevious().getPermission().equals("master") || tud.getPrevious().getPermission().equals("delta");
+            if (hasLava) {
                 new TARDISDelavafier(plugin, uuid).swap();
             }
             String wall = "ORANGE_WOOL";
             String floor = "LIGHT_GRAY_WOOL";
             if (perm.equals("archive")) {
                 new ArchiveUpdate(plugin, uuid.toString(), getArchiveName()).setInUse();
-                tud.setSchematic(CONSOLES.SCHEMATICFor("archive"));
+                tud.setSchematic(Consoles.schematicFor("archive"));
             } else {
                 tud.setSchematic(tud.getPrevious());
                 // get player prefs
@@ -88,7 +88,7 @@ public class TARDISRepair {
             plugin.getTrackerKeeper().getUpgrades().put(uuid, tud);
             TARDISThemeRunnable ttr = new TARDISThemeRepairRunnable(plugin, uuid, tud, clean);
             // start the rebuild
-            long initial_delay = (master) ? 45L : 5L;
+            long initial_delay = (hasLava) ? 45L : 5L;
             long delay = Math.round(20 / plugin.getConfig().getDouble("growth.room_speed"));
             int task = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, ttr, initial_delay, delay);
             ttr.setTaskID(task);

@@ -20,10 +20,11 @@ import com.google.gson.*;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISBuilderInstanceKeeper;
 import me.eccentric_nz.TARDIS.TARDISConstants;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISMushroomBlockData;
-import me.eccentric_nz.TARDIS.database.ResultSetAchievements;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
-import me.eccentric_nz.TARDIS.enumeration.USE_CLAY;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetAchievements;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
+import me.eccentric_nz.TARDIS.enumeration.UseClay;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.rooms.TARDISPainting;
 import me.eccentric_nz.TARDIS.schematic.TARDISBannerSetter;
@@ -61,24 +62,15 @@ import java.util.Map;
 public class TARDISBuilderInner implements Runnable {
 
     private final TARDIS plugin;
-    private final List<Block> lampblocks = new ArrayList<>();
-    private Block postBedrock = null;
-    private final SCHEMATIC schm;
+    private final List<Block> lampBlocks = new ArrayList<>();
+    private final List<Block> fractalBlocks = new ArrayList<>();
+    private final Schematic schm;
     private final World world;
     private final int dbID;
     private final Player player;
     private final Material wall_type;
     private final Material floor_type;
     private final boolean tips;
-    private int task, level = 0, row = 0, startx, starty, startz, resetx, resetz, h, w, d, j = 2;
-    private JsonArray arr;
-    private JsonObject obj;
-    private Location wg1;
-    private Location wg2;
-    private TARDISTIPSData pos;
-    private List<Chunk> chunkList;
-    private String playerUUID;
-    private boolean running = false;
     private final HashMap<Block, BlockData> postDoorBlocks = new HashMap<>();
     private final HashMap<Block, BlockData> postRedstoneTorchBlocks = new HashMap<>();
     private final HashMap<Block, BlockData> postTorchBlocks = new HashMap<>();
@@ -91,12 +83,22 @@ public class TARDISBuilderInner implements Runnable {
     private final HashMap<Block, BlockData> postCarpetBlocks = new HashMap<>();
     private final List<MushroomBlock> postMushroomBlocks = new ArrayList<>();
     private final HashMap<Block, TARDISBannerData> postBannerBlocks = new HashMap<>();
-    private Location ender = null;
     private final HashMap<String, Object> set = new HashMap<>();
     private final HashMap<String, Object> where = new HashMap<>();
+    private Block postBedrock = null;
+    private int task, level = 0, row = 0, startx, starty, startz, resetx, resetz, h, w, d, j = 2;
+    private JsonArray arr;
+    private JsonObject obj;
+    private Location wg1;
+    private Location wg2;
+    private TARDISTIPSData pos;
+    private List<Chunk> chunkList;
+    private String playerUUID;
+    private boolean running = false;
+    private Location ender = null;
     private Material type;
     private BlockData data;
-    private USE_CLAY use_clay;
+    private UseClay use_clay;
     private int counter = 0;
     private double div = 1.0d;
     private BossBar bb;
@@ -118,7 +120,7 @@ public class TARDISBuilderInner implements Runnable {
      * @param tips       a boolean determining where this TARDIS will be built -------- false:own world, underground -
      *                   true:default world--------
      */
-    public TARDISBuilderInner(TARDIS plugin, SCHEMATIC schm, World world, int dbID, Player player, Material wall_type, Material floor_type, boolean tips) {
+    public TARDISBuilderInner(TARDIS plugin, Schematic schm, World world, int dbID, Player player, Material wall_type, Material floor_type, boolean tips) {
         this.plugin = plugin;
         this.schm = schm;
         this.world = world;
@@ -214,9 +216,9 @@ public class TARDISBuilderInner implements Runnable {
             where.put("tardis_id", dbID);
             // determine 'use_clay' material
             try {
-                use_clay = USE_CLAY.valueOf(plugin.getConfig().getString("creation.use_clay"));
+                use_clay = UseClay.valueOf(plugin.getConfig().getString("creation.use_clay"));
             } catch (IllegalArgumentException e) {
-                use_clay = USE_CLAY.WOOL;
+                use_clay = UseClay.WOOL;
             }
             // get input array
             arr = obj.get("input").getAsJsonArray();
@@ -273,7 +275,7 @@ public class TARDISBuilderInner implements Runnable {
             if (postBedrock != null) {
                 postBedrock.setBlockData(TARDISConstants.POWER);
             }
-            lampblocks.forEach((lamp) -> {
+            lampBlocks.forEach((lamp) -> {
                 BlockData lantern;
                 if (schm.hasLanterns()) {
                     lantern = TARDISConstants.LANTERN;
@@ -283,7 +285,10 @@ public class TARDISBuilderInner implements Runnable {
                 }
                 lamp.setBlockData(lantern);
             });
-            lampblocks.clear();
+            lampBlocks.clear();
+            for (int f = 0; f < fractalBlocks.size(); f++) {
+                FractalFence.grow(fractalBlocks.get(f), f);
+            }
             TARDISBannerSetter.setBanners(postBannerBlocks);
             if (plugin.isWorldGuardOnServer() && plugin.getConfig().getBoolean("preferences.use_worldguard")) {
                 if (tips) {
@@ -334,7 +339,7 @@ public class TARDISBuilderInner implements Runnable {
             plugin.getQueryFactory().doUpdate("tardis", set, where);
             // give kit?
             if (plugin.getKitsConfig().getBoolean("give.create.enabled")) {
-                if (player.hasPermission("tardis.kit.create")) {
+                if (TARDISPermission.hasPermission(player, "tardis.kit.create")) {
                     // check if they have the tardis kit
                     HashMap<String, Object> wherek = new HashMap<>();
                     wherek.put("uuid", playerUUID);
@@ -449,6 +454,9 @@ public class TARDISBuilderInner implements Runnable {
                         data = Material.getMaterial(m).createBlockData();
                 }
             }
+            if ((type.equals(Material.WARPED_FENCE) || type.equals(Material.CRIMSON_FENCE)) && schm.getPermission().equals("delta")) {
+                fractalBlocks.add(world.getBlockAt(x, y, z));
+            }
             if (type.equals(Material.WHITE_STAINED_GLASS) && schm.getPermission().equals("war")) {
                 data = plugin.getServer().createBlockData(TARDISMushroomBlockData.MUSHROOM_STEM_DATA.get(47));
                 postMushroomBlocks.add(new MushroomBlock(world.getBlockAt(x, y, z), data));
@@ -543,7 +551,7 @@ public class TARDISBuilderInner implements Runnable {
             if (type.equals(Material.REDSTONE_LAMP) || type.equals(Material.SEA_LANTERN)) {
                 // remember lamp blocks
                 Block lamp = world.getBlockAt(x, y, z);
-                lampblocks.add(lamp);
+                lampBlocks.add(lamp);
                 // remember lamp block locations for malfunction and light switch
                 HashMap<String, Object> setlb = new HashMap<>();
                 String lloc = world.getName() + ":" + x + ":" + y + ":" + z;
@@ -562,6 +570,8 @@ public class TARDISBuilderInner implements Runnable {
                 if (type.equals(Material.COMMAND_BLOCK)) {
                     if (schm.getPermission().equals("ender")) {
                         data = Material.END_STONE_BRICKS.createBlockData();
+                    } else if (schm.getPermission().equals("delta")) {
+                        data = Material.BLACKSTONE.createBlockData();
                     } else {
                         data = Material.STONE_BRICKS.createBlockData();
                     }
@@ -600,17 +610,17 @@ public class TARDISBuilderInner implements Runnable {
                 plugin.getGeneralKeeper().getProtectBlockMap().put(loc, dbID);
             }
             // if it's the door, don't set it just remember its block then do it at the end
-            if (type.equals(Material.HONEYCOMB_BLOCK) && schm.getPermission().equals("rotor")) {
+            if (type.equals(Material.HONEYCOMB_BLOCK) && (schm.getPermission().equals("delta") || schm.getPermission().equals("rotor"))) {
                 /*
                  * spawn an item frame and place the time rotor in it
                  */
-                TARDISBlockSetters.setBlock(world, x, y, z, Material.STONE_BRICKS);
-                TARDISTimeRotor.setItemFrame(schm, new Location(world, x, y + 1, z), dbID);
+                TARDISBlockSetters.setBlock(world, x, y, z, (schm.getPermission().equals("delta")) ? Material.POLISHED_BLACKSTONE_BRICKS : Material.STONE_BRICKS);
+                TARDISTimeRotor.setItemFrame(schm.getPermission(), new Location(world, x, y + 1, z), dbID);
             } else if (type.equals(Material.IRON_DOOR)) { // doors
                 postDoorBlocks.put(world.getBlockAt(x, y, z), data);
-            } else if (type.equals(Material.REDSTONE_TORCH)) {
+            } else if (type.equals(Material.REDSTONE_TORCH) || type.equals(Material.REDSTONE_WALL_TORCH)) {
                 postRedstoneTorchBlocks.put(world.getBlockAt(x, y, z), data);
-            } else if (type.equals(Material.TORCH)) {
+            } else if (type.equals(Material.TORCH) || type.equals(Material.WALL_TORCH) || type.equals(Material.SOUL_TORCH) || type.equals(Material.SOUL_WALL_TORCH)) {
                 postTorchBlocks.put(world.getBlockAt(x, y, z), data);
             } else if (type.equals(Material.STICKY_PISTON)) {
                 postStickyPistonBaseBlocks.put(world.getBlockAt(x, y, z), data);

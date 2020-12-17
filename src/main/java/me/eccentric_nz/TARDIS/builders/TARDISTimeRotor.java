@@ -18,7 +18,6 @@ package me.eccentric_nz.TARDIS.builders;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +30,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * The time rotor, sometimes called the time column is a component in the central column of the TARDIS console. While
+ * the TARDIS is in flight, the rotor rises and falls, stopping when the TARDIS handbrake is engaged. It is associated
+ * with the 'whooshing' noise heard when the TARDIS is in flight.
+ */
 public class TARDISTimeRotor {
 
     private static final HashMap<String, Integer> BY_NAME = new HashMap<String, Integer>() {
@@ -39,18 +43,19 @@ public class TARDISTimeRotor {
             put("rotor", 10000003);
             put("copper", 10000004);
             put("round", 10000005);
+            put("delta", 10000006);
         }
     };
 
-    public static void setItemFrame(SCHEMATIC schm, Location location, int id) {
+    public static void setItemFrame(String schm, Location location, int id) {
         location.getBlock().setBlockData(TARDISConstants.VOID_AIR);
         ItemFrame itemFrame = (ItemFrame) location.getWorld().spawnEntity(location, EntityType.ITEM_FRAME);
         itemFrame.setFacingDirection(BlockFace.UP);
-        setRotor(BY_NAME.get(schm.getPermission()), itemFrame, false);
+        setRotor(BY_NAME.get(schm), itemFrame, false);
         // save itemFrame UUID
         UUID uuid = itemFrame.getUniqueId();
         updateRotorRecord(id, uuid.toString());
-        TARDIS.plugin.getGeneralKeeper().getTimeRotors().put(id, uuid);
+        TARDIS.plugin.getGeneralKeeper().getTimeRotors().add(uuid);
     }
 
     public static void updateRotorRecord(int id, String uuid) {
@@ -68,7 +73,14 @@ public class TARDISTimeRotor {
         im.setDisplayName("Time Rotor");
         im.setCustomModelData(which);
         is.setItemMeta(im);
-        itemFrame.setItem(is);
+        itemFrame.setItem(is, false);
+        itemFrame.setFixed(true);
+        itemFrame.setVisible(false);
+    }
+
+    public static void unlockRotor(ItemFrame itemFrame) {
+        itemFrame.setFixed(false);
+        itemFrame.setVisible(true);
     }
 
     public static ItemFrame getItemFrame(UUID uuid) {

@@ -19,14 +19,15 @@ package me.eccentric_nz.TARDIS.commands.tardis;
 import com.google.gson.JsonObject;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.database.ResultSetChunks;
-import me.eccentric_nz.TARDIS.database.ResultSetLamps;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetChunks;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetLamps;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
-import me.eccentric_nz.TARDIS.schematic.TARDISSchematicGZip;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.schematic.TARDISSchematicGZip;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -60,7 +61,7 @@ class TARDISLampsCommand {
 
     boolean addLampBlocks(Player owner) {
         // check they have permission
-        if (!owner.hasPermission("tardis.update")) {
+        if (!TARDISPermission.hasPermission(owner, "tardis.update")) {
             TARDISMessage.send(owner, "NO_PERMS");
             return false;
         }
@@ -86,7 +87,7 @@ class TARDISLampsCommand {
             ResultSetChunks rsc = new ResultSetChunks(plugin, wherec, true);
             if (rsc.resultSet()) {
                 int starty, endy;
-                SCHEMATIC schm = tardis.getSchematic();
+                Schematic schm = tardis.getSchematic();
                 Material lampon = (schm.hasLanterns()) ? Material.SEA_LANTERN : Material.REDSTONE_LAMP;
                 // player preference
                 ResultSetPlayerPrefs rsp = new ResultSetPlayerPrefs(plugin, owner.getUniqueId().toString());

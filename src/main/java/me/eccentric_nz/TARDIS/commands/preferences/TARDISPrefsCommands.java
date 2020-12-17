@@ -17,9 +17,10 @@
 package me.eccentric_nz.TARDIS.commands.preferences;
 
 import me.eccentric_nz.TARDIS.TARDIS;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.commands.TARDISCommandHelper;
-import me.eccentric_nz.TARDIS.database.ResultSetArtronLevel;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetArtronLevel;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
 import me.eccentric_nz.TARDIS.forcefield.TARDISForceField;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.sonic.TARDISSonicMenuInventory;
@@ -75,7 +76,6 @@ public class TARDISPrefsCommands implements CommandExecutor {
         firstArgs.add("key");
         firstArgs.add("key_menu");
         firstArgs.add("junk");
-        firstArgs.add("lamp");
         firstArgs.add("language");
         firstArgs.add("lanterns");
         firstArgs.add("minecart");
@@ -113,7 +113,7 @@ public class TARDISPrefsCommands implements CommandExecutor {
             }
             String pref = args[0].toLowerCase(Locale.ENGLISH);
             if (firstArgs.contains(pref)) {
-                if (player.hasPermission("tardis.timetravel")) {
+                if (TARDISPermission.hasPermission(player, "tardis.timetravel")) {
                     if (pref.equals("sonic")) {
                         // open sonic prefs menu
                         ItemStack[] sonics = new TARDISSonicMenuInventory(plugin).getMenu();
@@ -137,7 +137,6 @@ public class TARDISPrefsCommands implements CommandExecutor {
                     // if no prefs record found, make one
                     if (!rsp.resultSet()) {
                         set.put("uuid", uuid);
-                        set.put("lamp", plugin.getConfig().getString("police_box.tardis_lamp"));
                         plugin.getQueryFactory().doInsert("player_prefs", set);
                     }
                     switch (pref) {
@@ -155,8 +154,6 @@ public class TARDISPrefsCommands implements CommandExecutor {
                             return new TARDISIsomorphicCommand(plugin).toggleIsomorphicControls(player);
                         case "key":
                             return new TARDISSetKeyCommand(plugin).setKeyPref(player, args);
-                        case "lamp":
-                            return new TARDISSetLampCommand(plugin).setLampPref(player, args);
                         case "language":
                             return new TARDISSetLanguageCommand().setLanguagePref(player, args);
                         case "wall":
@@ -169,7 +166,7 @@ public class TARDISPrefsCommands implements CommandExecutor {
                                 TARDISMessage.send(player, "PREF_ON_OFF", pref);
                                 return false;
                             }
-                            if (pref.equals("forcefield") && player.hasPermission("tardis.forcefield")) {
+                            if (pref.equals("forcefield") && TARDISPermission.hasPermission(player, "tardis.forcefield")) {
                                 // add tardis + location
                                 if (args[1].equalsIgnoreCase("on")) {
                                     // check power
@@ -210,9 +207,5 @@ public class TARDISPrefsCommands implements CommandExecutor {
             }
         }
         return false;
-    }
-
-    public static String ucfirst(String str) {
-        return str.substring(0, 1).toUpperCase(Locale.ENGLISH) + str.substring(1).toLowerCase(Locale.ENGLISH);
     }
 }

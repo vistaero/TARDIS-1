@@ -18,14 +18,16 @@ package me.eccentric_nz.TARDIS.travel;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.api.Parameters;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.FLAG;
+import me.eccentric_nz.TARDIS.enumeration.Flag;
 import me.eccentric_nz.TARDIS.flight.TARDISLand;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -70,10 +72,10 @@ public class TARDISRescue {
             TARDISMessage.send(player, "PLAYER_IN_AREA", ChatColor.AQUA + "/tardistravel area [area name]");
             return false;
         }
-        if (!request && !plugin.getPluginRespect().getRespect(player_loc, new Parameters(player, FLAG.getDefaultFlags()))) {
+        if (!request && !plugin.getPluginRespect().getRespect(player_loc, new Parameters(player, Flag.getDefaultFlags()))) {
             return false;
         }
-        if (!plugin.getPlanetsConfig().getBoolean("planets." + player_loc.getWorld().getName() + ".time_travel")) {
+        if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(player_loc.getWorld().getName()) + ".time_travel")) {
             TARDISMessage.send(player, "NO_WORLD_TRAVEL");
             return false;
         }
@@ -117,7 +119,7 @@ public class TARDISRescue {
      * @return true if rescue was successful
      */
     public RescueData tryRescue(Player player, UUID saved, boolean request) {
-        if (player.hasPermission("tardis.timetravel") && !(player.hasPermission("tardis.exile") && plugin.getConfig().getBoolean("travel.exile"))) {
+        if (TARDISPermission.hasPermission(player, "tardis.timetravel") && !(TARDISPermission.hasPermission(player, "tardis.exile") && plugin.getConfig().getBoolean("travel.exile"))) {
             // get tardis data
             HashMap<String, Object> where = new HashMap<>();
             where.put("uuid", player.getUniqueId().toString());

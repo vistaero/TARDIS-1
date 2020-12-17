@@ -18,9 +18,10 @@ package me.eccentric_nz.TARDIS.commands.remote;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisPreset;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisPreset;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -47,22 +48,21 @@ class TARDISRemoteRebuildCommand {
             TARDISMessage.send(sender, "CURRENT_NOT_FOUND");
             return true;
         }
-        Location l = new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ());
         ResultSetTardisPreset rs = new ResultSetTardisPreset(plugin);
         if (rs.fromID(id) && rs.getPreset().equals(PRESET.INVISIBLE)) {
             TARDISMessage.send(player.getPlayer(), "INVISIBILITY_ENGAGED");
             return true;
         }
-        BuildData bd = new BuildData(plugin, player.getUniqueId().toString());
+        BuildData bd = new BuildData(player.getUniqueId().toString());
         bd.setDirection(rsc.getDirection());
-        bd.setLocation(l);
+        bd.setLocation(new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ()));
         bd.setMalfunction(false);
         bd.setOutside(false);
         bd.setPlayer(player);
         bd.setRebuild(true);
         bd.setSubmarine(rsc.isSubmarine());
         bd.setTardisID(id);
-        bd.setBiome(rsc.getBiome());
+        bd.setThrottle(SpaceTimeThrottle.REBUILD);
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), 10L);
         TARDISMessage.send(sender, "TARDIS_REBUILT");
         // set hidden to false

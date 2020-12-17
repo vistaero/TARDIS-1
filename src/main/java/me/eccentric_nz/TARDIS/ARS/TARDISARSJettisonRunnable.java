@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -77,6 +78,10 @@ class TARDISARSJettisonRunnable implements Runnable {
                             }
                         }
                     }
+                    BlockState state = b.getState();
+                    if (state instanceof BlockState) {
+                        plugin.getTardisHelper().removeTileEntity(state);
+                    }
                     b.setBlockData(TARDISConstants.AIR);
                 }
             }
@@ -117,6 +122,15 @@ class TARDISARSJettisonRunnable implements Runnable {
                 del.put("y", 0);
                 del.put("z", 0);
                 plugin.getQueryFactory().doDelete("vaults", del);
+            }
+            // if it is a maze room remove the controls
+            if (r.equals("MAZE")) {
+                for (int c = 40; c < 45; c++) {
+                    HashMap<String, Object> del = new HashMap<>();
+                    del.put("tardis_id", id);
+                    del.put("type", c);
+                    plugin.getQueryFactory().doDelete("controls", del);
+                }
             }
             if (r.equals("RENDERER")) {
                 // remove stored location from the database

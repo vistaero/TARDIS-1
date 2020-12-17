@@ -20,11 +20,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISMushroomBlockData;
-import me.eccentric_nz.TARDIS.database.ResultSetFarming;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisTimeLordName;
-import me.eccentric_nz.TARDIS.enumeration.ROOM;
-import me.eccentric_nz.TARDIS.enumeration.USE_CLAY;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetFarming;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisTimeLordName;
+import me.eccentric_nz.TARDIS.enumeration.Room;
+import me.eccentric_nz.TARDIS.enumeration.UseClay;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.utility.*;
 import org.bukkit.*;
@@ -56,16 +57,13 @@ public class TARDISRoomRunnable implements Runnable {
     private final TARDIS plugin;
     private final Location l;
     private final JsonObject s;
-    private int task, level, row, col, h, w, c, startx, starty, startz, resetx, resety, resetz;
     private final int tardis_id;
     private final int progressLevel;
     private final int progressRow;
     private final int progressColumn;
     private final Material wall_type, floor_type;
     private final String room;
-    private boolean running;
     private final Player player;
-    private World world;
     private final List<Chunk> chunkList = new ArrayList<>();
     private final List<Block> iceblocks = new ArrayList<>();
     private final List<Block> lampblocks = new ArrayList<>();
@@ -88,10 +86,14 @@ public class TARDISRoomRunnable implements Runnable {
     private final HashMap<Block, TARDISBannerData> bannerblocks = new HashMap<>();
     private final BlockFace[] repeaterData = new BlockFace[6];
     private final HashMap<Integer, Integer> repeaterOrder = new HashMap<>();
-    private JsonArray arr;
-    private Location aqua_spawn;
     private final boolean wasResumed;
     private final List<String> postBlocks;
+    private int maze_count = 0;
+    private int task, level, row, col, h, w, c, startx, starty, startz, resetx, resety, resetz;
+    private boolean running;
+    private World world;
+    private JsonArray arr;
+    private Location aqua_spawn;
 
     public TARDISRoomRunnable(TARDIS plugin, TARDISRoomData roomData, Player player) {
         this.plugin = plugin;
@@ -496,11 +498,11 @@ public class TARDISRoomRunnable implements Runnable {
                 BlockData data = plugin.getServer().createBlockData(v.get("data").getAsString());
                 Material type = data.getMaterial();
                 // determine 'use_clay' material
-                USE_CLAY use_clay;
+                UseClay use_clay;
                 try {
-                    use_clay = USE_CLAY.valueOf(plugin.getConfig().getString("creation.use_clay"));
+                    use_clay = UseClay.valueOf(plugin.getConfig().getString("creation.use_clay"));
                 } catch (IllegalArgumentException e) {
-                    use_clay = USE_CLAY.WOOL;
+                    use_clay = UseClay.WOOL;
                 }
                 Material ow;
                 Material lgw;
@@ -565,7 +567,7 @@ public class TARDISRoomRunnable implements Runnable {
                     plugin.getQueryFactory().insertControl(tardis_id, 34, new Location(world, startx, starty, startz).toString(), 1);
                 }
                 // set drop chest
-                if (type.equals(Material.TRAPPED_CHEST) && room.equals("VAULT") && player != null && player.hasPermission("tardis.vault")) {
+                if (type.equals(Material.TRAPPED_CHEST) && room.equals("VAULT") && player != null && TARDISPermission.hasPermission(player, "tardis.vault")) {
                     // determine the min x, y, z coords
                     int mx = startx % 16;
                     if (mx < 0) {
@@ -614,13 +616,16 @@ public class TARDISRoomRunnable implements Runnable {
                     plugin.getQueryFactory().insertControl(tardis_id, 19, plate, 0);
                 }
                 // set stable
-                if (type.equals(Material.SOUL_SAND) && (room.equals("STABLE") || room.equals("VILLAGE") || room.equals("RENDERER") || room.equals("ZERO") || room.equals("HUTCH") || room.equals("IGLOO") || room.equals("STALL") || room.equals("BAMBOO") || room.equals("BIRDCAGE"))) {
+                if (type.equals(Material.SOUL_SAND) && (room.equals("STABLE") || room.equals("VILLAGE") || room.equals("RENDERER") || room.equals("ZERO") || room.equals("HUTCH") || room.equals("IGLOO") || room.equals("STALL") || room.equals("BAMBOO") || room.equals("BIRDCAGE") || room.equals("MAZE"))) {
                     HashMap<String, Object> sets = new HashMap<>();
                     sets.put(room.toLowerCase(Locale.ENGLISH), world.getName() + ":" + startx + ":" + starty + ":" + startz);
                     HashMap<String, Object> wheres = new HashMap<>();
                     wheres.put("tardis_id", tardis_id);
                     if (room.equals("RENDERER") || room.equals("ZERO")) {
                         plugin.getQueryFactory().doUpdate("tardis", sets, wheres);
+                    } else if (room.equals("MAZE")) {
+                        String loc_str = TARDISStaticLocationGetters.makeLocationStr(world, startx, starty + 1, startz);
+                        plugin.getQueryFactory().insertControl(tardis_id, 44, loc_str, 0);
                     } else {
                         ResultSetFarming rsf = new ResultSetFarming(plugin, tardis_id);
                         if (rsf.resultSet()) {
@@ -632,13 +637,14 @@ public class TARDISRoomRunnable implements Runnable {
                         }
                     }
                     // replace with correct block
-                    switch (ROOM.valueOf(room)) {
+                    switch (Room.valueOf(room)) {
                         case VILLAGE:
                             data = Material.COBBLESTONE.createBlockData();
                             break;
                         case HUTCH:
                         case STABLE:
                         case STALL:
+                        case MAZE:
                             data = Material.GRASS_BLOCK.createBlockData();
                             break;
                         case BAMBOO:
@@ -672,7 +678,7 @@ public class TARDISRoomRunnable implements Runnable {
                             }
                             break;
                     }
-                    if (!room.equals("ZERO") && !room.equals("RENDERER")) {
+                    if (!room.equals("ZERO") && !room.equals("RENDERER") && !room.equals("MAZE")) {
                         // update player prefs - turn on mob farming
                         if (player != null) {
                             turnOnFarming(player);
@@ -920,6 +926,12 @@ public class TARDISRoomRunnable implements Runnable {
                         Double[] values = {1D, 16D, 0.5D};
                         plugin.getGeneralKeeper().getGravityUpList().put(loc, values);
                     }
+                }
+                if (room.equals("MAZE") && type.equals(Material.STONE_PRESSURE_PLATE)) {
+                    String loc_str = TARDISStaticLocationGetters.makeLocationStr(world, startx, starty, startz);
+                    int maze = 40 + maze_count;
+                    plugin.getQueryFactory().insertControl(tardis_id, maze, loc_str, 0);
+                    maze_count++;
                 }
                 if (room.equals("BAKER") || room.equals("WOOD")) {
                     // remember the controls

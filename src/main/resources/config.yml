@@ -32,7 +32,6 @@ creation:
 # outer TARDIS
 police_box:
   default_preset: FACTORY
-  tardis_lamp: REDSTONE_LAMP
   name_tardis: false
   materialise: true
   confirm_timeout: 15
@@ -79,6 +78,7 @@ preferences:
   respect_worldborder: true
   respect_factions: true
   respect_grief_prevention: true
+  respect_red_protect: true
   sfx_volume: 10
   difficulty: easy
   strike_lightning: true
@@ -184,10 +184,12 @@ abandon:
 archive:
   enabled: true
   limit: 3
-# handles
-rechargers: {}
+blueprints:
+  enabled: false
+rechargers: { }
 # don't touch
 conversions:
+  archive_wall_data: true
   ars_materials: true
   condenser_materials: true
   player_prefs_materials: true

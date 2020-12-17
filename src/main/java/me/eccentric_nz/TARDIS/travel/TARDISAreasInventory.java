@@ -18,7 +18,8 @@ package me.eccentric_nz.TARDIS.travel;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.database.ResultSetAreas;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetAreas;
 import me.eccentric_nz.TARDIS.database.data.Area;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -60,7 +61,7 @@ public class TARDISAreasInventory {
             // cycle through areas
             for (Area a : rsa.getData()) {
                 String name = a.getAreaName();
-                if (p.hasPermission("tardis.area." + name) || p.hasPermission("tardis.area.*")) {
+                if (TARDISPermission.hasPermission(p, "tardis.area." + name) || TARDISPermission.hasPermission(p, "tardis.area.*")) {
                     ItemStack is = new ItemStack(TARDISConstants.GUI_IDS.get(i), 1);
                     ItemMeta im = is.getItemMeta();
                     im.setDisplayName(name);

@@ -53,8 +53,8 @@ import me.eccentric_nz.TARDIS.control.TARDISControlMenuListener;
 import me.eccentric_nz.TARDIS.desktop.TARDISArchiveMenuListener;
 import me.eccentric_nz.TARDIS.desktop.TARDISThemeMenuListener;
 import me.eccentric_nz.TARDIS.desktop.TARDISWallMenuListener;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
-import me.eccentric_nz.TARDIS.enumeration.INVENTORY_MANAGER;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
+import me.eccentric_nz.TARDIS.enumeration.InventoryManager;
 import me.eccentric_nz.TARDIS.flight.TARDISHandbrakeListener;
 import me.eccentric_nz.TARDIS.flight.TARDISManualFlightListener;
 import me.eccentric_nz.TARDIS.flight.TARDISRegulatorListener;
@@ -72,6 +72,8 @@ import me.eccentric_nz.TARDIS.lazarus.TARDISLazarusListener;
 import me.eccentric_nz.TARDIS.listeners.*;
 import me.eccentric_nz.TARDIS.move.*;
 import me.eccentric_nz.TARDIS.planets.*;
+import me.eccentric_nz.TARDIS.recipes.TARDISRecipeCategoryListener;
+import me.eccentric_nz.TARDIS.recipes.TARDISRecipeInventoryListener;
 import me.eccentric_nz.TARDIS.rooms.TARDISJettisonSeeder;
 import me.eccentric_nz.TARDIS.rooms.TARDISRoomSeeder;
 import me.eccentric_nz.TARDIS.schematic.TARDISSchematicListener;
@@ -104,11 +106,11 @@ class TARDISListenerRegisterer {
         plugin.getPM().registerEvents(new TARDISBlockBreakListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISBlockPlaceListener(plugin), plugin);
         if (plugin.getConfig().getBoolean("preferences.walk_in_tardis")) {
+            plugin.getPM().registerEvents(new TARDISPoliceBoxDoorListener(plugin), plugin);
             if (plugin.getConfig().getBoolean("preferences.open_door_policy")) {
                 plugin.getPM().registerEvents(new TARDISAnyoneDoorListener(plugin), plugin);
                 plugin.getPM().registerEvents(new TARDISAnyoneMoveListener(plugin), plugin);
             } else {
-                plugin.getPM().registerEvents(new TARDISPoliceBoxDoorListener(plugin), plugin);
                 plugin.getPM().registerEvents(new TARDISDoorWalkListener(plugin), plugin);
                 plugin.getPM().registerEvents(new TARDISMoveListener(plugin), plugin);
             }
@@ -133,7 +135,7 @@ class TARDISListenerRegisterer {
         plugin.getPM().registerEvents(new TARDISArtronFurnaceListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISBeaconColouringListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISBindListener(plugin), plugin);
-        if (!plugin.getDifficulty().equals(DIFFICULTY.HARD)) {
+        if (!plugin.getDifficulty().equals(Difficulty.HARD)) {
             plugin.getPM().registerEvents(new TARDISBiomeReaderListener(plugin), plugin);
         }
         plugin.getPM().registerEvents(new TARDISBlockDamageListener(plugin), plugin);
@@ -201,6 +203,8 @@ class TARDISListenerRegisterer {
         plugin.getPM().registerEvents(new TARDISPresetListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISQuitListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISRecipeListener(plugin), plugin);
+        plugin.getPM().registerEvents(new TARDISRecipeInventoryListener(plugin), plugin);
+        plugin.getPM().registerEvents(new TARDISRecipeCategoryListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISRegulatorListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISRemoteKeyListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISRedstoneListener(plugin), plugin);
@@ -219,6 +223,7 @@ class TARDISListenerRegisterer {
         }
         plugin.getPM().registerEvents(new TARDISSleepListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISSmelterListener(plugin), plugin);
+        plugin.getPM().registerEvents(new TARDISSmithingListener(), plugin);
         plugin.getPM().registerEvents(new TARDISSonicEntityListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISSonicConfiguratorMenuListener(plugin), plugin);
         plugin.getPM().registerEvents(new TARDISSonicGeneratorMenuListener(plugin), plugin);
@@ -258,7 +263,7 @@ class TARDISListenerRegisterer {
             plugin.getPM().registerEvents(new TARDISSelectWatchListener(plugin), plugin);
             plugin.getPM().registerEvents(new TARDISRespawnListener(plugin), plugin);
             if (plugin.getConfig().getBoolean("arch.switch_inventory")) {
-                if (!plugin.getInvManager().equals(INVENTORY_MANAGER.NONE)) {
+                if (!plugin.getInvManager().equals(InventoryManager.NONE)) {
                     plugin.getPM().registerEvents(new TARDISInventoryPluginHelper(plugin), plugin);
                 }
             }

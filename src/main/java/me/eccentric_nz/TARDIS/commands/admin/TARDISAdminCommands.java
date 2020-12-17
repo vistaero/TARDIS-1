@@ -19,16 +19,25 @@ package me.eccentric_nz.TARDIS.commands.admin;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.achievement.TARDISAchievementFactory;
 import me.eccentric_nz.TARDIS.arch.TARDISArchCommand;
+import me.eccentric_nz.TARDIS.builders.FractalFence;
 import me.eccentric_nz.TARDIS.commands.TARDISCommandHelper;
 import me.eccentric_nz.TARDIS.database.tool.Converter;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
-import me.eccentric_nz.TARDIS.enumeration.USE_CLAY;
+import me.eccentric_nz.TARDIS.enumeration.UseClay;
+import me.eccentric_nz.TARDIS.maze.TARDISMazeBuilder;
+import me.eccentric_nz.TARDIS.maze.TARDISMazeGenerator;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
+import me.eccentric_nz.TARDIS.utility.UpdateTARDISPlugins;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,12 +55,12 @@ import java.util.Locale;
  */
 public class TARDISAdminCommands implements CommandExecutor {
 
-    private final TARDIS plugin;
     final HashMap<String, String> firstsStr = new HashMap<>();
     final List<String> firstsStrArtron = new ArrayList<>();
     final HashMap<String, String> firstsBool = new HashMap<>();
     final HashMap<String, String> firstsInt = new HashMap<>();
     final List<String> firstsIntArtron = new ArrayList<>();
+    private final TARDIS plugin;
 
     public TARDISAdminCommands(TARDIS plugin) {
         this.plugin = plugin;
@@ -86,6 +95,7 @@ public class TARDISAdminCommands implements CommandExecutor {
         firstsStr.put("language", "preferences");
         firstsStr.put("list", "");
         firstsStr.put("make_preset", "");
+        firstsStr.put("maze", "");
         firstsStr.put("playercount", "");
         firstsStr.put("prune", "");
         firstsStr.put("prunelist", "");
@@ -97,19 +107,22 @@ public class TARDISAdminCommands implements CommandExecutor {
         firstsStr.put("repair", "");
         firstsStr.put("respect_towny", "preferences");
         firstsStr.put("respect_worldguard", "preferences");
+        firstsStr.put("revoke", "");
         firstsStr.put("set_size", "");
         firstsStr.put("siege", "siege");
         firstsStr.put("sign_colour", "police_box");
         firstsStr.put("spawn_abandoned", "");
-        firstsStr.put("tardis_lamp", "police_box");
-        firstsStr.put("use_clay", "creation");
+        firstsStr.put("tree", "");
         firstsStr.put("undisguise", "");
+        firstsStr.put("update_plugins", "");
+        firstsStr.put("use_clay", "creation");
         firstsStr.put("vortex_fall", "preferences");
         firstsStrArtron.add("full_charge_item");
         firstsStrArtron.add("jettison_seed");
         // boolean
         firstsBool.put("3d_doors", "allow");
-        firstsBool.put("abandon", "abandon.enable");
+        firstsBool.put("abandon", "");
+        firstsBool.put("archive", "");
         firstsBool.put("achievements", "allow");
         firstsBool.put("add_perms", "creation");
         firstsBool.put("admin_bypass", "allow");
@@ -117,6 +130,7 @@ public class TARDISAdminCommands implements CommandExecutor {
         firstsBool.put("allow_end_after_visit", "travel");
         firstsBool.put("allow_nether_after_visit", "travel");
         firstsBool.put("autonomous", "allow");
+        firstsBool.put("blueprints", "");
         firstsBool.put("chameleon", "travel");
         firstsBool.put("check_blocks_before_upgrade", "desktop");
         firstsBool.put("create_worlds", "creation");
@@ -258,13 +272,31 @@ public class TARDISAdminCommands implements CommandExecutor {
                             return true;
                         }
                     }
+                    if (first.equals("update_plugins")) {
+                        if (!sender.isOp()) {
+                            TARDISMessage.message(sender, "You must be a server operator to run this command!");
+                            return true;
+                        }
+                        return new UpdateTARDISPlugins(plugin).fetchFromJenkins(sender);
+                    }
+                    if (first.equals("maze")) {
+                        if (sender instanceof Player) {
+                            Player p = (Player) sender;
+                            Location l = p.getTargetBlock(plugin.getGeneralKeeper().getTransparent(), 16).getRelative(BlockFace.UP).getLocation();
+                            TARDISMazeGenerator generator = new TARDISMazeGenerator();
+                            generator.makeMaze();
+                            TARDISMazeBuilder builder = new TARDISMazeBuilder(generator.getMaze(), l);
+                            builder.build(false);
+                        }
+                        return true;
+                    }
                 }
                 if (first.equals("adv")) {
                     TARDISAchievementFactory.checkAdvancement(args[1]);
                     return true;
                 }
                 if (first.equals("list")) {
-                    return new TARDISListTardisesCommand(plugin).listTardises(sender, args);
+                    return new TARDISListCommand(plugin).listStuff(sender, args);
                 }
                 if (first.equals("purge_portals")) {
                     return new TARDISPortalCommand(plugin).clearAll(sender);
@@ -275,6 +307,14 @@ public class TARDISAdminCommands implements CommandExecutor {
                 if (args.length < 2) {
                     TARDISMessage.send(sender, "TOO_FEW_ARGS");
                     return false;
+                }
+                if (first.equals("tree")) {
+                    if (sender instanceof Player) {
+                        Player p = (Player) sender;
+                        Block l = p.getTargetBlock(plugin.getGeneralKeeper().getTransparent(), 16).getRelative(BlockFace.UP).getLocation().getBlock();
+                        int which = TARDISNumberParsers.parseInt(args[1]);
+                        FractalFence.grow(l, which);
+                    }
                 }
                 if (first.equals("reload")) {
                     return new TARDISReloadCommand(plugin).reloadOtherConfig(sender, args);
@@ -357,7 +397,7 @@ public class TARDISAdminCommands implements CommandExecutor {
                 if (first.equals("delete")) {
                     return new TARDISDeleteCommand(plugin).deleteTARDIS(sender, args);
                 }
-                if (first.equals("key") || first.equals("custom_schematic_seed") || first.equals("tardis_lamp")) {
+                if (first.equals("key") || first.equals("custom_schematic_seed")) {
                     return new TARDISSetMaterialCommand(plugin).setConfigMaterial(sender, args, firstsStr.get(first));
                 }
                 if (first.equals("full_charge_item") || first.equals("jettison_seed")) {
@@ -381,7 +421,7 @@ public class TARDISAdminCommands implements CommandExecutor {
                         return true;
                     }
                     plugin.getConfig().set("preferences.difficulty", args[1].toLowerCase(Locale.ENGLISH));
-                    plugin.setDifficulty(DIFFICULTY.valueOf(args[1].toUpperCase(Locale.ENGLISH)));
+                    plugin.setDifficulty(Difficulty.valueOf(args[1].toUpperCase(Locale.ENGLISH)));
                 }
                 if (first.equals("default_preset")) {
                     try {
@@ -394,7 +434,7 @@ public class TARDISAdminCommands implements CommandExecutor {
                 }
                 if (first.equals("use_clay")) {
                     try {
-                        USE_CLAY use_clay = USE_CLAY.valueOf(args[1].toUpperCase(Locale.ENGLISH));
+                        UseClay use_clay = UseClay.valueOf(args[1].toUpperCase(Locale.ENGLISH));
                     } catch (IllegalArgumentException e) {
                         TARDISMessage.send(sender, "ARG_USE_CLAY");
                         return true;
@@ -424,6 +464,9 @@ public class TARDISAdminCommands implements CommandExecutor {
                 }
                 if (first.equals("repair")) {
                     return new TARDISRepairCommand(plugin).setFreeCount(sender, args);
+                }
+                if (first.equals("revoke")) {
+                    return new TARDISRevokeCommand(plugin).removePermission(sender, args);
                 }
                 if (first.equals("vortex_fall")) {
                     if (!args[1].equalsIgnoreCase("kill") && !args[1].equalsIgnoreCase("teleport")) {

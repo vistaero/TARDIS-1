@@ -17,7 +17,7 @@
 package me.eccentric_nz.TARDIS.sonic.actions;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetDoors;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetDoors;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -69,11 +69,13 @@ public class TARDISSonic {
                 switch (blockType) {
                     case ACACIA_DOOR:
                     case BIRCH_DOOR:
+                    case CRIMSON_DOOR:
                     case DARK_OAK_DOOR:
                     case IRON_DOOR:
                     case JUNGLE_DOOR:
                     case OAK_DOOR:
                     case SPRUCE_DOOR:
+                    case WARPED_DOOR:
                         Block lowerdoor;
                         Bisected bisected = (Bisected) targetBlock.getBlockData();
                         if (bisected.getHalf().equals(Bisected.Half.TOP)) {

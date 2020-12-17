@@ -22,7 +22,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.database.TARDISDatabaseConnection;
-import me.eccentric_nz.TARDIS.database.TARDISMaterialIDConverter;
+import me.eccentric_nz.TARDIS.database.converters.TARDISMaterialIDConverter;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
@@ -71,7 +71,6 @@ public class ConstructsConverter {
                         Matcher m = p.matcher(bpID);
                         if (!m.find()) {
                             // no IDs found, already converted
-                            plugin.debug("doesn't match");
                             continue;
                         }
                         String[][] bpGrid = new String[10][4];

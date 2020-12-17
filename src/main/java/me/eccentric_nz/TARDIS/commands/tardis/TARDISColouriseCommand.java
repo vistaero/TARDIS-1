@@ -17,10 +17,11 @@
 package me.eccentric_nz.TARDIS.commands.tardis;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.entity.Player;
 
@@ -42,7 +43,7 @@ class TARDISColouriseCommand {
     }
 
     void updateBeaconGlass(Player player) {
-        if (!player.hasPermission("tardis.upgrade")) {
+        if (!TARDISPermission.hasPermission(player, "tardis.upgrade")) {
             TARDISMessage.send(player, "NO_PERMS");
             return;
         }
@@ -60,7 +61,7 @@ class TARDISColouriseCommand {
             return;
         }
         Tardis tardis = rs.getTardis();
-        SCHEMATIC console = tardis.getSchematic();
+        Schematic console = tardis.getSchematic();
         if (!console.hasBeacon()) {
             TARDISMessage.send(player, "COLOUR_NOT_VALID");
             return;

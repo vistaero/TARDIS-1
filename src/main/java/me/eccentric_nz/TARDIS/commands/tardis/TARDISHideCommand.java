@@ -18,14 +18,17 @@ package me.eccentric_nz.TARDIS.commands.tardis;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -45,7 +48,7 @@ public class TARDISHideCommand {
     }
 
     public boolean hide(OfflinePlayer player) {
-        if (player.getPlayer().hasPermission("tardis.rebuild")) {
+        if (TARDISPermission.hasPermission(player, "tardis.rebuild")) {
             UUID uuid = player.getUniqueId();
             if (plugin.getTrackerKeeper().getHideCooldown().containsKey(uuid)) {
                 long now = System.currentTimeMillis();
@@ -76,7 +79,7 @@ public class TARDISHideCommand {
             }
             id = tardis.getTardis_id();
             TARDISCircuitChecker tcc = null;
-            if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(player.getPlayer(), true)) {
+            if (!plugin.getDifficulty().equals(Difficulty.EASY) && !plugin.getUtils().inGracePeriod(player.getPlayer(), true)) {
                 tcc = new TARDISCircuitChecker(plugin, id);
                 tcc.getCircuits();
             }
@@ -118,7 +121,7 @@ public class TARDISHideCommand {
                 TARDISMessage.send(player.getPlayer(), "ENERGY_NO_HIDE");
                 return false;
             }
-            DestroyData dd = new DestroyData(plugin, uuid.toString());
+            DestroyData dd = new DestroyData();
             dd.setDirection(rsc.getDirection());
             dd.setLocation(l);
             dd.setPlayer(player.getPlayer());
@@ -126,7 +129,8 @@ public class TARDISHideCommand {
             dd.setOutside(false);
             dd.setSubmarine(rsc.isSubmarine());
             dd.setTardisID(id);
-            dd.setBiome(rsc.getBiome());
+            dd.setTardisBiome(TARDISBiome.get(rsc.getBiomeKey()));
+            dd.setThrottle(SpaceTimeThrottle.REBUILD);
             plugin.getPresetDestroyer().destroyPreset(dd);
             plugin.getTrackerKeeper().getInVortex().add(id);
             TARDISMessage.send(player.getPlayer(), "TARDIS_HIDDEN", ChatColor.GREEN + " /tardis rebuild " + ChatColor.RESET);

@@ -18,7 +18,7 @@ package me.eccentric_nz.TARDIS.api;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
@@ -69,7 +69,7 @@ public class TARDISRandomOverworld extends TARDISRandomLocation {
             // get the y coord
             if (param.spaceTardis()) {
                 if (safeOverworld(war.getW(), x, z, param.getCompass())) {
-                    if ((dest.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.WATER)) && TARDISStaticUtils.isOceanBiome(dest.getBlock().getBiome())) {
+                    if ((dest.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.WATER)) && TARDISStaticUtils.isOceanBiome(TARDISStaticUtils.getBiomeAt(dest))) {
                         if (safeSubmarine(dest, param.getCompass(), param.getPlayer())) {
                             break;
                         }

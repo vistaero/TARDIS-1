@@ -18,7 +18,7 @@ package me.eccentric_nz.TARDIS.rooms;
 
 import com.google.gson.JsonObject;
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.database.ResultSetTardisTimeLord;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardisTimeLord;
 import me.eccentric_nz.TARDIS.database.TARDISDatabaseConnection;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
 import me.eccentric_nz.TARDIS.schematic.TARDISSchematicGZip;
@@ -42,9 +42,9 @@ public class TARDISRoomPersister {
     private final TARDIS plugin;
     private final TARDISDatabaseConnection service = TARDISDatabaseConnection.getINSTANCE();
     private final Connection connection = service.getConnection();
+    private final String prefix;
     private PreparedStatement ps = null;
     private int count = 0;
-    private final String prefix;
 
     public TARDISRoomPersister(TARDIS plugin) {
         this.plugin = plugin;

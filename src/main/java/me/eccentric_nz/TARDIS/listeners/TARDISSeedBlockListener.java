@@ -22,10 +22,11 @@ import me.eccentric_nz.TARDIS.builders.TARDISBuildData;
 import me.eccentric_nz.TARDIS.builders.TARDISSeedBlockProcessor;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISMushroomBlockData;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISSeedModel;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.enumeration.CONSOLES;
-import me.eccentric_nz.TARDIS.enumeration.SCHEMATIC;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.enumeration.Consoles;
+import me.eccentric_nz.TARDIS.enumeration.Schematic;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import org.bukkit.*;
 import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.entity.Player;
@@ -86,7 +87,7 @@ public class TARDISSeedBlockListener implements Listener {
                 event.getBlockPlaced().setBlockData(multipleFacing);
             }
             List<String> lore = im.getLore();
-            SCHEMATIC schm = CONSOLES.getBY_NAMES().get(lore.get(0));
+            Schematic schm = Consoles.getBY_NAMES().get(lore.get(0));
             Material wall = Material.valueOf(getValuesFromWallString(lore.get(1)));
             Material floor = Material.valueOf(getValuesFromWallString(lore.get(2)));
             TARDISBuildData seed = new TARDISBuildData();
@@ -167,7 +168,7 @@ public class TARDISSeedBlockListener implements Listener {
                     key = plugin.getConfig().getString("preferences.key");
                 }
                 if (player.getInventory().getItemInMainHand().getType().equals(Material.valueOf(key))) {
-                    if (!plugin.getPlanetsConfig().getBoolean("planets." + l.getWorld().getName() + ".time_travel")) {
+                    if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(l.getWorld().getName()) + ".time_travel")) {
                         TARDISMessage.send(player, "WORLD_NO_TARDIS");
                         return;
                     }

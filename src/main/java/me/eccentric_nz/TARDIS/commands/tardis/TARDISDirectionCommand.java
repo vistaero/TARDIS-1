@@ -18,16 +18,18 @@ package me.eccentric_nz.TARDIS.commands.tardis;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetControls;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetControls;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
-import me.eccentric_nz.TARDIS.move.TARDISDoorCloser;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.move.TARDISDoorCloser;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticLocationGetters;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -52,7 +54,7 @@ public class TARDISDirectionCommand {
     }
 
     public boolean changeDirection(Player player, String[] args) {
-        if (player.hasPermission("tardis.timetravel")) {
+        if (TARDISPermission.hasPermission(player, "tardis.timetravel")) {
             if (args.length < 2 || (!args[1].equalsIgnoreCase("north") && !args[1].equalsIgnoreCase("west") && !args[1].equalsIgnoreCase("south") && !args[1].equalsIgnoreCase("east"))) {
                 TARDISMessage.send(player, "DIRECTION_NEED");
                 return false;
@@ -72,7 +74,7 @@ public class TARDISDirectionCommand {
             }
             int id = tardis.getTardis_id();
             TARDISCircuitChecker tcc = null;
-            if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(player, true)) {
+            if (!plugin.getDifficulty().equals(Difficulty.EASY) && !plugin.getUtils().inGracePeriod(player, true)) {
                 tcc = new TARDISCircuitChecker(plugin, id);
                 tcc.getCircuits();
             }
@@ -140,7 +142,7 @@ public class TARDISDirectionCommand {
                 }
                 plugin.getPresetDestroyer().destroyDoor(id);
                 plugin.getPresetDestroyer().destroySign(l, old_d, demat);
-                BuildData bd = new BuildData(plugin, uuid.toString());
+                BuildData bd = new BuildData(uuid.toString());
                 bd.setDirection(d);
                 bd.setLocation(l);
                 bd.setMalfunction(false);
@@ -149,7 +151,7 @@ public class TARDISDirectionCommand {
                 bd.setRebuild(true);
                 bd.setSubmarine(rsc.isSubmarine());
                 bd.setTardisID(id);
-                bd.setBiome(rsc.getBiome());
+                bd.setThrottle(SpaceTimeThrottle.REBUILD);
                 plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), 10L);
             }
             HashMap<String, Object> wherea = new HashMap<>();

@@ -18,8 +18,8 @@ package me.eccentric_nz.TARDIS.commands;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.database.ResultSetAreas;
 import me.eccentric_nz.TARDIS.database.data.Area;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetAreas;
 import me.eccentric_nz.TARDIS.enumeration.PRESET;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import org.bukkit.ChatColor;
@@ -46,8 +46,8 @@ import java.util.Locale;
  */
 public class TARDISAreaCommands implements CommandExecutor {
 
-    private final TARDIS plugin;
     public static final BlockData SNOW = Material.SNOW_BLOCK.createBlockData();
+    private final TARDIS plugin;
 
     public TARDISAreaCommands(TARDIS plugin) {
         this.plugin = plugin;

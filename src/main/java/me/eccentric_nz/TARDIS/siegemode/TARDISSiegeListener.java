@@ -20,16 +20,18 @@ import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
 import me.eccentric_nz.TARDIS.builders.BuildData;
 import me.eccentric_nz.TARDIS.custommodeldata.TARDISMushroomBlockData;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
-import me.eccentric_nz.TARDIS.database.ResultSetTardis;
-import me.eccentric_nz.TARDIS.database.ResultSetTravellers;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTardis;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetTravellers;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
 import me.eccentric_nz.TARDIS.enumeration.COMPASS;
-import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.travel.TARDISTimeTravel;
 import me.eccentric_nz.TARDIS.utility.TARDISNumberParsers;
 import me.eccentric_nz.TARDIS.utility.TARDISStaticUtils;
+import me.eccentric_nz.TARDIS.utility.TARDISStringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -178,7 +180,7 @@ public class TARDISSiegeListener implements Listener {
             return;
         }
         String w = p.getLocation().getWorld().getName();
-        if (!plugin.getPlanetsConfig().getBoolean("planets." + w + ".time_travel")) {
+        if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(w) + ".time_travel")) {
             event.setCancelled(true);
             TARDISMessage.send(p, "SIEGE_NO_WORLD");
             return;
@@ -240,7 +242,7 @@ public class TARDISSiegeListener implements Listener {
             return;
         }
         String w = p.getLocation().getWorld().getName();
-        if (!plugin.getPlanetsConfig().getBoolean("planets." + w + ".time_travel")) {
+        if (!plugin.getPlanetsConfig().getBoolean("planets." + TARDISStringUtils.worldName(w) + ".time_travel")) {
             event.setCancelled(true);
             TARDISMessage.send(p, "SIEGE_NO_WORLD");
             return;
@@ -354,7 +356,7 @@ public class TARDISSiegeListener implements Listener {
             }
             // rebuild the TARDIS
             Location current = b.getLocation();
-            BuildData bd = new BuildData(plugin, p.getUniqueId().toString());
+            BuildData bd = new BuildData(p.getUniqueId().toString());
             bd.setDirection(rsc.getDirection());
             bd.setLocation(current);
             bd.setMalfunction(false);
@@ -363,7 +365,7 @@ public class TARDISSiegeListener implements Listener {
             bd.setRebuild(true);
             bd.setSubmarine(rsc.isSubmarine());
             bd.setTardisID(id);
-            bd.setBiome(rsc.getBiome());
+            bd.setThrottle(SpaceTimeThrottle.REBUILD);
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), 10L);
             HashMap<String, Object> set = new HashMap<>();
             set.put("siege_on", 0);

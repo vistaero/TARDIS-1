@@ -22,11 +22,13 @@ import me.eccentric_nz.TARDIS.advanced.TARDISCircuitChecker;
 import me.eccentric_nz.TARDIS.advanced.TARDISCircuitDamager;
 import me.eccentric_nz.TARDIS.artron.TARDISArtronLevels;
 import me.eccentric_nz.TARDIS.artron.TARDISBeaconToggler;
+import me.eccentric_nz.TARDIS.blueprints.TARDISPermission;
 import me.eccentric_nz.TARDIS.commands.admin.TARDISAdminMenuInventory;
-import me.eccentric_nz.TARDIS.database.*;
 import me.eccentric_nz.TARDIS.database.data.Tardis;
-import me.eccentric_nz.TARDIS.enumeration.DIFFICULTY;
-import me.eccentric_nz.TARDIS.enumeration.DISK_CIRCUIT;
+import me.eccentric_nz.TARDIS.database.resultset.*;
+import me.eccentric_nz.TARDIS.enumeration.Difficulty;
+import me.eccentric_nz.TARDIS.enumeration.DiskCircuit;
+import me.eccentric_nz.TARDIS.enumeration.FlightMode;
 import me.eccentric_nz.TARDIS.forcefield.TARDISForceField;
 import me.eccentric_nz.TARDIS.listeners.TARDISMenuListener;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
@@ -100,7 +102,7 @@ public class TARDISPrefsMenuListener extends TARDISMenuListener implements Liste
                     ItemMeta im = is.getItemMeta();
                     if (slot == 23 && im.getDisplayName().equals("Force Field")) {
                         // toggle force field on / off
-                        if (p.hasPermission("tardis.forcefield")) {
+                        if (TARDISPermission.hasPermission(p, "tardis.forcefield")) {
                             List<String> lore = im.getLore();
                             boolean bool = (lore.get(0).equals(plugin.getLanguage().getString("SET_OFF")));
                             if (bool) {
@@ -131,12 +133,12 @@ public class TARDISPrefsMenuListener extends TARDISMenuListener implements Liste
                     if (slot == 28 && im.getDisplayName().equals("Flight Mode")) {
                         List<String> lore = im.getLore();
                         // cycle through flight modes
-                        TARDISSetFlightCommand.FlightMode flight = TARDISSetFlightCommand.FlightMode.valueOf(lore.get(0));
+                        FlightMode flight = FlightMode.valueOf(lore.get(0));
                         int mode = flight.getMode() + 1;
                         if (mode > 3) {
                             mode = 1;
                         }
-                        lore.set(0, TARDISSetFlightCommand.FlightMode.getByMode().get(mode).toString());
+                        lore.set(0, FlightMode.getByMode().get(mode).toString());
                         im.setLore(lore);
                         is.setItemMeta(im);
                         // set flight mode
@@ -193,7 +195,7 @@ public class TARDISPrefsMenuListener extends TARDISMenuListener implements Liste
                                         plugin.getTrackerKeeper().getHasRandomised().removeAll(Collections.singleton(id));
                                     }
                                     TARDISCircuitChecker tcc = null;
-                                    if (!plugin.getDifficulty().equals(DIFFICULTY.EASY) && !plugin.getUtils().inGracePeriod(p, true)) {
+                                    if (!plugin.getDifficulty().equals(Difficulty.EASY) && !plugin.getUtils().inGracePeriod(p, true)) {
                                         tcc = new TARDISCircuitChecker(plugin, id);
                                         tcc.getCircuits();
                                     }
@@ -201,7 +203,7 @@ public class TARDISPrefsMenuListener extends TARDISMenuListener implements Liste
                                     if (tcc != null && plugin.getConfig().getBoolean("circuits.damage") && plugin.getConfig().getInt("circuits.uses.materialisation") > 0) {
                                         // decrement uses
                                         int uses_left = tcc.getMaterialisationUses();
-                                        new TARDISCircuitDamager(plugin, DISK_CIRCUIT.MATERIALISATION, uses_left, id, p).damage();
+                                        new TARDISCircuitDamager(plugin, DiskCircuit.MATERIALISATION, uses_left, id, p).damage();
                                     }
                                 } else {
                                     TARDISMessage.send(p, "HANDBRAKE_IN_VORTEX");

@@ -18,10 +18,12 @@ package me.eccentric_nz.TARDIS.commands.remote;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.builders.BuildData;
-import me.eccentric_nz.TARDIS.database.ResultSetBackLocation;
-import me.eccentric_nz.TARDIS.database.ResultSetCurrentLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetBackLocation;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetCurrentLocation;
 import me.eccentric_nz.TARDIS.destroyers.DestroyData;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
+import me.eccentric_nz.TARDIS.planets.TARDISBiome;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -81,7 +83,7 @@ class TARDISRemoteBackCommand {
         plugin.getTrackerKeeper().getInVortex().add(id);
         if (!plugin.getTrackerKeeper().getDestinationVortex().containsKey(id)) {
             // destroy the police box
-            DestroyData dd = new DestroyData(plugin, player.getUniqueId().toString());
+            DestroyData dd = new DestroyData();
             dd.setDirection(rsc.getDirection());
             dd.setLocation(new Location(rsc.getWorld(), rsc.getX(), rsc.getY(), rsc.getZ()));
             dd.setPlayer(player);
@@ -89,12 +91,13 @@ class TARDISRemoteBackCommand {
             dd.setOutside(true);
             dd.setSubmarine(rsc.isSubmarine());
             dd.setTardisID(id);
-            dd.setBiome(rsc.getBiome());
+            dd.setTardisBiome(TARDISBiome.get(rsc.getBiomeKey()));
+            dd.setThrottle(SpaceTimeThrottle.NORMAL);
             plugin.getTrackerKeeper().getDematerialising().add(id);
             plugin.getPresetDestroyer().destroyPreset(dd);
         }
         // rebuild the police box
-        BuildData bd = new BuildData(plugin, player.getUniqueId().toString());
+        BuildData bd = new BuildData(player.getUniqueId().toString());
         bd.setDirection(rsb.getDirection());
         bd.setLocation(new Location(rsb.getWorld(), rsb.getX(), rsb.getY(), rsb.getZ()));
         bd.setMalfunction(false);
@@ -103,6 +106,7 @@ class TARDISRemoteBackCommand {
         bd.setRebuild(false);
         bd.setSubmarine(rsb.isSubmarine());
         bd.setTardisID(id);
+        bd.setThrottle(SpaceTimeThrottle.NORMAL);
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getPresetBuilder().buildPreset(bd), 20L);
         plugin.getTrackerKeeper().getHasDestination().remove(id);
         plugin.getTrackerKeeper().getRescue().remove(id);

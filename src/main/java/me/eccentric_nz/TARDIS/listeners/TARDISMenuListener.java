@@ -17,7 +17,7 @@
 package me.eccentric_nz.TARDIS.listeners;
 
 import me.eccentric_nz.TARDIS.TARDIS;
-import me.eccentric_nz.TARDIS.enumeration.STORAGE;
+import me.eccentric_nz.TARDIS.enumeration.Storage;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -82,6 +82,8 @@ public class TARDISMenuListener implements Listener {
         // TODO should Handles Program GUI be in here?
 //        map.put(ChatColor.DARK_RED + "Handles Program", 54);
         map.put(ChatColor.DARK_RED + "Player Prefs Menu", 36);
+        map.put(ChatColor.DARK_RED + "Recipe Categories", 27);
+        map.put(ChatColor.DARK_RED + "TARDIS Recipes", 27);
         map.put(ChatColor.DARK_RED + "Saved Programs", 54);
         map.put(ChatColor.DARK_RED + "Sonic Activator", 9);
         map.put(ChatColor.DARK_RED + "Sonic Configurator", 27);
@@ -104,7 +106,7 @@ public class TARDISMenuListener implements Listener {
         map.put(ChatColor.DARK_RED + "TARDIS saves", 90);
         map.put(ChatColor.DARK_RED + "TARDIS transmats", 90);
         map.put(ChatColor.DARK_RED + "Temporal Locator", 27);
-        for (STORAGE s : STORAGE.values()) {
+        for (Storage s : Storage.values()) {
             map.put(s.getTitle(), 54);
         }
         return map;

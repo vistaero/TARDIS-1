@@ -18,8 +18,9 @@ package me.eccentric_nz.TARDIS.flight;
 
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.database.ResultSetControls;
-import me.eccentric_nz.TARDIS.database.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetControls;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetPlayerPrefs;
+import me.eccentric_nz.TARDIS.enumeration.SpaceTimeThrottle;
 import me.eccentric_nz.TARDIS.messaging.TARDISMessage;
 import me.eccentric_nz.TARDIS.travel.TARDISMalfunction;
 import me.eccentric_nz.TARDIS.utility.TARDISSounds;
@@ -41,7 +42,7 @@ public class TARDISTakeoff {
         this.plugin = plugin;
     }
 
-    public void run(int id, Block block, Location handbrake, Player player, boolean beac_on, String beacon, boolean bar) {
+    public void run(int id, Block block, Location handbrake, Player player, boolean beac_on, String beacon, boolean bar, SpaceTimeThrottle spaceTimeThrottle) {
         // set the handbrake
         TARDISHandbrake.setLevers(block, false, true, handbrake.toString(), id, plugin);
         if (plugin.getConfig().getBoolean("circuits.damage") && plugin.getTrackerKeeper().getHasNotClickedHandbrake().contains(id)) {
@@ -67,12 +68,12 @@ public class TARDISTakeoff {
         new TARDISDematerialiseToVortex(plugin, id, player, handbrake).run();
         if (plugin.getTrackerKeeper().getHasDestination().containsKey(id)) {
             // materialise
-            new TARDISMaterialseFromVortex(plugin, id, player, handbrake).run();
+            new TARDISMaterialseFromVortex(plugin, id, player, handbrake, spaceTimeThrottle).run();
         } else {
-            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new TARDISLoopingFlightSound(plugin, handbrake, id), 500L);
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new TARDISLoopingFlightSound(plugin, handbrake, id), spaceTimeThrottle.getFlightTime());
         }
         if (bar) {
-            new TARDISTravelBar(plugin).showTravelRemaining(player, 500L, true);
+            new TARDISTravelBar(plugin).showTravelRemaining(player, spaceTimeThrottle.getFlightTime(), true);
         }
     }
 
@@ -88,9 +89,11 @@ public class TARDISTakeoff {
             ResultSetPlayerPrefs rsp = new ResultSetPlayerPrefs(plugin, player.getUniqueId().toString());
             boolean beac_on = true;
             boolean bar = false;
+            SpaceTimeThrottle spaceTimeThrottle = SpaceTimeThrottle.NORMAL;
             if (rsp.resultSet()) {
                 beac_on = rsp.isBeaconOn();
                 bar = rsp.isTravelbarOn();
+                spaceTimeThrottle = SpaceTimeThrottle.getByDelay().get(rsp.getThrottle());
             }
             // set the handbrake
             TARDISHandbrake.setLevers(handbrake.getBlock(), false, true, rs.getLocation(), rs.getTardis_id(), plugin);
@@ -115,12 +118,12 @@ public class TARDISTakeoff {
             new TARDISDematerialiseToVortex(plugin, id, player, handbrake).run();
             if (plugin.getTrackerKeeper().getHasDestination().containsKey(id)) {
                 // materialise
-                new TARDISMaterialseFromVortex(plugin, id, player, handbrake).run();
+                new TARDISMaterialseFromVortex(plugin, id, player, handbrake, spaceTimeThrottle).run();
             } else {
-                plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new TARDISLoopingFlightSound(plugin, handbrake, id), 500L);
+                plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new TARDISLoopingFlightSound(plugin, handbrake, id), spaceTimeThrottle.getFlightTime());
             }
             if (bar) {
-                new TARDISTravelBar(plugin).showTravelRemaining(player, 500L, true);
+                new TARDISTravelBar(plugin).showTravelRemaining(player, spaceTimeThrottle.getFlightTime(), true);
             }
         }
     }
