@@ -317,7 +317,7 @@ public class TARDISGiveCommand implements CommandExecutor {
                 lore = new ArrayList<>();
             }
             String format = ChatColor.AQUA + "" + ChatColor.ITALIC;
-            String what = item.equals("key") ? "key" : "disk";
+            String what = item.equals("key") || item.equals("r-key") ? "key" : "disk";
             lore.add(format + "This " + what + " belongs to");
             lore.add(format + player.getName());
             im.setLore(lore);
