@@ -20,13 +20,15 @@ import me.eccentric_nz.TARDIS.ARS.TARDISARSMethods;
 import me.eccentric_nz.TARDIS.ARS.TARDISARSSlot;
 import me.eccentric_nz.TARDIS.TARDIS;
 import me.eccentric_nz.TARDIS.TARDISConstants;
-import me.eccentric_nz.TARDIS.database.resultset.ResultSetARS;
 import me.eccentric_nz.TARDIS.database.TARDISDatabaseConnection;
+import me.eccentric_nz.TARDIS.database.resultset.ResultSetARS;
+import me.eccentric_nz.TARDIS.travel.TARDISDoorLocation;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -106,6 +108,20 @@ public class TARDISInteriorPostioning {
     }
 
     /**
+     * Get the TIPS slot from a player location
+     *
+     * @param location the player's current location in the TARDIS world
+     * @return the TIPS slot number
+     */
+    public static int getTIPSSlot(Location location) {
+        int px = location.getBlockX();
+        int pz = location.getBlockZ();
+        int row = px / 1024;
+        int col = pz / 1024;
+        return (col * 20) + row + 1;
+    }
+
+    /**
      * Calculate the position data for the Junk TARDIS TIPS slot.
      *
      * @return a TIPS Data container
@@ -134,7 +150,6 @@ public class TARDISInteriorPostioning {
         Statement statement = null;
         ResultSet rs = null;
         String query = "SELECT tips FROM " + prefix + "tardis";
-        int i = 0;
         try {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
@@ -142,7 +157,6 @@ public class TARDISInteriorPostioning {
                 while (rs.next()) {
                     int s = rs.getInt("tips");
                     usedSlots.add(s);
-                    i++;
                 }
             }
         } catch (SQLException e) {
@@ -160,26 +174,6 @@ public class TARDISInteriorPostioning {
             }
         }
         return usedSlots;
-    }
-
-    @Deprecated
-    public void reclaimChunks(World w, TARDISTIPSData data) {
-        // get starting chunk
-        Location l = new Location(w, data.getMinX(), 0, data.getMinZ());
-        Chunk chunk = w.getChunkAt(l);
-        int sx = chunk.getX();
-        int sz = chunk.getZ();
-        for (int x = 0; x < 64; x++) {
-            for (int z = 0; z < 64; z++) {
-                int cx = sx + x;
-                int cz = sz + z;
-                for (Entity e : w.getChunkAt(cx, cz).getEntities()) {
-                    e.remove();
-                }
-                w.regenerateChunk(cx, cz);
-                w.unloadChunk(cx, cz, true);
-            }
-        }
     }
 
     // won't remove manually grown rooms...
@@ -207,7 +201,19 @@ public class TARDISInteriorPostioning {
                             Chunk tipsChunk = w.getBlockAt(slot.getX(), slot.getY(), slot.getZ()).getChunk();
                             // remove mobs
                             for (Entity e : tipsChunk.getEntities()) {
-                                e.remove();
+                                if (e instanceof Player) {
+                                    Player p = (Player) e;
+                                    // get the exit location
+                                    TARDISDoorLocation dl = plugin.getGeneralKeeper().getDoorListener().getDoor(0, id);
+                                    Location location = dl.getL();
+                                    // teleport player and remove from travellers table
+                                    plugin.getGeneralKeeper().getDoorListener().movePlayer(p, location, true, p.getWorld(), false, 0, true);
+                                    HashMap<String, Object> wheret = new HashMap<>();
+                                    wheret.put("uuid", p.getUniqueId().toString());
+                                    plugin.getQueryFactory().doDelete("travellers", wheret);
+                                } else {
+                                    e.remove();
+                                }
                             }
                             for (int y = 0; y < 16; y++) {
                                 for (int col = 0; col < 16; col++) {

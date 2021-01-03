@@ -65,7 +65,7 @@ public class TARDISSQLiteDatabase {
             statement.executeUpdate(queryArchive);
 
             // Table structure for table 'areas'
-            String queryAreas = "CREATE TABLE IF NOT EXISTS " + prefix + "areas (area_id INTEGER PRIMARY KEY NOT NULL, area_name TEXT COLLATE NOCASE DEFAULT '', world TEXT COLLATE NOCASE DEFAULT '', minx INTEGER, minz INTEGER, maxx INTEGER, maxz INTEGER, y INTEGER, parking_distance INTEGER DEFAULT 2, invisibility TEXT DEFAULT 'ALLOW')";
+            String queryAreas = "CREATE TABLE IF NOT EXISTS " + prefix + "areas (area_id INTEGER PRIMARY KEY NOT NULL, area_name TEXT COLLATE NOCASE DEFAULT '', world TEXT COLLATE NOCASE DEFAULT '', minx INTEGER, minz INTEGER, maxx INTEGER, maxz INTEGER, y INTEGER, parking_distance INTEGER DEFAULT 2, invisibility TEXT DEFAULT 'ALLOW', direction TEXT DEFAULT '')";
             statement.executeUpdate(queryAreas);
 
             // Table structure for table 'ars'
@@ -179,6 +179,10 @@ public class TARDISSQLiteDatabase {
             // Table structure for table 'room_progress'
             String queryRoomProgress = "CREATE TABLE IF NOT EXISTS " + prefix + "room_progress (progress_id INTEGER PRIMARY KEY NOT NULL, direction TEXT DEFAULT '', room TEXT DEFAULT '', location TEXT DEFAULT '', tardis_id INTEGER DEFAULT 0, progress_row INTEGER DEFAULT 0, progress_column INTEGER DEFAULT 0, progress_level INTEGER DEFAULT 0, middle_type TEXT DEFAULT '', floor_type TEXT DEFAULT '', post_blocks TEXT DEFAULT '')";
             statement.executeUpdate(queryRoomProgress);
+
+            // Table structure for table 'seeds'
+            String querySeeds = "CREATE TABLE IF NOT EXISTS " + prefix + "seeds (seed_id INTEGER PRIMARY KEY NOT NULL, schematic TEXT DEFAULT '', wall TEXT DEFAULT 'ORANGE_WOOL', floor TEXT DEFAULT 'LIGHT_GRAY_WOOL', location TEXT DEFAULT '')";
+            statement.executeUpdate(querySeeds);
 
             // Table structure for table 'siege'
             String querySiege = "CREATE TABLE IF NOT EXISTS " + prefix + "siege (siege_id INTEGER PRIMARY KEY NOT NULL, uuid TEXT DEFAULT '', tardis_id INTEGER DEFAULT 0)";

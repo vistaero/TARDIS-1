@@ -32,7 +32,7 @@ public class SQL {
 
             "CREATE TABLE IF NOT EXISTS %sarchive (archive_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', `name` varchar(32) DEFAULT '', console_size varchar(16) DEFAULT '', beacon int(1) DEFAULT '0', lanterns int(1) DEFAULT '0', `use` int(1) DEFAULT '0', `y` int(3) DEFAULT '64', `data` text, description varchar(256), PRIMARY KEY (archive_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
-            "CREATE TABLE IF NOT EXISTS %sareas (area_id int(11) NOT NULL AUTO_INCREMENT, area_name varchar(64) DEFAULT '', world varchar(64) DEFAULT '', minx int(7) DEFAULT '0', minz int(7) DEFAULT '0', maxx int(7) DEFAULT '0', maxz int(7) DEFAULT '0', y int(3) DEFAULT '0', parking_distance int(2) DEFAULT '2', invisibility varchar(32) DEFAULT 'ALLOW', PRIMARY KEY (area_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
+            "CREATE TABLE IF NOT EXISTS %sareas (area_id int(11) NOT NULL AUTO_INCREMENT, area_name varchar(64) DEFAULT '', world varchar(64) DEFAULT '', minx int(7) DEFAULT '0', minz int(7) DEFAULT '0', maxx int(7) DEFAULT '0', maxz int(7) DEFAULT '0', y int(3) DEFAULT '0', parking_distance int(2) DEFAULT '2', invisibility varchar(32) DEFAULT 'ALLOW', direction varchar(5) DEFAULT '', PRIMARY KEY (area_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
             "CREATE TABLE IF NOT EXISTS %sars (ars_id int(11) NOT NULL AUTO_INCREMENT, tardis_id int(11) DEFAULT '0', uuid varchar(48) DEFAULT '', player varchar(32) DEFAULT '', ars_x_east int(2) DEFAULT '2', ars_z_south int(2) DEFAULT '2', ars_y_layer int(1) DEFAULT '1', json text, PRIMARY KEY (ars_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
@@ -90,6 +90,8 @@ public class SQL {
 
             "CREATE TABLE IF NOT EXISTS %sroom_progress (progress_id int(11) NOT NULL, direction varchar(5) DEFAULT '', room varchar(32) DEFAULT '', location varchar(512) DEFAULT '', tardis_id int(11) DEFAULT '0', progress_row int(3) DEFAULT '0', progress_column int(3) DEFAULT '0', progress_level int(3) DEFAULT '0', middle_type varchar(64) DEFAULT '', floor_type varchar(64) DEFAULT '', post_blocks text NULL, PRIMARY KEY (progress_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
+            "CREATE TABLE IF NOT EXISTS %sseeds (seed_id int(11) NOT NULL AUTO_INCREMENT, schematic varchar(32) DEFAULT '', wall varchar(64) DEFAULT 'ORANGE_WOOL', floor varchar(64) DEFAULT 'LIGHT_GRAY_WOOL', location varchar(512) DEFAULT '', PRIMARY KEY (seed_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
+
             "CREATE TABLE IF NOT EXISTS %ssiege (siege_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', tardis_id int(11) DEFAULT '0', PRIMARY KEY (siege_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
 
             "CREATE TABLE IF NOT EXISTS %ssonic (sonic_id int(11) NOT NULL AUTO_INCREMENT, uuid varchar(48) DEFAULT '', activated int(1) DEFAULT '0', sonic_type varchar(16) DEFAULT '', model int(11) DEFAULT '10000011', bio int(1) DEFAULT '0', diamond int(1) DEFAULT '0', emerald int(1) DEFAULT '0', redstone int(1) DEFAULT '0', painter int(1) DEFAULT '0', ignite int(1) DEFAULT '0', arrow int(1) DEFAULT '0', knockback int(1) DEFAULT '0', sonic_uuid varchar(48) DEFAULT '', PRIMARY KEY (sonic_id)) DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;",
@@ -124,7 +126,7 @@ public class SQL {
 
             "INSERT INTO `%sarchive` (`archive_id`, `uuid`, `name`, `console_size`, `beacon`, `lanterns`, `use`, `y`, `data`, `description`) VALUES ",
 
-            "INSERT INTO `%sareas` (`area_id`, `area_name`, `world`, `minx`, `minz`, `maxx`, `maxz`, `y`, `parking_distance`, `invisibility`) VALUES ",
+            "INSERT INTO `%sareas` (`area_id`, `area_name`, `world`, `minx`, `minz`, `maxx`, `maxz`, `y`, `parking_distance`, `invisibility`, `direction`) VALUES ",
 
             "INSERT INTO `%sars` (`ars_id`, `tardis_id`, `uuid`, `player`, `ars_x_east`, `ars_z_south`, `ars_y_layer`, `json`) VALUES ",
 
@@ -182,6 +184,8 @@ public class SQL {
 
             "INSERT INTO `%sroom_progress` (`progress_id`, `direction`, `room`, `location`, `tardis_id`, `progress_row`, `progress_column`, `progress_level`, `middle_type`, `floor_type`, `post_blocks`) VALUES ",
 
+            "INSERT INTO `%sseeds` (`seed_id`, `schematic`, `wall`, `floor`, `location`) VALUES ",
+
             "INSERT INTO `%ssiege` (`siege_id`, `uuid`, `tardis_id`) VALUES ",
 
             "INSERT INTO `%ssonic` (`sonic_id`, `uuid`, `activated`, `sonic_type`, `model`, `bio`, `diamond`, `emerald`, `redstone`, `painter`, `ignite`, `arrow`, `knockback`, `sonic_uuid`) VALUES ",
@@ -216,7 +220,7 @@ public class SQL {
 
             "(%s, '%s', '%s', '%s', %s, %s, %s, %s, '%s', '%s')",
 
-            "(%s, '%s', '%s', %s, %s, %s, %s, %s, %s, '%s')",
+            "(%s, '%s', '%s', %s, %s, %s, %s, %s, %s, '%s', '%s')",
 
             "(%s, %s, '%s', '%s', %s, %s, %s, '%s')",
 
@@ -273,6 +277,8 @@ public class SQL {
             "(%s, '%s', '%s', %s)",
 
             "(%s, '%s', '%s', '%s', %s, %s, %s, %s, '%s', '%s', '%s')",
+
+            "(%s, '%s', '%s', '%s', '%s')",
 
             "(%s, '%s', %s)",
 

@@ -105,7 +105,7 @@ public class Converter implements Runnable {
                                         sb.append(str);
                                         break;
                                     case areas:
-                                        str = String.format(SQL.VALUES.get(i), rs.getInt("area_id"), rs.getString("area_name"), rs.getString("world"), rs.getInt("minx"), rs.getInt("minz"), rs.getInt("maxx"), rs.getInt("maxz"), rs.getInt("y"), rs.getInt("parking_distance"), rs.getString("invisibility")) + end;
+                                        str = String.format(SQL.VALUES.get(i), rs.getInt("area_id"), rs.getString("area_name"), rs.getString("world"), rs.getInt("minx"), rs.getInt("minz"), rs.getInt("maxx"), rs.getInt("maxz"), rs.getInt("y"), rs.getInt("parking_distance"), rs.getString("invisibility"), rs.getString("direction")) + end;
                                         sb.append(str);
                                         break;
                                     case ars:
@@ -218,6 +218,10 @@ public class Converter implements Runnable {
                                         break;
                                     case room_progress:
                                         str = String.format(SQL.VALUES.get(i), rs.getInt("progress_id"), rs.getString("direction"), rs.getString("room"), rs.getInt("tardis_id"), rs.getInt("progress_row"), rs.getInt("progress_column"), rs.getInt("progress_level"), rs.getString("middle_type"), rs.getString("floor_type")) + end;
+                                        sb.append(str);
+                                        break;
+                                    case seeds:
+                                        str = String.format(SQL.VALUES.get(i), rs.getInt("seed_id"), rs.getString("schematic"), rs.getString("wall"), rs.getString("floor"), rs.getString("location")) + end;
                                         sb.append(str);
                                         break;
                                     case siege:
